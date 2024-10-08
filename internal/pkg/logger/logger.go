@@ -21,18 +21,20 @@ func newLogger() *zap.SugaredLogger {
 	// making log file
 	ex, err := os.Executable()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error getting exec path: %s", err)
 	}
 
 	// TEMP!!!
-	logDir := filepath.Join(ex, "logs")
+	logDir := filepath.Join(filepath.Dir(ex), "logs")
 	if _, err := os.Stat(logDir); err != nil {
-		os.MkdirAll(logDir, os.ModePerm)
+		if err := os.MkdirAll(logDir, os.ModePerm); err != nil {
+			log.Fatalf("error mkdir all(%s): %s", logDir, err)
+		}
 	}
 
 	logFile, err := os.OpenFile(filepath.Join(logDir, "main.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error opening log file(%s): %s", logFile.Name(), err)
 	}
 
 	// making encoder config
