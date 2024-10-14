@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "subliker.sso.v1;ssov1";
+
+service Auth {
+    rpc RegisterTelegramID (RegisterTelegramIDRequest) returns (RegisterTelegramIDResponse);
+    rpc IsManager (IsManagerRequest) returns (IsManagerResponse);
+}
+
+message RegisterTelegramIDRequest {
+    string telegram_id = 1;
+}
+
+message RegisterTelegramIDResponse {
+    string user_id = 1;
+}
+
+message IsManagerRequest {
+    int64 telegram_id = 1;
+}
+
+message IsManagerResponse {
+    bool IsManager = 1;
+}
