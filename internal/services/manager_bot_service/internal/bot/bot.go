@@ -1,37 +1,52 @@
 package bot
 
 import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"errors"
+	"time"
+
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
+	"github.com/subliker/track-parcel-service/internal/pkg/session"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
+	tele "gopkg.in/telebot.v4"
 )
 
-type BotConfig struct {
-	Token string
+type Bot interface {
+	Run() error
 }
 
-func Run(bcfg BotConfig) {
-	bot, err := tgbotapi.NewBotAPI(bcfg.Token)
+type bot struct {
+	client *tele.Bot
+}
+
+// New creates new instance of bot
+func New(cfg config.BotConfig, ss session.Store) Bot {
+	var b bot
+
+	// try to build bot client
+	client, err := tele.NewBot(tele.Settings{
+		Token:  cfg.Token,
+		Poller: &tele.LongPoller{Timeout: time.Second * 10},
+	})
 	if err != nil {
-		logger.Zap.Fatalf("error creating bot: %s", err)
+		logger.Zap.Fatalf("error building bot: %s", err)
 	}
+	b.client = client
 
-	bot.Debug = true
+	// handlers init
+	b.initHandlers()
 
-	logger.Zap.Infof("Authorized on account %s", bot.Self.UserName)
+	return &b
+}
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+// Run runs bot after initialization
+func (b *bot) Run() error {
+	b.client.Start()
+	return errors.New("bot stopped")
+}
 
-	updates := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message != nil { // If we got a message
-			logger.Zap.Infof("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			msg.ReplyToMessageID = update.Message.MessageID
-
-			bot.Send(msg)
-		}
-	}
+// initHandlers initializes all handlers
+func (b *bot) initHandlers() {
+	b.client.Handle("/start", func(c tele.Context) error {
+		return c.Reply("Hello!")
+	})
 }

@@ -1,12 +1,16 @@
 package main
 
 import (
-	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/app"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
 )
 
 func main() {
-	if err := app.New(); err != nil {
-		logger.Zap.Fatalf("error running app: %s", err)
-	}
+	// reading config
+	cfg := config.Get()
+
+	// creating new instance of app
+	a := app.New(cfg)
+	// running app
+	a.Run()
 }
