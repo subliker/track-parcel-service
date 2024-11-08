@@ -4,10 +4,12 @@ import (
 	"strings"
 
 	"github.com/spf13/viper"
-	"github.com/subliker/track-parcel-service/internal/pkg/logger"
+	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 )
 
 func init() {
+	logger := zap.Logger.WithFields("layer", "config")
+
 	// config file setup
 	viper.SetConfigFile("./configs/config.toml")
 	viper.SetConfigType("toml")
@@ -16,7 +18,7 @@ func init() {
 
 	// reading config
 	if err := viper.ReadInConfig(); err != nil {
-		logger.Zap.Errorf("error reading config: %s", err)
+		logger.Errorf("error reading config: %s", err)
 	}
 
 	// reading environments

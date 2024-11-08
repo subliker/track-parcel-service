@@ -4,26 +4,30 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
-	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/store/session"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session"
 )
 
 type App struct {
-	bot bot.Bot
+	bot    bot.Bot
+	logger logger.Logger
 }
 
-func New(cfg config.Config) App {
+func New(cfg config.Config, logger logger.Logger) App {
 	var a App
 
 	// creation new session store
-	store := session.New()
+	store := session.New(logger)
 
 	// creating new bot
-	a.bot = bot.New(cfg.Bot, store)
+	a.bot = bot.New(cfg.Bot, store, logger)
+
+	// set logger
+	a.logger = logger.WithFields("layer", "app")
 
 	return a
 }
 
 func (a *App) Run() {
 	// running bot
-	logger.Zap.Fatal(a.bot.Run())
+	a.logger.Fatal(a.bot.Run())
 }

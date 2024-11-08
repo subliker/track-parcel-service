@@ -3,5 +3,7 @@
 version: '3'
 
 tasks:
+  run:
+    - go run ./cmd/mbot/main.go
   gen-i18n:
     - go generate ./internal/lang/lang.go

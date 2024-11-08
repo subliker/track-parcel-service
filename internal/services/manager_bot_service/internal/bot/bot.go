@@ -19,10 +19,11 @@ type bot struct {
 	client       *tele.Bot
 	bundle       lang.Messages
 	sessionStore session.Store
+	logger       logger.Logger
 }
 
 // New creates new instance of bot
-func New(cfg config.BotConfig, ss session.Store) Bot {
+func New(cfg config.BotConfig, ss session.Store, logger logger.Logger) Bot {
 	var b bot
 
 	// try to build bot client
@@ -31,17 +32,21 @@ func New(cfg config.BotConfig, ss session.Store) Bot {
 		Poller: &tele.LongPoller{Timeout: time.Second * 10},
 	})
 	if err != nil {
-		logger.Zap.Fatalf("error building bot: %s", err)
+		logger.Fatalf("error building bot: %s", err)
 	}
 	b.client = client
 
+	// set session store
 	b.sessionStore = ss
-
-	// handlers init
-	b.initHandlers()
 
 	// language initialization
 	b.bundle = lang.MessagesForOrDefault(cfg.Language)
+
+	// set logger
+	b.logger = logger.WithFields("layer", "bot")
+
+	// handlers init
+	b.initHandlers()
 
 	return &b
 }
@@ -56,4 +61,6 @@ func (b *bot) Run() error {
 func (b *bot) initHandlers() {
 	b.client.Handle("/start", b.handleStart())
 	b.client.Handle("/add-parcel", b.handleAddParcel())
+
+	b.client.Handle(tele.OnText, b.handleOnText())
 }

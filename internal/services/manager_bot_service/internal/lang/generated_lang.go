@@ -34,7 +34,7 @@ func MessagesForOrDefault(tag string) Messages {
 
 type Messages interface{
     OnStartMessage(user_name string) string
-    OnSetParcel(err_string string) string
+    OnAddParcel() string
 }
 
 type ru_RU_Messages struct{}
@@ -45,12 +45,8 @@ func (ru_RU_Messages) OnStartMessage(user_name string) string {
         return fmt.Sprintf("Привет, %s! Это тестовый бот для менеджеров", user_name)
     }
 }
-func (ru_RU_Messages) OnSetParcel(err_string string) string {
-    if err_string == "" {
-        return "Посылка успешно добавлена"
-    } else {
-        return fmt.Sprintf("Ошибка добавления посылки: %s", err_string)
-    }
+func (ru_RU_Messages) OnAddParcel() string {
+    return "Давайте добавим вашу посылку! Как вы назовете эту посылку?"
 }
 
 

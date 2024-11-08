@@ -1,3 +1,3 @@
-package models
+package telegram
 
-type TelegramID int64
+type ID int64
