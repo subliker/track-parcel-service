@@ -34,7 +34,18 @@ func MessagesForOrDefault(tag string) Messages {
 
 type Messages interface{
     OnStartMessage(user_name string) string
-    OnAddParcel() string
+    States() states
+}
+type states interface{
+    MakeParcel() statesmakeParcel
+}
+type statesmakeParcel interface{
+    Name() string
+    Recipient() string
+    ArrivalAddress() string
+    ForecastDate() string
+    ForecastDateIncorrectTime() string
+    Description() string
 }
 
 type ru_RU_Messages struct{}
@@ -45,8 +56,31 @@ func (ru_RU_Messages) OnStartMessage(user_name string) string {
         return fmt.Sprintf("Привет, %s! Это тестовый бот для менеджеров", user_name)
     }
 }
-func (ru_RU_Messages) OnAddParcel() string {
+func (ru_RU_Messages) States() states {
+    return ru_RU_states{}
+}
+type ru_RU_states struct{}
+func (ru_RU_states) MakeParcel() statesmakeParcel {
+    return ru_RU_statesmakeParcel{}
+}
+type ru_RU_statesmakeParcel struct{}
+func (ru_RU_statesmakeParcel) Name() string {
     return "Давайте добавим вашу посылку! Как вы назовете эту посылку?"
+}
+func (ru_RU_statesmakeParcel) Recipient() string {
+    return "Введите имя получателя"
+}
+func (ru_RU_statesmakeParcel) ArrivalAddress() string {
+    return "Введите адрес получения"
+}
+func (ru_RU_statesmakeParcel) ForecastDate() string {
+    return "Введите предположительную дату доставки"
+}
+func (ru_RU_statesmakeParcel) ForecastDateIncorrectTime() string {
+    return "Введено некорректное время"
+}
+func (ru_RU_statesmakeParcel) Description() string {
+    return "Введите описание для посылки"
 }
 
 

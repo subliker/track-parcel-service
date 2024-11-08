@@ -60,7 +60,7 @@ func (b *bot) handleAddParcel() tele.HandlerFunc {
 
 		session.SetState(state.MakeParcel{})
 
-		ctx.Send(b.bundle.OnAddParcel())
+		ctx.Send(b.bundle.States().MakeParcel().Name())
 		return nil
 	}
 }
