@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	_ "github.com/subliker/track-parcel-service/internal/pkg/viper"
+	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
+	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 )
 
 type (
@@ -20,11 +20,24 @@ type (
 	}
 )
 
-func Get() Config {
-	cfg := Config{}
+func init() {
+	viper.SetEnvPrefix("SSO")
 
+	// env and default binding
+	viper.BindEnv("env")
+
+	viper.SetDefault("grpc.port", 50051)
+	viper.SetDefault("grpc.timeout", time.Second)
+
+	viper.SetDefault("sso.target", "localhost:50051")
+}
+
+func Get() Config {
+	logger := zap.NewLogger().WithFields("layer", "config")
+
+	cfg := Config{}
 	if err := viper.Unmarshal(&cfg); err != nil {
-		logger.Zap.Fatalf("error unmarshal config: %s", err)
+		logger.Fatalf("error unmarshal config: %s", err)
 	}
 
 	return cfg

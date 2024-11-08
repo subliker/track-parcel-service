@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	sso "github.com/subliker/track-parcel-service/internal/pkg/client/sso/grpc"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/validation"
@@ -12,6 +13,7 @@ import (
 type Config struct {
 	Bot     BotConfig     `validate:"required" mapstructure:"bot"`
 	Session SessionConfig `mapstructure:"session"`
+	SSO     sso.Config    `validate:"required" mapstructure:"sso"`
 }
 
 type BotConfig struct {
@@ -33,6 +35,8 @@ func init() {
 
 	viper.SetDefault("session.count", 1024)
 	viper.SetDefault("session.ttl", int64(time.Hour*48))
+
+	viper.SetDefault("sso.target", "localhost:50051")
 }
 
 func Get() Config {

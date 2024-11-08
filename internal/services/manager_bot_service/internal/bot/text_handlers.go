@@ -1,9 +1,11 @@
 package bot
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
+	ssov1 "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/sso"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
@@ -43,6 +45,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				ctx.Send("Посылка готова")
 				logger.Info(st.Parcel)
 				// add parcel in
+				b.ssoClient.RegisterTelegramID(context.Background(), &ssov1.RegisterTelegramIDRequest{})
 				ss.ClearState()
 				break
 			}

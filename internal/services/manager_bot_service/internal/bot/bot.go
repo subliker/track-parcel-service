@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	sso "github.com/subliker/track-parcel-service/internal/pkg/client/sso/grpc"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
@@ -19,11 +20,12 @@ type bot struct {
 	client       *tele.Bot
 	bundle       lang.Messages
 	sessionStore session.Store
+	ssoClient    sso.Client
 	logger       logger.Logger
 }
 
 // New creates new instance of bot
-func New(cfg config.BotConfig, ss session.Store, logger logger.Logger) Bot {
+func New(cfg config.BotConfig, ss session.Store, logger logger.Logger, sso sso.Client) Bot {
 	var b bot
 
 	// try to build bot client
@@ -35,6 +37,9 @@ func New(cfg config.BotConfig, ss session.Store, logger logger.Logger) Bot {
 		logger.Fatalf("error building bot: %s", err)
 	}
 	b.client = client
+
+	// set sso client
+	b.ssoClient = sso
 
 	// set session store
 	b.sessionStore = ss

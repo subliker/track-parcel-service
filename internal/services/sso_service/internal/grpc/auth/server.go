@@ -2,16 +2,14 @@ package auth
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	ssov1 "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/sso"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type (
-	serverApi struct {
+	ServerApi struct {
 		ssov1.UnimplementedAuthServer
 		auth Auth
 	}
@@ -23,22 +21,23 @@ type (
 )
 
 func Register(gRPCServer *grpc.Server, auth Auth) {
-	ssov1.RegisterAuthServer(gRPCServer, &serverApi{auth: auth})
+	ssov1.RegisterAuthServer(gRPCServer, &ServerApi{auth: auth})
 }
 
-func (s *serverApi) RegisterTelegramID(ctx context.Context, in *ssov1.RegisterTelegramIDRequest) (*ssov1.RegisterTelegramIDResponse, error) {
-	if in.TelegramId == "" {
-		return nil, status.Error(codes.InvalidArgument, "telegram id is empty")
-	}
+func (s *ServerApi) RegisterTelegramID(ctx context.Context, req *ssov1.RegisterTelegramIDRequest) (*ssov1.RegisterTelegramIDResponse, error) {
+	// if req.TelegramId == "" {
+	// 	return nil, status.Error(codes.InvalidArgument, "telegram id is empty")
+	// }
 
-	uid, err := s.auth.RegisterTelegramID(ctx, in.GetTelegramId())
-	if err != nil {
-		if errors.Is(err, "") {
-			return nil, status.Error(codes.AlreadyExists, "user already exists")
-		}
+	// uid, err := s.auth.RegisterTelegramID(ctx, req.GetTelegramId())
+	// if err != nil {
+	// 	if errors.Is(err, "") {
+	// 		return nil, status.Error(codes.AlreadyExists, "user already exists")
+	// 	}
 
-		return nil, status.Error(codes.Internal, "failed to register user")
-	}
+	// 	return nil, status.Error(codes.Internal, "failed to register user")
+	// }
+	fmt.Print("it works")
 
-	return &ssov1.RegisterTelegramIDResponse{UserId: uid}, nil
+	return &ssov1.RegisterTelegramIDResponse{UserId: ""}, nil
 }

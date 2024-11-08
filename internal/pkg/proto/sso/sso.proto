@@ -11,6 +11,7 @@ service Auth {
 
 message RegisterTelegramIDRequest {
     string telegram_id = 1;
+    bool isManager = 2;
 }
 
 message RegisterTelegramIDResponse {
