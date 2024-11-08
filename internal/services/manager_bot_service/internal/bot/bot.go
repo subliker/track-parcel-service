@@ -7,6 +7,7 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
 	tele "gopkg.in/telebot.v4"
 )
 
@@ -15,7 +16,9 @@ type Bot interface {
 }
 
 type bot struct {
-	client *tele.Bot
+	client       *tele.Bot
+	bundle       lang.Messages
+	sessionStore session.Store
 }
 
 // New creates new instance of bot
@@ -32,8 +35,13 @@ func New(cfg config.BotConfig, ss session.Store) Bot {
 	}
 	b.client = client
 
+	b.sessionStore = ss
+
 	// handlers init
 	b.initHandlers()
+
+	// language initialization
+	b.bundle = lang.MessagesForOrDefault(cfg.Language)
 
 	return &b
 }
@@ -46,7 +54,6 @@ func (b *bot) Run() error {
 
 // initHandlers initializes all handlers
 func (b *bot) initHandlers() {
-	b.client.Handle("/start", func(c tele.Context) error {
-		return c.Reply("Hello!")
-	})
+	b.client.Handle("/start", b.handleStart())
+	b.client.Handle("/add-parcel", b.handleAddParcel())
 }

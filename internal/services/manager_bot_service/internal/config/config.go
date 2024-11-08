@@ -15,12 +15,13 @@ type Config struct {
 }
 
 type BotConfig struct {
-	Token string `validate:"required" mapstructure:"token"`
+	Token    string `validate:"required" mapstructure:"token"`
+	Language string `validate:"required" mapstructure:"language"`
 }
 
 type SessionConfig struct {
-	Count int   `mapstructure:"count"`
-	TTL   int64 `mapstructure:"ttl"`
+	Count int   `validate:"required" mapstructure:"count"`
+	TTL   int64 `validate:"required" mapstructure:"ttl"`
 }
 
 func init() {
@@ -28,6 +29,8 @@ func init() {
 
 	// env and default binding
 	viper.BindEnv("bot.token")
+	viper.SetDefault("bot.language", "ru-RU")
+
 	viper.SetDefault("session.count", 1024)
 	viper.SetDefault("session.ttl", int64(time.Hour*48))
 }

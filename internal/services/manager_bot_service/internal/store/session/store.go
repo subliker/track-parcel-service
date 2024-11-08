@@ -39,7 +39,7 @@ func (s *store) Add(tID models.TelegramID) error {
 	// check if session is already exist
 	ok := s.cache.Contains(tID)
 	if ok {
-		return ErrSessionIsAlreadyExist
+		return session.ErrSessionIsAlreadyExist
 	}
 
 	// getting new instance of session from sync pool
@@ -54,7 +54,7 @@ func (s *store) Remove(tID models.TelegramID) error {
 	// check if session is already exist
 	ss, ok := s.cache.Get(tID)
 	if !ok {
-		return ErrSessionIsNotExist
+		return session.ErrSessionIsNotExist
 	}
 
 	// return instance of session to sync pool
@@ -69,7 +69,7 @@ func (s *store) Get(tID models.TelegramID) (session.Session, error) {
 	// getting session
 	ss, ok := s.cache.Get(tID)
 	if !ok {
-		return nil, ErrSessionIsNotExist
+		return nil, session.ErrSessionIsNotExist
 	}
 	return ss, nil
 }
