@@ -45,7 +45,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				ctx.Send("Посылка готова")
 				logger.Info(st.Parcel)
 				// add parcel in
-				b.ssoClient.RegisterTelegramID(context.Background(), &ssov1.RegisterTelegramIDRequest{})
+				b.ssoClient.RegisterTelegramID(context.Background(), &ssov1.RegisterTelegramIDRequest{TelegramId: ctx.Sender().ID})
 				ss.ClearState()
 				break
 			}

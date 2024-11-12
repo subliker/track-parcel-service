@@ -8,6 +8,7 @@ import (
 	ssov1 "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/sso"
 	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/grpc/auth"
+	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/store/pgstore"
 
 	"google.golang.org/grpc"
 )
@@ -26,7 +27,13 @@ func New(cfg config.Config) *App {
 
 	grpcServer := grpc.NewServer()
 
-	ssov1.RegisterAuthServer(grpcServer, &auth.ServerApi{})
+	// up store
+	store, err := pgstore.New(cfg.DB)
+	if err != nil {
+		zap.Logger.Fatal(err)
+	}
+
+	ssov1.RegisterAuthServer(grpcServer, auth.New(store))
 
 	fmt.Println(lis.Addr())
 

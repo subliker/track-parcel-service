@@ -4,14 +4,19 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
+	"github.com/subliker/track-parcel-service/internal/pkg/models/user"
 	ssov1 "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/sso"
+	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/store"
 	"google.golang.org/grpc"
 )
 
 type (
 	ServerApi struct {
 		ssov1.UnimplementedAuthServer
-		auth Auth
+		auth  Auth
+		store store.Store
 	}
 
 	Auth interface {
@@ -20,11 +25,22 @@ type (
 	}
 )
 
+func New(store store.Store) *ServerApi {
+	return &ServerApi{
+		store: store,
+	}
+}
+
 func Register(gRPCServer *grpc.Server, auth Auth) {
 	ssov1.RegisterAuthServer(gRPCServer, &ServerApi{auth: auth})
 }
 
 func (s *ServerApi) RegisterTelegramID(ctx context.Context, req *ssov1.RegisterTelegramIDRequest) (*ssov1.RegisterTelegramIDResponse, error) {
+	userRepo, _ := s.store.User()
+	if err := userRepo.Register(user.User{TelegramId: telegram.ID(req.TelegramId)}); err != nil {
+		zap.Logger.Error(err)
+		return nil, nil
+	}
 	// if req.TelegramId == "" {
 	// 	return nil, status.Error(codes.InvalidArgument, "telegram id is empty")
 	// }
