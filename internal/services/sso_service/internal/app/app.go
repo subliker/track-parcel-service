@@ -1,25 +1,41 @@
 package app
 
 import (
-	"fmt"
 	"net"
 
+	"fmt"
+
+	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
-	ssov1 "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/sso"
 	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/grpc/auth"
 	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/store/pgstore"
-
 	"google.golang.org/grpc"
 )
 
-type App struct {
+type app struct {
 	ssoServer *grpc.Server
+
+	logger logger.Logger
 }
 
-func New(cfg config.Config) *App {
-	var a App
+type App interface {
+	Run() error
+}
 
+func New(cfg config.Config, logger logger.Logger) App {
+	var a app
+
+	// set logger
+	a.logger = logger.WithFields("layer", "app")
+
+	// setting up store
+	store, err := pgstore.New(cfg.DB)
+	if err != nil {
+		zap.Logger.Fatal(err)
+	}
+
+	// creating new sso server
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GRPC.Port))
 	if err != nil {
 		zap.Logger.Fatal(err)
@@ -27,20 +43,16 @@ func New(cfg config.Config) *App {
 
 	grpcServer := grpc.NewServer()
 
-	// up store
-	store, err := pgstore.New(cfg.DB)
-	if err != nil {
-		zap.Logger.Fatal(err)
-	}
-
 	ssov1.RegisterAuthServer(grpcServer, auth.New(store))
-
-	fmt.Println(lis.Addr())
-
-	if err := grpcServer.Serve(lis); err != nil {
-		zap.Logger.Fatal(err)
-	}
 
 	a.ssoServer = grpcServer
 	return &a
+}
+
+func (a *app) Run() error {
+	// running server
+	if err := a.ssoServer.Serve(lis); err != nil {
+		return err
+	}
+
 }
