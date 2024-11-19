@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS managers (
     telegram_id BIGINT NOT NULL UNIQUE,
     full_name TEXT NOT NULL,
     phone_number TEXT,
+    api_token TEXT UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
