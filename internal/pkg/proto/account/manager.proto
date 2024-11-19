@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package manager;
+
+option go_package = "account/manager";
+
+import "google/protobuf/empty.proto";
+
+service Manager {
+    rpc Register (RegisterRequest) returns (google.protobuf.Empty);
+    rpc GetInfo (GetInfoRequest) returns (GetInfoResponse);
+    rpc GetApiToken (GetApiTokenRequest) returns (GetApiTokenResponse);
+}
+
+message RegisterRequest {
+    int64 manager_telegram_id = 1;
+    string manager_full_name = 2;
+    string manager_email = 3;
+    optional string manager_phone_number = 4;
+    optional string manager_company = 5;
+}
+
+message GetInfoRequest {
+    int64 manager_telegram_id = 1;
+}
+
+message GetInfoResponse {
+    string manager_full_name = 1;
+    string manager_email = 2;
+    optional string manager_phone_number = 3;
+    optional string manager_company = 4;
+}
+
+message GetApiTokenRequest {
+    int64 manager_telegram_id = 1;
+}
+
+message GetApiTokenResponse {
+    string manager_api_token = 1;
+}
