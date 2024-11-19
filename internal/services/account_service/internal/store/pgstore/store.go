@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
-	"github.com/pressly/goose"
+	"github.com/pressly/goose/v3"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
@@ -22,12 +22,12 @@ func init() {
 
 type pgStore struct {
 	db      *sql.DB
-	user    *user.Repository
-	manager *manager.Repository
+	user    store.UserRepository
+	manager store.ManagerRepository
 }
 
 func New(cfg config.DBConfig) (store.Store, error) {
-	logger := zap.Logger.WithFields("layer", "pgstore", "host", cfg.Host, "port", cfg.Port)
+	logger := zap.Logger.WithFields("layer", "pgstore")
 
 	// pgs connection string
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName)
@@ -49,15 +49,15 @@ func New(cfg config.DBConfig) (store.Store, error) {
 	// migrations
 	if migrateMode {
 		if err := goose.Up(db, "migrations"); err != nil {
-			logger.Fatal("migrations error: %s", err)
+			logger.Fatalf("migrations error: %s", err)
 		}
+		logger.Info("migration was successful")
 	}
 
-	userRepo := user.New(db, logger)
-
 	return &pgStore{
-		db:   db,
-		user: &userRepo,
+		db:      db,
+		user:    user.New(logger, db),
+		manager: manager.New(logger, db),
 	}, nil
 }
 
@@ -65,16 +65,10 @@ func (s *pgStore) Close() error {
 	return s.db.Close()
 }
 
-func (s *pgStore) Manager() (*manager.Repository, error) {
-	if s.manager == nil {
-		return nil, fmt.Errorf("manager repository is not set")
-	}
-	return s.manager, nil
+func (s *pgStore) Manager() store.ManagerRepository {
+	return s.manager
 }
 
-func (s *pgStore) User() (*user.Repository, error) {
-	if s.user == nil {
-		return nil, fmt.Errorf("user repository is not set")
-	}
-	return s.user, nil
+func (s *pgStore) User() store.UserRepository {
+	return s.user
 }

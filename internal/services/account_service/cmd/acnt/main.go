@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/app"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
@@ -9,6 +11,8 @@ import (
 )
 
 func main() {
+	flag.Parse()
+
 	// creating logger
 	logger := zap.NewLogger()
 
@@ -22,7 +26,7 @@ func main() {
 	}
 
 	// creating new grpc server
-	accountServer := grpc.NewServer(store)
+	accountServer := grpc.NewServer(logger, store)
 
 	// creating new instance of app
 	a := app.New(cfg, logger, store, accountServer)
