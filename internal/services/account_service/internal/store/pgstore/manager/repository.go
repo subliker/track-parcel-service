@@ -85,3 +85,35 @@ func (r *Repository) Get(tID telegram.ID) (manager.Manager, error) {
 
 	return m, nil
 }
+
+func (r *Repository) GetApiToken(tID telegram.ID) (manager.ApiToken, error) {
+	logger := r.logger.WithFields("command", "get api token")
+
+	// making api token var
+	var t manager.ApiToken
+
+	// making query builder
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// build query
+	query, args, err := psql.Select("api_token").
+		From("managers").
+		Where(squirrel.Eq{"telegram_id": tID}).
+		ToSql()
+	if err != nil {
+		errMsg := fmt.Errorf("error making query of manager api token selecting: %s", err)
+		logger.Error(errMsg)
+		return t, errMsg
+	}
+
+	// executing query
+	row := r.db.QueryRow(query, args...)
+	err = row.Scan(&t)
+	if errors.Is(err, sql.ErrNoRows) {
+		return t, ErrManagerNotFound
+	} else if err != nil {
+		return t, err
+	}
+
+	return t, nil
+}

@@ -14,4 +14,5 @@ type UserRepository interface {
 type ManagerRepository interface {
 	Register(manager.Manager) error
 	Get(telegram.ID) (manager.Manager, error)
+	GetApiToken(telegram.ID) (manager.ApiToken, error)
 }

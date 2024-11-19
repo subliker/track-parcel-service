@@ -65,3 +65,19 @@ func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.Ge
 		ManagerCompany:     m.Company,
 	}, nil
 }
+
+func (s *ServerApi) GetApiToken(ctx context.Context, req *pb.GetApiTokenRequest) (*pb.GetApiTokenResponse, error) {
+	logger := s.logger.WithFields("handler", "get api token")
+
+	// getting api token from repo
+	t, err := s.store.Manager().GetApiToken(telegram.ID(req.ManagerTelegramId))
+	if err != nil {
+		err = fmt.Errorf("error getting manager(%d): %s", req.ManagerTelegramId, err)
+		logger.Error(err)
+		return nil, err
+	}
+
+	return &pb.GetApiTokenResponse{
+		ManagerApiToken: fmt.Sprint(t),
+	}, nil
+}
