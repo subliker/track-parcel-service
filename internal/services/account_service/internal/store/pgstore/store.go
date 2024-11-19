@@ -8,10 +8,10 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
-	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/config"
-	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/store"
-	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/store/pgstore/manager"
-	"github.com/subliker/track-parcel-service/internal/services/sso_service/internal/store/pgstore/user"
+	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
+	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
+	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pgstore/manager"
+	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pgstore/user"
 )
 
 var migrateMode bool
@@ -27,7 +27,7 @@ type pgStore struct {
 }
 
 func New(cfg config.DBConfig) (store.Store, error) {
-	logger := zap.Logger.WithFields("layer", "pgstore")
+	logger := zap.Logger.WithFields("layer", "pgstore", "host", cfg.Host, "port", cfg.Port)
 
 	// pgs connection string
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName)
@@ -37,6 +37,13 @@ func New(cfg config.DBConfig) (store.Store, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// try to ping db
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
 	logger.Info("pgstore was connected")
 
 	// migrations

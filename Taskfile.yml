@@ -7,4 +7,4 @@ tasks:
     - go install github.com/MrNemo64/go-n-i18n/cmd/i18n@latest
   proto:
     cmds:
-      - protoc -I ./internal/pkg/proto ./internal/pkg/proto/account/* --go_out=./internal/pkg/proto/gen/go --go_opt=paths=source_relative --go-grpc_out=./internal/pkg/proto/gen/go --go-grpc_opt=paths=source_relative
+      - protoc -I ./internal/pkg/proto ./internal/pkg/proto/account/* --go_out=./internal/pkg/proto/gen/go --go-grpc_out=./internal/pkg/proto/gen/go

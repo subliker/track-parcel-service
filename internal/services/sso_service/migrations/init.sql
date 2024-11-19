@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS users {
-    id BIGSERIAL PRIMARY KEY,
-    telegram_id BIGINT,
-}
-
-CREATE TABLE IF NOT EXISTS managers {
-    id BIGSERIAL PRIMARY KEY,
-    telegram_id BIGINT,
-}
