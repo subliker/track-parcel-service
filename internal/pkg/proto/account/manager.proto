@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package manager;
 
-option go_package = "subliker.manager.v1;managerv1";
+option go_package = "account/manager";
 
 import "google/protobuf/empty.proto";
 
