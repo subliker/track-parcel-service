@@ -20,8 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Manager_Register_FullMethodName = "/manager.Manager/Register"
-	Manager_GetInfo_FullMethodName  = "/manager.Manager/GetInfo"
+	Manager_Register_FullMethodName    = "/manager.Manager/Register"
+	Manager_GetInfo_FullMethodName     = "/manager.Manager/GetInfo"
+	Manager_GetApiToken_FullMethodName = "/manager.Manager/GetApiToken"
 )
 
 // ManagerClient is the client API for Manager service.
@@ -30,6 +31,7 @@ const (
 type ManagerClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetInfo(ctx context.Context, in *GetInfoRequest, opts ...grpc.CallOption) (*GetInfoResponse, error)
+	GetApiToken(ctx context.Context, in *GetApiTokenRequest, opts ...grpc.CallOption) (*GetApiTokenResponse, error)
 }
 
 type managerClient struct {
@@ -60,12 +62,23 @@ func (c *managerClient) GetInfo(ctx context.Context, in *GetInfoRequest, opts ..
 	return out, nil
 }
 
+func (c *managerClient) GetApiToken(ctx context.Context, in *GetApiTokenRequest, opts ...grpc.CallOption) (*GetApiTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetApiTokenResponse)
+	err := c.cc.Invoke(ctx, Manager_GetApiToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ManagerServer is the server API for Manager service.
 // All implementations must embed UnimplementedManagerServer
 // for forward compatibility.
 type ManagerServer interface {
 	Register(context.Context, *RegisterRequest) (*emptypb.Empty, error)
 	GetInfo(context.Context, *GetInfoRequest) (*GetInfoResponse, error)
+	GetApiToken(context.Context, *GetApiTokenRequest) (*GetApiTokenResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
 
@@ -81,6 +94,9 @@ func (UnimplementedManagerServer) Register(context.Context, *RegisterRequest) (*
 }
 func (UnimplementedManagerServer) GetInfo(context.Context, *GetInfoRequest) (*GetInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetInfo not implemented")
+}
+func (UnimplementedManagerServer) GetApiToken(context.Context, *GetApiTokenRequest) (*GetApiTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetApiToken not implemented")
 }
 func (UnimplementedManagerServer) mustEmbedUnimplementedManagerServer() {}
 func (UnimplementedManagerServer) testEmbeddedByValue()                 {}
@@ -139,6 +155,24 @@ func _Manager_GetInfo_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_GetApiToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetApiTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).GetApiToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Manager_GetApiToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).GetApiToken(ctx, req.(*GetApiTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Manager_ServiceDesc is the grpc.ServiceDesc for Manager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -153,6 +187,10 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetInfo",
 			Handler:    _Manager_GetInfo_Handler,
+		},
+		{
+			MethodName: "GetApiToken",
+			Handler:    _Manager_GetApiToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
