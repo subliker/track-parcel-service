@@ -72,43 +72,43 @@ func NewLogger() logger.Logger {
 }
 
 func (l *zapLogger) Info(args ...interface{}) {
-	l.logger.Info(args)
+	l.logger.Info(args...)
 }
 
 func (l *zapLogger) Infof(template string, args ...interface{}) {
-	l.logger.Infof(template, args)
+	l.logger.Infof(template, args...)
 }
 
 func (l *zapLogger) Warn(args ...interface{}) {
-	l.logger.Warn(args)
+	l.logger.Warn(args...)
 }
 
 func (l *zapLogger) Warnf(template string, args ...interface{}) {
-	l.logger.Warnf(template, args)
+	l.logger.Warnf(template, args...)
 }
 
 func (l *zapLogger) Error(args ...interface{}) {
-	l.logger.Error(args)
+	l.logger.Error(args...)
 }
 
 func (l *zapLogger) Errorf(template string, args ...interface{}) {
-	l.logger.Errorf(template, args)
+	l.logger.Errorf(template, args...)
 }
 
 func (l *zapLogger) Debug(args ...interface{}) {
-	l.logger.Debug(args)
+	l.logger.Debug(args...)
 }
 
 func (l *zapLogger) Debugf(template string, args ...interface{}) {
-	l.logger.Debugf(template, args)
+	l.logger.Debugf(template, args...)
 }
 
 func (l *zapLogger) Fatal(args ...interface{}) {
-	l.logger.Fatal(args)
+	l.logger.Fatal(args...)
 }
 
 func (l *zapLogger) Fatalf(template string, args ...interface{}) {
-	l.logger.Fatalf(template, args)
+	l.logger.Fatalf(template, args...)
 }
 
 func (l *zapLogger) WithFields(args ...interface{}) logger.Logger {
