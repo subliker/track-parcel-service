@@ -80,7 +80,7 @@ func (r *Repository) Get(tID telegram.ID) (user.User, error) {
 	row := r.db.QueryRow(query, args...)
 	err = row.Scan(&u.TelegramId, &u.FullName, &u.PhoneNumber)
 	if errors.Is(err, sql.ErrNoRows) {
-		return u, ErrUserNotFound
+		return u, store.ErrUserNotFound
 	} else if err != nil {
 		return u, err
 	}

@@ -86,7 +86,7 @@ func (r *Repository) Get(tID telegram.ID) (manager.Manager, error) {
 	row := r.db.QueryRow(query, args...)
 	err = row.Scan(&m.TelegramId, &m.FullName, &m.PhoneNumber, &m.Email, &m.Company)
 	if errors.Is(err, sql.ErrNoRows) {
-		return m, ErrManagerNotFound
+		return m, store.ErrManagerNotFound
 	} else if err != nil {
 		return m, err
 	}
@@ -118,7 +118,7 @@ func (r *Repository) GetApiToken(tID telegram.ID) (manager.ApiToken, error) {
 	row := r.db.QueryRow(query, args...)
 	err = row.Scan(&t)
 	if errors.Is(err, sql.ErrNoRows) {
-		return t, ErrManagerNotFound
+		return t, store.ErrManagerNotFound
 	} else if err != nil {
 		return t, err
 	}

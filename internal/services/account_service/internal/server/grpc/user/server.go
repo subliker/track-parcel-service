@@ -9,6 +9,8 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/models/user"
 	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/user"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -31,6 +33,7 @@ func New(logger logger.Logger, store store.Store) *ServerApi {
 
 func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emptypb.Empty, error) {
 	logger := s.logger.WithFields("handler", "register")
+	const errMsg = "error register user(%d): %s"
 
 	// add user to store
 	if err := s.store.User().Register(user.User{
@@ -38,9 +41,9 @@ func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emp
 		FullName:    req.UserFullName,
 		PhoneNumber: req.UserPhoneNumber,
 	}); err != nil {
-		err = fmt.Errorf("error register user(%d): %s", req.UserTelegramId, err)
-		logger.Error(err)
-		return nil, err
+		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
 	}
 
 	return nil, nil
@@ -48,13 +51,19 @@ func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emp
 
 func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.GetInfoResponse, error) {
 	logger := s.logger.WithFields("handler", "get info")
+	const errMsg = "error getting user(%d): %s"
 
 	// getting user from repo
 	u, err := s.store.User().Get(telegram.ID(req.UserTelegramId))
+	if err == store.ErrUserNotFound {
+		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.NotFound, errMsg)
+	}
 	if err != nil {
-		err = fmt.Errorf("error getting user(%d): %s", req.UserTelegramId, err)
-		logger.Error(err)
-		return nil, err
+		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
 	}
 
 	return &pb.GetInfoResponse{
