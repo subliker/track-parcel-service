@@ -7,7 +7,7 @@ import (
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/app"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/server/grpc"
-	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pgstore"
+	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	cfg := config.Get()
 
 	// creating store
-	store, err := pgstore.New(cfg.DB)
+	store, err := pg.New(logger, cfg.DB)
 	if err != nil {
 		logger.Fatalf("error store create: %s", err)
 	}

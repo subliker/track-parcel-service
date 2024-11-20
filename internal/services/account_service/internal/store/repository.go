@@ -1,18 +1,16 @@
 package store
 
 import (
-	"github.com/subliker/track-parcel-service/internal/pkg/models/manager"
-	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
-	"github.com/subliker/track-parcel-service/internal/pkg/models/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
 )
 
 type UserRepository interface {
-	Register(user.User) error
-	Get(telegram.ID) (user.User, error)
+	Register(model.User) error
+	Get(model.TelegramID) (model.User, error)
 }
 
 type ManagerRepository interface {
-	Register(manager.Manager) error
-	Get(telegram.ID) (manager.Manager, error)
-	GetApiToken(telegram.ID) (manager.ApiToken, error)
+	Register(model.Manager) error
+	Get(model.TelegramID) (model.Manager, error)
+	GetApiToken(model.TelegramID) (model.ManagerApiToken, error)
 }

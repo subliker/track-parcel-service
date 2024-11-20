@@ -5,8 +5,8 @@ import (
 	"net"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
-	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/config"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
 	"google.golang.org/grpc"
 )
 
@@ -15,18 +15,18 @@ type App interface {
 }
 
 type app struct {
-	accountServer *grpc.Server
-	grpcConfig    config.GRPCConfig
+	parcelServer *grpc.Server
+	grpcConfig   config.GRPCConfig
 
-	store store.Store
+	store parcel.Store
 
 	logger logger.Logger
 }
 
 func New(cfg config.Config,
 	logger logger.Logger,
-	store store.Store,
-	accountServer *grpc.Server) App {
+	store parcel.Store,
+	parcelServer *grpc.Server) App {
 	var a app
 
 	// set config
@@ -38,8 +38,8 @@ func New(cfg config.Config,
 	// set store
 	a.store = store
 
-	// set account server
-	a.accountServer = accountServer
+	// set parcel server
+	a.parcelServer = parcelServer
 	return &a
 }
 
@@ -52,6 +52,6 @@ func (a *app) Run() error {
 
 	// running server
 	a.logger.Infof("starting grpc server at port %d...", a.grpcConfig.Port)
-	a.logger.Fatal(a.accountServer.Serve(lis))
+	a.logger.Fatal(a.parcelServer.Serve(lis))
 	return nil
 }
