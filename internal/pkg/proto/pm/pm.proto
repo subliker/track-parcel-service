@@ -11,6 +11,8 @@ service ParcelsManager {
     rpc AddParcel (AddParcelRequest) returns (AddParcelResponse);
     rpc DeleteParcel (DeleteParcelRequest) returns (google.protobuf.Empty);
     rpc GetParcel (GetParcelRequest) returns (GetParcelResponse);
+    rpc AddCheckpoint(AddCheckpointRequest) returns (google.protobuf.Empty);
+    rpc GetCheckpoints(GetCheckpointsRequest) returns (GetCheckpointsResponse);
 }
 
 message AddParcelRequest {
@@ -29,12 +31,6 @@ enum ParcelStatus {
     IN_TRANSIT = 2;
     DELIVERED = 3;
     CANCELED = 4;
-}
-
-message Checkpoint {
-    google.protobuf.Timestamp time = 1;
-    string place = 2;
-    string description = 3;
 }
 
 message AddParcelResponse {
@@ -58,4 +54,27 @@ message GetParcelResponse {
     string parcel_description = 8;
     ParcelStatus parcel_status = 9;
     repeated Checkpoint parcel_checkpoints = 10;
+}
+
+message AddCheckpointRequest {
+    int64 track_number = 1;
+    google.protobuf.Timestamp time = 2;
+    string place = 3;
+    string description = 4;
+}
+
+message GetCheckpointsRequest {
+    string track_number = 1;
+    int32 page = 2;
+    int32 page_size = 3;
+}
+
+message GetCheckpointsResponse {
+    repeated Checkpoint checkpoints = 1;
+}
+
+message Checkpoint {
+    google.protobuf.Timestamp time = 1;
+    string place = 2;
+    string description = 3;
 }

@@ -20,9 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ParcelsManager_AddParcel_FullMethodName    = "/pm.ParcelsManager/AddParcel"
-	ParcelsManager_DeleteParcel_FullMethodName = "/pm.ParcelsManager/DeleteParcel"
-	ParcelsManager_GetParcel_FullMethodName    = "/pm.ParcelsManager/GetParcel"
+	ParcelsManager_AddParcel_FullMethodName      = "/pm.ParcelsManager/AddParcel"
+	ParcelsManager_DeleteParcel_FullMethodName   = "/pm.ParcelsManager/DeleteParcel"
+	ParcelsManager_GetParcel_FullMethodName      = "/pm.ParcelsManager/GetParcel"
+	ParcelsManager_AddCheckpoint_FullMethodName  = "/pm.ParcelsManager/AddCheckpoint"
+	ParcelsManager_GetCheckpoints_FullMethodName = "/pm.ParcelsManager/GetCheckpoints"
 )
 
 // ParcelsManagerClient is the client API for ParcelsManager service.
@@ -32,6 +34,8 @@ type ParcelsManagerClient interface {
 	AddParcel(ctx context.Context, in *AddParcelRequest, opts ...grpc.CallOption) (*AddParcelResponse, error)
 	DeleteParcel(ctx context.Context, in *DeleteParcelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetParcel(ctx context.Context, in *GetParcelRequest, opts ...grpc.CallOption) (*GetParcelResponse, error)
+	AddCheckpoint(ctx context.Context, in *AddCheckpointRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetCheckpoints(ctx context.Context, in *GetCheckpointsRequest, opts ...grpc.CallOption) (*GetCheckpointsResponse, error)
 }
 
 type parcelsManagerClient struct {
@@ -72,6 +76,26 @@ func (c *parcelsManagerClient) GetParcel(ctx context.Context, in *GetParcelReque
 	return out, nil
 }
 
+func (c *parcelsManagerClient) AddCheckpoint(ctx context.Context, in *AddCheckpointRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ParcelsManager_AddCheckpoint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *parcelsManagerClient) GetCheckpoints(ctx context.Context, in *GetCheckpointsRequest, opts ...grpc.CallOption) (*GetCheckpointsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCheckpointsResponse)
+	err := c.cc.Invoke(ctx, ParcelsManager_GetCheckpoints_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ParcelsManagerServer is the server API for ParcelsManager service.
 // All implementations must embed UnimplementedParcelsManagerServer
 // for forward compatibility.
@@ -79,6 +103,8 @@ type ParcelsManagerServer interface {
 	AddParcel(context.Context, *AddParcelRequest) (*AddParcelResponse, error)
 	DeleteParcel(context.Context, *DeleteParcelRequest) (*emptypb.Empty, error)
 	GetParcel(context.Context, *GetParcelRequest) (*GetParcelResponse, error)
+	AddCheckpoint(context.Context, *AddCheckpointRequest) (*emptypb.Empty, error)
+	GetCheckpoints(context.Context, *GetCheckpointsRequest) (*GetCheckpointsResponse, error)
 	mustEmbedUnimplementedParcelsManagerServer()
 }
 
@@ -97,6 +123,12 @@ func (UnimplementedParcelsManagerServer) DeleteParcel(context.Context, *DeletePa
 }
 func (UnimplementedParcelsManagerServer) GetParcel(context.Context, *GetParcelRequest) (*GetParcelResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetParcel not implemented")
+}
+func (UnimplementedParcelsManagerServer) AddCheckpoint(context.Context, *AddCheckpointRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCheckpoint not implemented")
+}
+func (UnimplementedParcelsManagerServer) GetCheckpoints(context.Context, *GetCheckpointsRequest) (*GetCheckpointsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCheckpoints not implemented")
 }
 func (UnimplementedParcelsManagerServer) mustEmbedUnimplementedParcelsManagerServer() {}
 func (UnimplementedParcelsManagerServer) testEmbeddedByValue()                        {}
@@ -173,6 +205,42 @@ func _ParcelsManager_GetParcel_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ParcelsManager_AddCheckpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCheckpointRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ParcelsManagerServer).AddCheckpoint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ParcelsManager_AddCheckpoint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ParcelsManagerServer).AddCheckpoint(ctx, req.(*AddCheckpointRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ParcelsManager_GetCheckpoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCheckpointsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ParcelsManagerServer).GetCheckpoints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ParcelsManager_GetCheckpoints_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ParcelsManagerServer).GetCheckpoints(ctx, req.(*GetCheckpointsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ParcelsManager_ServiceDesc is the grpc.ServiceDesc for ParcelsManager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +259,14 @@ var ParcelsManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetParcel",
 			Handler:    _ParcelsManager_GetParcel_Handler,
+		},
+		{
+			MethodName: "AddCheckpoint",
+			Handler:    _ParcelsManager_AddCheckpoint_Handler,
+		},
+		{
+			MethodName: "GetCheckpoints",
+			Handler:    _ParcelsManager_GetCheckpoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
