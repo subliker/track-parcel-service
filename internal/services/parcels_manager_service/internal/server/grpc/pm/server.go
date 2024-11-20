@@ -75,7 +75,7 @@ func (s *ServerApi) DeleteParcel(ctx context.Context, req *pb.DeleteParcelReques
 }
 
 func (s *ServerApi) GetParcelInfo(ctx context.Context, req *pb.GetParcelRequest) (*pb.GetParcelResponse, error) {
-	logger := s.logger.WithFields("handler", "get parcel")
+	logger := s.logger.WithFields("handler", "get parcel info")
 	const errMsg = "error get parcel(%s): %s"
 
 	// get parcel from store
@@ -87,7 +87,7 @@ func (s *ServerApi) GetParcelInfo(ctx context.Context, req *pb.GetParcelRequest)
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)
-		return nil, status.Error(codes.NotFound, errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
 	}
 
 	return &pb.GetParcelResponse{
@@ -98,5 +98,56 @@ func (s *ServerApi) GetParcelInfo(ctx context.Context, req *pb.GetParcelRequest)
 		ParcelForecastDate:   timestamppb.New(p.ForecastDate),
 		ParcelDescription:    p.Description,
 		ParcelStatus:         pb.ParcelStatus(pb.ParcelStatus_value[string(p.Status)]),
+	}, nil
+}
+
+func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pb.AddCheckpointRequest) (*emptypb.Empty, error) {
+	logger := s.logger.WithFields("handler", "add checkpoint")
+	const errMsg = "error add checkpoint for parcel(%d): %s"
+
+	// add checkpoint to store
+	err := s.store.AddCheckpoint(model.TrackNumber(req.TrackNumber), model.Checkpoint{
+		Time:        req.Time.AsTime(),
+		Place:       req.Place,
+		Description: req.Description,
+	})
+	if err != nil {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.NotFound, errMsg)
+	}
+
+	return nil, nil
+}
+
+func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRequest) (*pb.GetCheckpointsResponse, error) {
+	logger := s.logger.WithFields("handler", "get checkpoints")
+	const errMsg = "error get checkpoints for parcel(%s): %s"
+
+	// get checkpoints from store
+	cps, err := s.store.GetCheckpoints(model.TrackNumber(req.TrackNumber), int(req.Page), int(req.PageSize))
+	if errors.Is(err, parcel.ErrParcelNotFound) {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
+		return nil, status.Error(codes.NotFound, errMsg)
+	}
+	if err != nil {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.NotFound, errMsg)
+	}
+
+	// transfer to proto checkpoints
+	protoCps := make([]*pb.Checkpoint, len(cps))
+	for i := range protoCps {
+		cp := cps[i]
+		protoCps[i] = &pb.Checkpoint{
+			Time:        timestamppb.New(cp.Time),
+			Place:       cp.Place,
+			Description: cp.Description,
+		}
+	}
+
+	return &pb.GetCheckpointsResponse{
+		Checkpoints: protoCps,
 	}, nil
 }

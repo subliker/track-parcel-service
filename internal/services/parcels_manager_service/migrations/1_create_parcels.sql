@@ -14,5 +14,7 @@ CREATE TABLE IF NOT EXISTS parcels (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_parcels_track_number ON parcels(track_number);
+
 -- +goose Down
 DROP TABLE IF EXISTS parcels;
