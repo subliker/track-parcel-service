@@ -56,7 +56,6 @@ func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.Ge
 	m, err := s.repo.Get(model.TelegramID(req.ManagerTelegramId))
 	if err == store.ErrManagerNotFound {
 		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, err)
-		logger.Error(errMsg)
 		return nil, status.Error(codes.NotFound, errMsg)
 	}
 	if err != nil {
@@ -81,7 +80,6 @@ func (s *ServerApi) GetApiToken(ctx context.Context, req *pb.GetApiTokenRequest)
 	t, err := s.repo.GetApiToken(model.TelegramID(req.ManagerTelegramId))
 	if err == store.ErrManagerNotFound {
 		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, err)
-		logger.Error(errMsg)
 		return nil, status.Error(codes.NotFound, errMsg)
 	}
 	if err != nil {

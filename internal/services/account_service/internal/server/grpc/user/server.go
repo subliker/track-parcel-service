@@ -55,7 +55,6 @@ func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.Ge
 	u, err := s.repo.Get(model.TelegramID(req.UserTelegramId))
 	if err == store.ErrUserNotFound {
 		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, err)
-		logger.Error(errMsg)
 		return nil, status.Error(codes.NotFound, errMsg)
 	}
 	if err != nil {
