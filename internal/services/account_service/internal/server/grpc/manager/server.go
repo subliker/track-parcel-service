@@ -5,8 +5,7 @@ import (
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/pkg/models/manager"
-	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/manager"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 	"google.golang.org/grpc/codes"
@@ -17,14 +16,14 @@ import (
 type ServerApi struct {
 	pb.UnimplementedManagerServer
 
-	store  store.Store
+	repo   store.ManagerRepository
 	logger logger.Logger
 }
 
 // New creates new instance of manager server api
-func New(logger logger.Logger, store store.Store) *ServerApi {
+func New(logger logger.Logger, repo store.ManagerRepository) *ServerApi {
 	return &ServerApi{
-		store:  store,
+		repo:   repo,
 		logger: logger.WithFields("layer", "manager server api"),
 	}
 }
@@ -34,8 +33,8 @@ func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emp
 	const errMsg = "error register manager(%d): %s"
 
 	// add manager to store
-	if err := s.store.Manager().Register(manager.Manager{
-		TelegramId:  telegram.ID(req.ManagerTelegramId),
+	if err := s.repo.Register(model.Manager{
+		TelegramId:  model.TelegramID(req.ManagerTelegramId),
 		FullName:    req.ManagerFullName,
 		Email:       req.ManagerEmail,
 		PhoneNumber: req.ManagerPhoneNumber,
@@ -54,7 +53,7 @@ func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.Ge
 	const errMsg = "error getting manager(%d): %s"
 
 	// getting manager from repo
-	m, err := s.store.Manager().Get(telegram.ID(req.ManagerTelegramId))
+	m, err := s.repo.Get(model.TelegramID(req.ManagerTelegramId))
 	if err == store.ErrManagerNotFound {
 		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, err)
 		logger.Error(errMsg)
@@ -79,7 +78,7 @@ func (s *ServerApi) GetApiToken(ctx context.Context, req *pb.GetApiTokenRequest)
 
 	// getting api token from repo
 	const errMsg = "error getting manager(%d) api token: %s"
-	t, err := s.store.Manager().GetApiToken(telegram.ID(req.ManagerTelegramId))
+	t, err := s.repo.GetApiToken(model.TelegramID(req.ManagerTelegramId))
 	if err == store.ErrManagerNotFound {
 		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, err)
 		logger.Error(errMsg)

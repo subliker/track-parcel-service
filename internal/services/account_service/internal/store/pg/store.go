@@ -1,4 +1,4 @@
-package pgstore
+package pg
 
 import (
 	"database/sql"
@@ -7,11 +7,11 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
-	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
-	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pgstore/manager"
-	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pgstore/user"
+	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg/manager"
+	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg/user"
 )
 
 var migrateMode bool
@@ -26,8 +26,8 @@ type pgStore struct {
 	manager store.ManagerRepository
 }
 
-func New(cfg config.DBConfig) (store.Store, error) {
-	logger := zap.Logger.WithFields("layer", "pgstore")
+func New(logger logger.Logger, cfg config.DBConfig) (store.Store, error) {
+	logger = logger.WithFields("layer", "pgstore")
 
 	// pgs connection string
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName)

@@ -15,7 +15,7 @@ func NewServer(logger logger.Logger, store store.Store) *grpc.Server {
 	s := grpc.NewServer()
 
 	// register servers
-	managerpb.RegisterManagerServer(s, manager.New(logger, store))
-	userpb.RegisterUserServer(s, user.New(logger, store))
+	managerpb.RegisterManagerServer(s, manager.New(logger, store.Manager()))
+	userpb.RegisterUserServer(s, user.New(logger, store.User()))
 	return s
 }

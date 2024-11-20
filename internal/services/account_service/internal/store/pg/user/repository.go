@@ -7,8 +7,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
-	"github.com/subliker/track-parcel-service/internal/pkg/models/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 )
 
@@ -27,7 +26,7 @@ func New(logger logger.Logger, db *sql.DB) store.UserRepository {
 	}
 }
 
-func (r *Repository) Register(user user.User) error {
+func (r *Repository) Register(user model.User) error {
 	logger := r.logger.WithFields("command", "register")
 
 	// making query builder
@@ -56,11 +55,11 @@ func (r *Repository) Register(user user.User) error {
 	return nil
 }
 
-func (r *Repository) Get(tID telegram.ID) (user.User, error) {
+func (r *Repository) Get(tID model.TelegramID) (model.User, error) {
 	logger := r.logger.WithFields("command", "get")
 
 	// making user struct
-	var u user.User
+	var u model.User
 
 	// making query builder
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
@@ -81,7 +80,8 @@ func (r *Repository) Get(tID telegram.ID) (user.User, error) {
 	err = row.Scan(&u.TelegramId, &u.FullName, &u.PhoneNumber)
 	if errors.Is(err, sql.ErrNoRows) {
 		return u, store.ErrUserNotFound
-	} else if err != nil {
+	}
+	if err != nil {
 		return u, err
 	}
 
