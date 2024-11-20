@@ -25,16 +25,24 @@ func New(logger logger.Logger, db *sql.DB) store.ManagerRepository {
 	}
 }
 
-func (r *Repository) Register(manager manager.Manager) error {
+func (r *Repository) Register(m manager.Manager) error {
 	logger := r.logger.WithFields("command", "register")
 
 	// making query builder
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
+	// generate api token
+	apiToken, err := manager.NewApiToken()
+	if err != nil {
+		errMsg := fmt.Errorf("error making manager api token inserting: %s", err)
+		logger.Error(errMsg)
+		return errMsg
+	}
+
 	// build query
 	query, args, err := psql.Insert("managers").
-		Columns("telegram_id", "full_name", "phone_number", "email", "company").
-		Values(&manager.TelegramId, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company).
+		Columns("telegram_id", "full_name", "phone_number", "email", "company", "api_token").
+		Values(&m.TelegramId, &m.FullName, &m.PhoneNumber, &m.Email, &m.Company, &apiToken).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of manager inserting: %s", err)
