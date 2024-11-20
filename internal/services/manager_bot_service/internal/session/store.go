@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 )
 
@@ -15,7 +15,7 @@ var sessionsPool = sync.Pool{
 }
 
 type store struct {
-	cache  *expirable.LRU[telegram.ID, *userSession]
+	cache  *expirable.LRU[model.TelegramID, *userSession]
 	logger logger.Logger
 }
 
@@ -32,15 +32,15 @@ func New(logger logger.Logger) session.Store {
 	return &s
 }
 
-func (s *store) handleAutoClear(tID telegram.ID, ss *userSession) {
+func (s *store) handleAutoClear(tID model.TelegramID, ss *userSession) {
 	s.logger.Infof("%s was wiped", tID)
 }
 
-func (s *store) Contains(tID telegram.ID) bool {
+func (s *store) Contains(tID model.TelegramID) bool {
 	return s.cache.Contains(tID)
 }
 
-func (s *store) Add(tID telegram.ID) error {
+func (s *store) Add(tID model.TelegramID) error {
 	// check if session is already exist
 	ok := s.cache.Contains(tID)
 	if ok {
@@ -55,7 +55,7 @@ func (s *store) Add(tID telegram.ID) error {
 	return nil
 }
 
-func (s *store) Remove(tID telegram.ID) error {
+func (s *store) Remove(tID model.TelegramID) error {
 	// check if session is already exist
 	ss, ok := s.cache.Get(tID)
 	if !ok {
@@ -70,7 +70,7 @@ func (s *store) Remove(tID telegram.ID) error {
 	return nil
 }
 
-func (s *store) Get(tID telegram.ID) (session.Session, error) {
+func (s *store) Get(tID model.TelegramID) (session.Session, error) {
 	// getting session
 	ss, ok := s.cache.Get(tID)
 	if !ok {

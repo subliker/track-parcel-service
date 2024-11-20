@@ -1,14 +1,14 @@
 package session
 
 import (
-	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
 )
 
 type Store interface {
-	Add(tID telegram.ID) error
-	Remove(tID telegram.ID) error
-	Get(tID telegram.ID) (Session, error)
-	Contains(tID telegram.ID) bool
+	Add(tID model.TelegramID) error
+	Remove(tID model.TelegramID) error
+	Get(tID model.TelegramID) (Session, error)
+	Contains(tID model.TelegramID) bool
 }
 
 type Session interface {

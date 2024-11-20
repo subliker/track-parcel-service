@@ -53,11 +53,10 @@ message GetParcelResponse {
     google.protobuf.Timestamp parcel_forecast_date = 5;
     string parcel_description = 8;
     ParcelStatus parcel_status = 9;
-    repeated Checkpoint parcel_checkpoints = 10;
 }
 
 message AddCheckpointRequest {
-    int64 track_number = 1;
+    string track_number = 1;
     google.protobuf.Timestamp time = 2;
     string place = 3;
     string description = 4;
@@ -65,8 +64,8 @@ message AddCheckpointRequest {
 
 message GetCheckpointsRequest {
     string track_number = 1;
-    int32 page = 2;
-    int32 page_size = 3;
+    uint64 page = 2;
+    uint64 page_size = 3;
 }
 
 message GetCheckpointsResponse {

@@ -42,7 +42,7 @@ func (s *ServerApi) AddParcel(ctx context.Context, req *pb.AddParcelRequest) (*p
 		ArrivalAddress: req.ParcelArrivalAddress,
 		ForecastDate:   req.ParcelForecastDate.AsTime(),
 		Description:    req.ParcelDescription,
-		Status:         model.Status(req.ParcelStatus),
+		Status:         model.Status(req.ParcelStatus.String()),
 	})
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, err)
@@ -74,7 +74,7 @@ func (s *ServerApi) DeleteParcel(ctx context.Context, req *pb.DeleteParcelReques
 	return nil, nil
 }
 
-func (s *ServerApi) GetParcelInfo(ctx context.Context, req *pb.GetParcelRequest) (*pb.GetParcelResponse, error) {
+func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*pb.GetParcelResponse, error) {
 	logger := s.logger.WithFields("handler", "get parcel info")
 	const errMsg = "error get parcel(%s): %s"
 
@@ -103,7 +103,7 @@ func (s *ServerApi) GetParcelInfo(ctx context.Context, req *pb.GetParcelRequest)
 
 func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pb.AddCheckpointRequest) (*emptypb.Empty, error) {
 	logger := s.logger.WithFields("handler", "add checkpoint")
-	const errMsg = "error add checkpoint for parcel(%d): %s"
+	const errMsg = "error add checkpoint for parcel(%s): %s"
 
 	// add checkpoint to store
 	err := s.store.AddCheckpoint(model.TrackNumber(req.TrackNumber), model.Checkpoint{
@@ -125,7 +125,7 @@ func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRe
 	const errMsg = "error get checkpoints for parcel(%s): %s"
 
 	// get checkpoints from store
-	cps, err := s.store.GetCheckpoints(model.TrackNumber(req.TrackNumber), int(req.Page), int(req.PageSize))
+	cps, err := s.store.GetCheckpoints(model.TrackNumber(req.TrackNumber), req.Page, req.PageSize)
 	if errors.Is(err, parcel.ErrParcelNotFound) {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		return nil, status.Error(codes.NotFound, errMsg)
