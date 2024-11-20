@@ -44,11 +44,11 @@ type Parcel struct {
 type Status string
 
 const (
-	StatusUnknown   Status = "unknown"
-	StatusPending   Status = "pending"
-	StatusInTransit Status = "in_transit"
-	StatusDelivered Status = "delivered"
-	StatusCanceled  Status = "canceled"
+	StatusUnknown   Status = "UNKNOWN"
+	StatusPending   Status = "PENDING"
+	StatusInTransit Status = "IN_TRANSIT"
+	StatusDelivered Status = "DELIVERED"
+	StatusCanceled  Status = "CANCELED"
 )
 
 type Checkpoint struct {
