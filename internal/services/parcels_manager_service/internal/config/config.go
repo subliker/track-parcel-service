@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"git.cyberzone.dev/project-tinpers/shared/pkg/logger/zap"
 	"github.com/spf13/viper"
+	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 )
 
 type (
