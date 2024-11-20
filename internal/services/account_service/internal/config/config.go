@@ -30,7 +30,7 @@ type (
 )
 
 func init() {
-	viper.SetEnvPrefix("SSO")
+	viper.SetEnvPrefix("ACNT")
 
 	// env and default binding
 	viper.BindEnv("env")
