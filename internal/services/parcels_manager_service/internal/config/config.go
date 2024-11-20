@@ -3,14 +3,12 @@ package config
 import (
 	"time"
 
+	"git.cyberzone.dev/project-tinpers/shared/pkg/logger/zap"
 	"github.com/spf13/viper"
-	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
-	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 )
 
 type (
 	Config struct {
-		Env  string     `mapstructure:"env"`
 		GRPC GRPCConfig `mapstructure:"grpc"`
 		DB   DBConfig   `mapstructure:"db"`
 	}
@@ -33,8 +31,6 @@ func init() {
 	viper.SetEnvPrefix("ACNT")
 
 	// env and default binding
-	viper.BindEnv("env")
-
 	viper.SetDefault("grpc.port", 50051)
 	viper.SetDefault("grpc.timeout", time.Second)
 

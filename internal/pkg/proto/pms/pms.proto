@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package pms;
+
+option go_package = "/pms";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service ParcelsManager {
+    rpc AddParcel (AddParcelRequest) returns (AddParcelResponse);
+    rpc DeleteParcel (DeleteParcelRequest) returns (google.protobuf.Empty);
+    rpc GetParcel (GetParcelRequest) returns (GetParcelResponse);
+}
+
+message AddParcelRequest {
+    string parcel_name = 1;
+    string manager_telegram_id = 2;
+    string parcel_recipient = 3;
+    string parcel_arrival_address = 4;
+    google.protobuf.Timestamp parcel_forecast_date = 5;
+    string parcel_description = 8;
+    ParcelStatus parcel_status = 9;
+    repeated Checkpoint parcel_checkpoints = 10;
+}
+
+enum ParcelStatus {
+    UNKNOWN = 0;
+    PENDING = 1;
+    IN_TRANSIT = 2;
+    DELIVERED = 3;
+    CANCELED = 4;
+}
+
+message Checkpoint {
+    google.protobuf.Timestamp time = 1;
+    string place = 2;
+    string description = 3;
+}
+
+message AddParcelResponse {
+    string parcel_id = 1;
+}
+
+message DeleteParcelRequest {
+    string parcel_id = 1;
+}
+
+message GetParcelRequest {
+    string parcel_id = 1;
+}
+
+message GetParcelResponse {
+    string parcel_name = 1;
+    string manager_telegram_id = 2;
+    string parcel_recipient = 3;
+    string parcel_arrival_address = 4;
+    google.protobuf.Timestamp parcel_forecast_date = 5;
+    string parcel_description = 8;
+    ParcelStatus parcel_status = 9;
+    repeated Checkpoint parcel_checkpoints = 10;
+}

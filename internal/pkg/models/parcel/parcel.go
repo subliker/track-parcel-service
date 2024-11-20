@@ -12,9 +12,6 @@ type Parcel struct {
 	ArrivalAddress string
 	ForecastDate   time.Time
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-
 	Description string
 	Status      Status
 	Checkpoints []Checkpoint
@@ -23,10 +20,11 @@ type Parcel struct {
 type Status uint
 
 const (
-	StatusNone Status = iota
-	StatusCreated
-	StatusOnTheWay
+	StatusUnknown Status = iota
+	StatusPending
+	StatusInTransit
 	StatusDelivered
+	StatusCanceled
 )
 
 type Checkpoint struct {

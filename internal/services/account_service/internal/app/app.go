@@ -10,6 +10,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+type App interface {
+	Run() error
+}
+
 type app struct {
 	accountServer *grpc.Server
 	grpcConfig    config.GRPCConfig
@@ -17,10 +21,6 @@ type app struct {
 	store store.Store
 
 	logger logger.Logger
-}
-
-type App interface {
-	Run() error
 }
 
 func New(cfg config.Config,
