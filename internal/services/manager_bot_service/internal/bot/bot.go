@@ -66,6 +66,7 @@ func (b *bot) Run() error {
 func (b *bot) initHandlers() {
 	b.client.Handle("/start", b.handleStart())
 	b.client.Handle("/add-parcel", b.handleAddParcel())
+	b.client.Handle("/register", b.handleRegister())
 
 	b.client.Handle(tele.OnText, b.handleOnText())
 }

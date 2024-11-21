@@ -11,9 +11,9 @@ import (
 )
 
 type Config struct {
-	Bot     BotConfig      `validate:"required" mapstructure:"bot"`
-	Session SessionConfig  `mapstructure:"session"`
-	SSO     manager.Config `validate:"required" mapstructure:"sso"`
+	Bot            BotConfig      `validate:"required" mapstructure:"bot"`
+	Session        SessionConfig  `mapstructure:"session"`
+	ManagerService manager.Config `validate:"required" mapstructure:"managerservice"`
 }
 
 type BotConfig struct {
