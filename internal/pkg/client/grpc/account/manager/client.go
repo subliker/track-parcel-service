@@ -13,6 +13,8 @@ type Client interface {
 	Register(ctx context.Context, in *pb.RegisterRequest) error
 	GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInfoResponse, error)
 	GetApiToken(ctx context.Context, in *pb.GetApiTokenRequest) (*pb.GetApiTokenResponse, error)
+	Auth(ctx context.Context, in *pb.AuthRequest) error
+	AuthApiToken(ctx context.Context, in *pb.AuthApiTokenRequest) (*pb.AuthApiTokenResponse, error)
 }
 
 type client struct {

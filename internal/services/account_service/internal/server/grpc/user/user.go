@@ -51,3 +51,31 @@ func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.Ge
 		UserPhoneNumber: u.PhoneNumber,
 	}, nil
 }
+
+func (s *ServerApi) Auth(ctx context.Context, req *pb.AuthRequest) (*emptypb.Empty, error) {
+	logger := s.logger.WithFields("handler", "auth")
+	const errMsg = "error auth user(%d): %s"
+
+	// check context
+	select {
+	case <-ctx.Done():
+		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, ctx.Err())
+		logger.Info(errMsg)
+		return nil, status.Error(codes.Canceled, errMsg)
+	default:
+	}
+
+	// check if user exists in repo
+	exists, err := s.repo.Exists(model.TelegramID(req.UserTelegramId))
+	if err != nil {
+		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
+	}
+	if !exists {
+		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, "user wasn't found")
+		return nil, status.Error(codes.NotFound, errMsg)
+	}
+
+	return nil, nil
+}

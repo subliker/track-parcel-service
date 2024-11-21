@@ -71,3 +71,35 @@ func (r *Repository) Get(tID model.TelegramID) (model.User, error) {
 
 	return u, nil
 }
+
+func (r *Repository) Exists(tID model.TelegramID) (bool, error) {
+	logger := r.logger.WithFields("command", "exists")
+
+	// making query builder
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// build query
+	query, args, err := psql.
+		Select("1").
+		Prefix("SELECT EXISTS (").
+		From("users").
+		Where(squirrel.Eq{"telegram_id": tID}).
+		Suffix(")").
+		ToSql()
+	if err != nil {
+		errMsg := fmt.Errorf("error making query of user exists selecting: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	// executing query
+	var exists bool
+	err = r.db.QueryRow(query, args...).Scan(&exists)
+	if err != nil {
+		errMsg := fmt.Errorf("error execution query of user exists selecting: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	return exists, nil
+}

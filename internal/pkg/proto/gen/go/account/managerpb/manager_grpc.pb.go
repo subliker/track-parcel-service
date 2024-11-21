@@ -20,10 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Manager_Register_FullMethodName    = "/managerpb.Manager/Register"
-	Manager_GetInfo_FullMethodName     = "/managerpb.Manager/GetInfo"
-	Manager_GetApiToken_FullMethodName = "/managerpb.Manager/GetApiToken"
-	Manager_Auth_FullMethodName        = "/managerpb.Manager/Auth"
+	Manager_Register_FullMethodName     = "/managerpb.Manager/Register"
+	Manager_GetInfo_FullMethodName      = "/managerpb.Manager/GetInfo"
+	Manager_GetApiToken_FullMethodName  = "/managerpb.Manager/GetApiToken"
+	Manager_Auth_FullMethodName         = "/managerpb.Manager/Auth"
+	Manager_AuthApiToken_FullMethodName = "/managerpb.Manager/AuthApiToken"
 )
 
 // ManagerClient is the client API for Manager service.
@@ -34,6 +35,7 @@ type ManagerClient interface {
 	GetInfo(ctx context.Context, in *GetInfoRequest, opts ...grpc.CallOption) (*GetInfoResponse, error)
 	GetApiToken(ctx context.Context, in *GetApiTokenRequest, opts ...grpc.CallOption) (*GetApiTokenResponse, error)
 	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AuthApiToken(ctx context.Context, in *AuthApiTokenRequest, opts ...grpc.CallOption) (*AuthApiTokenResponse, error)
 }
 
 type managerClient struct {
@@ -84,6 +86,16 @@ func (c *managerClient) Auth(ctx context.Context, in *AuthRequest, opts ...grpc.
 	return out, nil
 }
 
+func (c *managerClient) AuthApiToken(ctx context.Context, in *AuthApiTokenRequest, opts ...grpc.CallOption) (*AuthApiTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthApiTokenResponse)
+	err := c.cc.Invoke(ctx, Manager_AuthApiToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ManagerServer is the server API for Manager service.
 // All implementations must embed UnimplementedManagerServer
 // for forward compatibility.
@@ -92,6 +104,7 @@ type ManagerServer interface {
 	GetInfo(context.Context, *GetInfoRequest) (*GetInfoResponse, error)
 	GetApiToken(context.Context, *GetApiTokenRequest) (*GetApiTokenResponse, error)
 	Auth(context.Context, *AuthRequest) (*emptypb.Empty, error)
+	AuthApiToken(context.Context, *AuthApiTokenRequest) (*AuthApiTokenResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
 
@@ -113,6 +126,9 @@ func (UnimplementedManagerServer) GetApiToken(context.Context, *GetApiTokenReque
 }
 func (UnimplementedManagerServer) Auth(context.Context, *AuthRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Auth not implemented")
+}
+func (UnimplementedManagerServer) AuthApiToken(context.Context, *AuthApiTokenRequest) (*AuthApiTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthApiToken not implemented")
 }
 func (UnimplementedManagerServer) mustEmbedUnimplementedManagerServer() {}
 func (UnimplementedManagerServer) testEmbeddedByValue()                 {}
@@ -207,6 +223,24 @@ func _Manager_Auth_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_AuthApiToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthApiTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).AuthApiToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Manager_AuthApiToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).AuthApiToken(ctx, req.(*AuthApiTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Manager_ServiceDesc is the grpc.ServiceDesc for Manager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +263,10 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Auth",
 			Handler:    _Manager_Auth_Handler,
+		},
+		{
+			MethodName: "AuthApiToken",
+			Handler:    _Manager_AuthApiToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

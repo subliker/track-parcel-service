@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"

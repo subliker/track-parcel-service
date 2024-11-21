@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/validation"

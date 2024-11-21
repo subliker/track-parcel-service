@@ -95,3 +95,61 @@ func (c *client) GetApiToken(ctx context.Context, in *pb.GetApiTokenRequest) (*p
 	logger.Infof(errMsg, "non grpc error")
 	return nil, ErrUnexpected
 }
+
+func (c *client) Auth(ctx context.Context, in *pb.AuthRequest) error {
+	logger := c.logger.WithFields("request", "auth")
+	const errMsg = "request auth error: %s"
+
+	// api call
+	_, err := c.api.Auth(ctx, in)
+	if err == nil {
+		return nil
+	}
+
+	// handle errors
+	if grpcStatus, ok := status.FromError(err); ok {
+		errMsg := fmt.Errorf(errMsg, grpcStatus.Message())
+
+		switch grpcStatus.Code() {
+		case codes.NotFound:
+			return ErrManagerNotFound
+		case codes.Internal:
+			logger.Info(errMsg)
+			return ErrInternal
+		default:
+			logger.Info(errMsg)
+			return ErrUnexpected
+		}
+	}
+	logger.Infof(errMsg, "non grpc error")
+	return ErrUnexpected
+}
+
+func (c *client) AuthApiToken(ctx context.Context, in *pb.AuthApiTokenRequest) (*pb.AuthApiTokenResponse, error) {
+	logger := c.logger.WithFields("request", "auth api token")
+	const errMsg = "request auth api token error: %s"
+
+	// api call
+	res, err := c.api.AuthApiToken(ctx, in)
+	if err == nil {
+		return res, nil
+	}
+
+	// handle errors
+	if grpcStatus, ok := status.FromError(err); ok {
+		errMsg := fmt.Errorf(errMsg, grpcStatus.Message())
+
+		switch grpcStatus.Code() {
+		case codes.NotFound:
+			return nil, ErrManagerNotFound
+		case codes.Internal:
+			logger.Info(errMsg)
+			return nil, ErrInternal
+		default:
+			logger.Info(errMsg)
+			return nil, ErrUnexpected
+		}
+	}
+	logger.Infof(errMsg, "non grpc error")
+	return nil, ErrUnexpected
+}

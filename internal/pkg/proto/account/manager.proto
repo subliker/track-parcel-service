@@ -11,6 +11,7 @@ service Manager {
     rpc GetInfo (GetInfoRequest) returns (GetInfoResponse);
     rpc GetApiToken (GetApiTokenRequest) returns (GetApiTokenResponse);
     rpc Auth(AuthRequest) returns (google.protobuf.Empty);
+    rpc AuthApiToken(AuthApiTokenRequest) returns (AuthApiTokenResponse);
 }
 
 message RegisterRequest {
@@ -41,5 +42,13 @@ message GetApiTokenResponse {
 }
 
 message AuthRequest {
+    int64 manager_telegram_id = 1;
+}
+
+message AuthApiTokenRequest {
+    string manager_api_token = 1;
+}
+
+message AuthApiTokenResponse{
     int64 manager_telegram_id = 1;
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/app"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot"
