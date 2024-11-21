@@ -16,6 +16,15 @@ func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emp
 	logger := s.logger.WithFields("handler", "register")
 	const errMsg = "error register manager(%d): %s"
 
+	// check context
+	select {
+	case <-ctx.Done():
+		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, ctx.Err())
+		logger.Info(errMsg)
+		return nil, status.Error(codes.Canceled, errMsg)
+	default:
+	}
+
 	// add manager to store
 	if err := s.repo.Register(model.Manager{
 		TelegramId:  model.TelegramID(req.ManagerTelegramId),
@@ -35,6 +44,15 @@ func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emp
 func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.GetInfoResponse, error) {
 	logger := s.logger.WithFields("handler", "get info")
 	const errMsg = "error getting manager(%d): %s"
+
+	// check context
+	select {
+	case <-ctx.Done():
+		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, ctx.Err())
+		logger.Info(errMsg)
+		return nil, status.Error(codes.Canceled, errMsg)
+	default:
+	}
 
 	// getting manager from repo
 	m, err := s.repo.Get(model.TelegramID(req.ManagerTelegramId))
@@ -58,9 +76,18 @@ func (s *ServerApi) GetInfo(ctx context.Context, req *pb.GetInfoRequest) (*pb.Ge
 
 func (s *ServerApi) GetApiToken(ctx context.Context, req *pb.GetApiTokenRequest) (*pb.GetApiTokenResponse, error) {
 	logger := s.logger.WithFields("handler", "get api token")
+	const errMsg = "error getting manager(%d) api token: %s"
+
+	// check context
+	select {
+	case <-ctx.Done():
+		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, ctx.Err())
+		logger.Info(errMsg)
+		return nil, status.Error(codes.Canceled, errMsg)
+	default:
+	}
 
 	// getting api token from repo
-	const errMsg = "error getting manager(%d) api token: %s"
 	t, err := s.repo.GetApiToken(model.TelegramID(req.ManagerTelegramId))
 	if err == store.ErrManagerNotFound {
 		errMsg := fmt.Sprintf(errMsg, req.ManagerTelegramId, err)
