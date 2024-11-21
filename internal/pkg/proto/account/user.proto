@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package user;
+package userpb;
 
-option go_package = "account/user";
+option go_package = "account/userpb";
 
 import "google/protobuf/empty.proto";
 

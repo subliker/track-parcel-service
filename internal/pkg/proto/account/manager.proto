@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package manager;
+package managerpb;
 
-option go_package = "account/manager";
+option go_package = "account/managerpb";
 
 import "google/protobuf/empty.proto";
 
