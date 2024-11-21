@@ -21,13 +21,14 @@ type client struct {
 }
 
 func New(ctx context.Context, logger logger.Logger, cfg Config) Client {
-	cc, err := grpc.NewClient(cfg.target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	logger.Infof("grpc manager client starts on target %s", cfg.Target)
+	cc, err := grpc.NewClient(cfg.Target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal(err)
 	}
 
 	return &client{
 		api:    pb.NewManagerClient(cc),
-		logger: logger.WithFields("layer", "grpc client", "service", "manager"),
+		logger: logger.WithFields("layer", "grpc client", "service", "manager", "target", cc.Target()),
 	}
 }

@@ -27,14 +27,14 @@ func (c *client) Register(ctx context.Context, in *pb.RegisterRequest) error {
 		case codes.AlreadyExists:
 			return ErrManagerIsAlreadyExist
 		case codes.Internal:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return ErrInternal
 		default:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return ErrUnexpected
 		}
 	}
-	logger.Infof(errMsg, "non grpc error")
+	logger.Errorf(errMsg, err)
 	return ErrUnexpected
 }
 

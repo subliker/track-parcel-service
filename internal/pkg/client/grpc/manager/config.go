@@ -1,5 +1,5 @@
 package manager
 
 type Config struct {
-	target string `validate:"required" mapstructure:"target"`
+	Target string `validate:"required" mapstructure:"target"`
 }
