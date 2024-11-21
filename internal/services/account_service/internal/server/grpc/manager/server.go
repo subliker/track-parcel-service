@@ -2,7 +2,7 @@ package manager
 
 import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/manager"
+	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 )
 

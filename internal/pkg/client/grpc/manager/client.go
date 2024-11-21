@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/manager"
+	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

@@ -2,7 +2,7 @@ package pm
 
 import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pm"
+	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pmpb"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
 )
 

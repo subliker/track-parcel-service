@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pm"
+	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pmpb"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

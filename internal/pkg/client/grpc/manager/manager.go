@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/manager"
+	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
