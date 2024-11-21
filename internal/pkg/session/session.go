@@ -9,6 +9,7 @@ type Store interface {
 	Remove(tID model.TelegramID) error
 	Get(tID model.TelegramID) (Session, error)
 	Contains(tID model.TelegramID) bool
+	Ensure(tID model.TelegramID) error
 }
 
 type Session interface {

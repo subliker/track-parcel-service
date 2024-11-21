@@ -1,6 +1,7 @@
 package lru
 
 import (
+	"errors"
 	"sync"
 	"time"
 
@@ -77,4 +78,22 @@ func (s *store) Get(tID model.TelegramID) (session.Session, error) {
 		return nil, session.ErrSessionIsNotExist
 	}
 	return ss, nil
+}
+
+func (s *store) Ensure(tID model.TelegramID) error {
+	// try to add session
+	err := s.Add(tID)
+	if !errors.Is(err, session.ErrSessionIsAlreadyExist) {
+		return err
+	}
+
+	return nil
+}
+
+func (s *store) EnsureGet(tID model.TelegramID) (session.Session, error) {
+	// try to add session
+	err := s.Add(tID)
+	if !errors.Is(err, session.ErrSessionIsAlreadyExist) {
+		return nil, err
+	}
 }
