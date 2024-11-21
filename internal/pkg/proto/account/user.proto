@@ -9,6 +9,7 @@ import "google/protobuf/empty.proto";
 service User {
     rpc Register (RegisterRequest) returns (google.protobuf.Empty);
     rpc GetInfo (GetInfoRequest) returns (GetInfoResponse);
+    rpc Auth(AuthRequest) returns (google.protobuf.Empty);
 }
 
 message RegisterRequest {
@@ -24,4 +25,8 @@ message GetInfoRequest {
 message GetInfoResponse {
     string user_full_name = 2;
     optional string user_phone_number = 3;
+}
+
+message AuthRequest {
+    int64 user_telegram_id = 1;
 }

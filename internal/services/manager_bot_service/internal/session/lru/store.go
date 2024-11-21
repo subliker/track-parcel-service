@@ -96,4 +96,12 @@ func (s *store) EnsureGet(tID model.TelegramID) (session.Session, error) {
 	if !errors.Is(err, session.ErrSessionIsAlreadyExist) {
 		return nil, err
 	}
+
+	ss, ok := s.cache.Get(tID)
+	if !ok {
+		errMsg := errors.New("ensure get error: session add or get semantic problem")
+		s.logger.Error(errMsg)
+		return nil, errMsg
+	}
+	return ss, nil
 }
