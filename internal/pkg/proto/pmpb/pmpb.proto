@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package pm;
+package pmpb;
 
-option go_package = "/pm";
+option go_package = "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pmpb";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";

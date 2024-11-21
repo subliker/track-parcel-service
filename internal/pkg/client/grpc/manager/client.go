@@ -10,6 +10,9 @@ import (
 )
 
 type Client interface {
+	Register(ctx context.Context, in *pb.RegisterRequest) error
+	GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInfoResponse, error)
+	GetApiToken(ctx context.Context, in *pb.GetApiTokenRequest) (*pb.GetApiTokenResponse, error)
 }
 
 type client struct {

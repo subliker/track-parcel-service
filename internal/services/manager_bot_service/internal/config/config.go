@@ -4,16 +4,16 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	sso "github.com/subliker/track-parcel-service/internal/pkg/client/sso/grpc"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/manager"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/validation"
 )
 
 type Config struct {
-	Bot     BotConfig     `validate:"required" mapstructure:"bot"`
-	Session SessionConfig `mapstructure:"session"`
-	SSO     sso.Config    `validate:"required" mapstructure:"sso"`
+	Bot     BotConfig      `validate:"required" mapstructure:"bot"`
+	Session SessionConfig  `mapstructure:"session"`
+	SSO     manager.Config `validate:"required" mapstructure:"sso"`
 }
 
 type BotConfig struct {

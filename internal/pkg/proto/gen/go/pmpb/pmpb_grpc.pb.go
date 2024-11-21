@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.29.0--rc1
-// source: pm/pm.proto
+// source: pm/pmpb.proto
 
-package pm
+package pmpb
 
 import (
 	context "context"
@@ -20,11 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ParcelsManager_AddParcel_FullMethodName      = "/pm.ParcelsManager/AddParcel"
-	ParcelsManager_DeleteParcel_FullMethodName   = "/pm.ParcelsManager/DeleteParcel"
-	ParcelsManager_GetParcel_FullMethodName      = "/pm.ParcelsManager/GetParcel"
-	ParcelsManager_AddCheckpoint_FullMethodName  = "/pm.ParcelsManager/AddCheckpoint"
-	ParcelsManager_GetCheckpoints_FullMethodName = "/pm.ParcelsManager/GetCheckpoints"
+	ParcelsManager_AddParcel_FullMethodName      = "/pmpb.ParcelsManager/AddParcel"
+	ParcelsManager_DeleteParcel_FullMethodName   = "/pmpb.ParcelsManager/DeleteParcel"
+	ParcelsManager_GetParcel_FullMethodName      = "/pmpb.ParcelsManager/GetParcel"
+	ParcelsManager_AddCheckpoint_FullMethodName  = "/pmpb.ParcelsManager/AddCheckpoint"
+	ParcelsManager_GetCheckpoints_FullMethodName = "/pmpb.ParcelsManager/GetCheckpoints"
 )
 
 // ParcelsManagerClient is the client API for ParcelsManager service.
@@ -245,7 +245,7 @@ func _ParcelsManager_GetCheckpoints_Handler(srv interface{}, ctx context.Context
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ParcelsManager_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pm.ParcelsManager",
+	ServiceName: "pmpb.ParcelsManager",
 	HandlerType: (*ParcelsManagerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -270,5 +270,5 @@ var ParcelsManager_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pm/pm.proto",
+	Metadata: "pm/pmpb.proto",
 }

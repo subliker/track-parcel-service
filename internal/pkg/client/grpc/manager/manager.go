@@ -7,17 +7,16 @@ import (
 	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/manager"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (c *client) Register(ctx context.Context, in *pb.RegisterRequest) (*emptypb.Empty, error) {
+func (c *client) Register(ctx context.Context, in *pb.RegisterRequest) error {
 	logger := c.logger.WithFields("request", "register")
 	const errMsg = "request register error: %s"
 
 	// api call
-	res, err := c.api.Register(context.Background(), in)
+	_, err := c.api.Register(ctx, in)
 	if err == nil {
-		return res, nil
+		return nil
 	}
 
 	// handle errors
@@ -26,17 +25,17 @@ func (c *client) Register(ctx context.Context, in *pb.RegisterRequest) (*emptypb
 
 		switch grpcStatus.Code() {
 		case codes.AlreadyExists:
-			return nil, ErrManagerIsAlreadyExist
+			return ErrManagerIsAlreadyExist
 		case codes.Internal:
 			logger.Info(errMsg)
-			return nil, ErrInternal
+			return ErrInternal
 		default:
 			logger.Info(errMsg)
-			return nil, ErrUnexpected
+			return ErrUnexpected
 		}
 	}
 	logger.Infof(errMsg, "non grpc error")
-	return nil, ErrUnexpected
+	return ErrUnexpected
 }
 
 func (c *client) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInfoResponse, error) {
@@ -44,7 +43,7 @@ func (c *client) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInf
 	const errMsg = "request register error: %s"
 
 	// api call
-	res, err := c.api.GetInfo(context.Background(), in)
+	res, err := c.api.GetInfo(ctx, in)
 	if err == nil {
 		return res, nil
 	}
@@ -73,7 +72,7 @@ func (c *client) GetApiToken(ctx context.Context, in *pb.GetApiTokenRequest) (*p
 	const errMsg = "request register error: %s"
 
 	// api call
-	res, err := c.api.GetApiToken(context.Background(), in)
+	res, err := c.api.GetApiToken(ctx, in)
 	if err == nil {
 		return res, nil
 	}

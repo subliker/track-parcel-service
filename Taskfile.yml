@@ -8,4 +8,5 @@ tasks:
   proto:
     cmds:
       - protoc -I ./internal/pkg/proto ./internal/pkg/proto/account/* --go_out=./internal/pkg/proto/gen/go --go-grpc_out=./internal/pkg/proto/gen/go
-      - protoc -I ./internal/pkg/proto ./internal/pkg/proto/pm/* --go_out=./internal/pkg/proto/gen/go --go_opt=paths=source_relative --go-grpc_out=./internal/pkg/proto/gen/go --go_opt=paths=source_relative
+      # - protoc -I ./internal/pkg/proto ./internal/pkg/proto/pm/* --go_out=./internal/pkg/proto/gen/go --go_opt=paths=source_relative --go-grpc_out=./internal/pkg/proto/gen/go --go_opt=paths=source_relative
+      - p
