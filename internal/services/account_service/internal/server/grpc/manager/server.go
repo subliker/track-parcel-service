@@ -17,6 +17,6 @@ type ServerApi struct {
 func New(logger logger.Logger, repo store.ManagerRepository) *ServerApi {
 	return &ServerApi{
 		repo:   repo,
-		logger: logger.WithFields("layer", "manager server api"),
+		logger: logger.WithFields("layer", "grpc server api", "server", "manager"),
 	}
 }

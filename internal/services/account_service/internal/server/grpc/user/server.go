@@ -15,7 +15,7 @@ type ServerApi struct {
 
 // New creates new instance of user server api
 func New(logger logger.Logger, repo store.UserRepository) *ServerApi {
-	logger = logger.WithFields("layer", "user server api")
+	logger = logger.WithFields("layer", "grpc server api", "server", "user")
 	return &ServerApi{
 		repo:   repo,
 		logger: logger,

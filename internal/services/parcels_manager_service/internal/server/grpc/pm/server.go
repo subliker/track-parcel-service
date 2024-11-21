@@ -17,6 +17,6 @@ type ServerApi struct {
 func New(logger logger.Logger, store parcel.Store) *ServerApi {
 	return &ServerApi{
 		store:  store,
-		logger: logger.WithFields("layer", "grpc server api"),
+		logger: logger.WithFields("layer", "grpc server api", "server", "parcels manager"),
 	}
 }
