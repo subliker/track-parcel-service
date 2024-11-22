@@ -27,7 +27,7 @@ func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pb.AddCheckpointRequ
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)
-		return nil, status.Error(codes.NotFound, errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
 	}
 
 	return nil, nil
@@ -46,7 +46,7 @@ func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRe
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)
-		return nil, status.Error(codes.NotFound, errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
 	}
 
 	// transfer to proto checkpoints

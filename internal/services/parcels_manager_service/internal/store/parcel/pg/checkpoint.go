@@ -29,6 +29,12 @@ func (s *store) AddCheckpoint(tNum model.TrackNumber, cp model.Checkpoint) error
 	// executing query
 	res, err := s.db.Exec(query, args...)
 	if err != nil {
+		if sqlErr, ok := err.(*pq.Error); ok {
+			// if foreign key error
+			if sqlErr.Code == "23053" {
+				return parcel.ErrIncorrectForeignTrackNumber
+			}
+		}
 		errMsg := fmt.Errorf("error executing of checkpoint inserting: %s", err)
 		logger.Error(errMsg)
 		return errMsg
@@ -63,12 +69,6 @@ func (s *store) GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize
 	// executing query
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
-		if sqlErr, ok := err.(*pq.Error); ok {
-			// if foreign key error
-			if sqlErr.Code == "23053" {
-				return cps, parcel.ErrIncorrectForeignTrackNumber
-			}
-		}
 		errMsg := fmt.Errorf("error executing of getting checkpoints: %s", err)
 		logger.Error(errMsg)
 		return cps, errMsg
