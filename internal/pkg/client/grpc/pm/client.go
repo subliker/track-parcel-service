@@ -31,6 +31,6 @@ func New(ctx context.Context, logger logger.Logger, cfg Config) Client {
 
 	return &client{
 		api:    pb.NewParcelsManagerClient(cc),
-		logger: logger.WithFields("layer", "grpc client", "service", "manager", "targer", cc.Target()),
+		logger: logger.WithFields("layer", "grpc client", "service", "manager", "target", cc.Target()),
 	}
 }

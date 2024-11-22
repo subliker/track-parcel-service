@@ -10,5 +10,6 @@ type Store interface {
 	GetInfo(model.TrackNumber) (model.Parcel, error)
 	AddCheckpoint(model.TrackNumber, model.Checkpoint) error
 	GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize uint64) ([]*model.Checkpoint, error)
+	Exists(model.TrackNumber) (bool, error)
 	Close()
 }
