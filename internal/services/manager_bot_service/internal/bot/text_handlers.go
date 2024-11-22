@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
@@ -54,13 +55,19 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				return err
 			}
 			if st.FillStep == state.RegisterFillStepReady {
-				b.managerClient.Register(context.Background(), &managerpb.RegisterRequest{
+				err := b.managerClient.Register(context.Background(), &managerpb.RegisterRequest{
 					ManagerTelegramId:  int64(st.Manager.TelegramID),
 					ManagerFullName:    st.Manager.FullName,
 					ManagerEmail:       st.Manager.Email,
 					ManagerPhoneNumber: st.Manager.PhoneNumber,
 					ManagerCompany:     st.Manager.Company,
 				})
+				if err == manager.ErrManagerIsAlreadyExist {
+					return ctx.Send("you have been already registered")
+				}
+				if err != nil {
+					return ctx.Send("register ended with internal error")
+				}
 				ctx.Send("Регистрация готова")
 				logger.Info(st.Manager)
 				ss.ClearState()

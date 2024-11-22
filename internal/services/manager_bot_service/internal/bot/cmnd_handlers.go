@@ -45,7 +45,8 @@ func (b *bot) handleAddParcel() tele.HandlerFunc {
 			return ctx.Send("internal error")
 		}
 
-		session.SetState(state.MakeParcel{})
+		// set make parcel state
+		state.SetMakeParcel(session)
 
 		ctx.Send(b.bundle.States().MakeParcel().Name())
 		return nil
@@ -78,11 +79,8 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 			return ctx.Send("internal error")
 		}
 
-		session.SetState(state.Register{
-			Manager: model.Manager{
-				TelegramID: tID,
-			},
-		})
+		// set register state
+		state.SetRegister(session, tID)
 
 		return nil
 	}
