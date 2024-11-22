@@ -10,6 +10,9 @@ import (
 
 // TODO ADD LANG n VALIDATION n TIME PARSING
 func (b *bot) fillParcel(ctx tele.Context, st *state.MakeParcel) error {
+	// set state handler
+	ctx.Set("state_handler", "fill parcel")
+
 	st.FillStep++
 
 	fillBundle := b.bundle.States().MakeParcel()

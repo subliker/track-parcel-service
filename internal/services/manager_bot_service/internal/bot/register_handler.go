@@ -6,6 +6,9 @@ import (
 )
 
 func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
+	// set state handler
+	ctx.Set("state_handler", "fill register")
+
 	st.FillStep++
 
 	// TODO add bundle

@@ -32,8 +32,9 @@ func New(cfg config.BotConfig, ss session.Store, logger logger.Logger, managerCl
 
 	// try to build bot client
 	client, err := tele.NewBot(tele.Settings{
-		Token:  cfg.Token,
-		Poller: &tele.LongPoller{Timeout: time.Second * 10},
+		Token:   cfg.Token,
+		Poller:  &tele.LongPoller{Timeout: time.Second * 10},
+		OnError: b.OnError,
 	})
 	if err != nil {
 		logger.Fatalf("error building bot: %s", err)
@@ -80,7 +81,33 @@ func (b *bot) initHandlers() {
 	// group for auth middleware
 	authGroup := b.client.Group()
 	authGroup.Use(middleware.Auth(b.logger, b.managerClient))
-
+	// handle register
 	authGroup.Handle("/register", b.handleRegister())
 	authGroup.Handle(&style.MenuBtnRegister, b.handleRegister())
+}
+
+func (b *bot) OnError(err error, ctx tele.Context) {
+	logger := b.logger.WithFields("user_id", ctx.Sender().ID)
+
+	// if ctx is nil
+	if ctx == nil {
+		logger.Error("handler ended with empty context and error: %s", err)
+	}
+
+	// add handler name
+	handlerInterface := ctx.Get("handler")
+	handler, ok := handlerInterface.(string)
+	if ok {
+		logger.WithFields("handler", handler)
+	}
+
+	// add state handler name
+	stateHandlerInterface := ctx.Get("state_handler")
+	stateHandler, ok := stateHandlerInterface.(string)
+	if ok {
+		logger.WithFields("state_handler", stateHandler)
+	}
+
+	// log error
+	logger.Errorf("handler ended with error: %s", err)
 }

@@ -14,6 +14,7 @@ func Session(logger logger.Logger, sessionStore session.Store) tele.MiddlewareFu
 	const errMsg = "ensure session error: %s"
 	return func(next tele.HandlerFunc) tele.HandlerFunc {
 		return func(ctx tele.Context) error {
+			// ensure manager session
 			if err := sessionStore.Ensure(model.TelegramID(ctx.Sender().ID)); err != nil {
 				ctx.Send("internal error")
 				err = fmt.Errorf(errMsg, err)

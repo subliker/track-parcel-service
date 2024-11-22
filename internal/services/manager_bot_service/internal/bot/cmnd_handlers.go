@@ -1,6 +1,9 @@
 package bot
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/style"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
@@ -8,11 +11,9 @@ import (
 )
 
 func (b *bot) handleStart() tele.HandlerFunc {
-	// logger := b.logger.WithFields("handler", "start")
-
 	return func(ctx tele.Context) error {
-		// tID := model.TelegramID(ctx.Sender().ID)
-		// _ = logger.WithFields("user_id", tID)
+		// set handler name
+		ctx.Set("handler", "start")
 
 		ctx.Send(b.bundle.OnStartMessage(ctx.Sender().FirstName), style.MenuKeyboard)
 		return nil
@@ -20,17 +21,17 @@ func (b *bot) handleStart() tele.HandlerFunc {
 }
 
 func (b *bot) handleAddParcel() tele.HandlerFunc {
-	logger := b.logger.WithFields("handler", "add parcel")
-
 	return func(ctx tele.Context) error {
+		// set handler name
+		ctx.Set("handler", "add parcel")
+
 		tID := model.TelegramID(ctx.Sender().ID)
-		logger := logger.WithFields("user_id", tID)
 
 		// get session
 		session, err := b.sessionStore.Get(tID)
 		if err != nil {
-			logger.Errorf("get session error: %s", err)
-			return ctx.Send("internal error")
+			ctx.Send("internal error")
+			return fmt.Errorf("get session error: %s", err)
 		}
 
 		// set make parcel state
@@ -42,28 +43,29 @@ func (b *bot) handleAddParcel() tele.HandlerFunc {
 }
 
 func (b *bot) handleRegister() tele.HandlerFunc {
-	logger := b.logger.WithFields("handler", "register")
-
 	return func(ctx tele.Context) error {
+		// set handler name
+		ctx.Set("handler", "register")
+
 		tID := model.TelegramID(ctx.Sender().ID)
-		logger := logger.WithFields("user_id", tID)
 
 		// check if authorized
 		authorized, ok := ctx.Get("authorized").(bool)
 		if !ok {
-			logger.Error("auth error: authorized is nil")
-			return ctx.Send("internal error")
+			ctx.Send("internal error")
+			return errors.New("auth error: authorized is nil")
 		}
 
 		if authorized {
-			return ctx.Send("manager have been already registered")
+			ctx.Send("manager have been already registered")
+			return nil
 		}
 
 		// get session
 		session, err := b.sessionStore.Get(tID)
 		if err != nil {
-			logger.Errorf("get session error: %s", err)
-			return ctx.Send("internal error")
+			ctx.Send("internal error")
+			return fmt.Errorf("get session error: %s", err)
 		}
 
 		// set register state
