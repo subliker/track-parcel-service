@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
@@ -12,19 +11,11 @@ import (
 )
 
 func (b *bot) handleStart() tele.HandlerFunc {
-	logger := b.logger.WithFields("handler", "start")
+	// logger := b.logger.WithFields("handler", "start")
 
 	return func(ctx tele.Context) error {
-		tID := model.TelegramID(ctx.Sender().ID)
-		logger := logger.WithFields("user_id", tID)
-
-		// ensure session exists
-		if err := b.sessionStore.Ensure(tID); err != nil {
-			const errMsg = "error ensuring user session exists: %s"
-			err := fmt.Errorf(errMsg, err)
-			logger.Error(err)
-			return err
-		}
+		// tID := model.TelegramID(ctx.Sender().ID)
+		// _ = logger.WithFields("user_id", tID)
 
 		ctx.Send(b.bundle.OnStartMessage(ctx.Sender().FirstName))
 		return nil
@@ -38,10 +29,10 @@ func (b *bot) handleAddParcel() tele.HandlerFunc {
 		tID := model.TelegramID(ctx.Sender().ID)
 		logger := logger.WithFields("user_id", tID)
 
-		// ensure get session
-		session, err := b.sessionStore.EnsureGet(tID)
+		// get session
+		session, err := b.sessionStore.Get(tID)
 		if err != nil {
-			logger.Errorf("ensure get session error: %s", err)
+			logger.Errorf("get session error: %s", err)
 			return ctx.Send("internal error")
 		}
 
@@ -72,10 +63,10 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 			return ctx.Send("internal error")
 		}
 
-		// ensure get session
-		session, err := b.sessionStore.EnsureGet(tID)
+		// get session
+		session, err := b.sessionStore.Get(tID)
 		if err != nil {
-			logger.Errorf("ensure get session error: %s", err)
+			logger.Errorf("get session error: %s", err)
 			return ctx.Send("internal error")
 		}
 

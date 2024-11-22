@@ -7,6 +7,7 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/middleware"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
 	tele "gopkg.in/telebot.v4"
@@ -64,6 +65,9 @@ func (b *bot) Run() error {
 
 // initHandlers initializes all handlers
 func (b *bot) initHandlers() {
+	// ensure session
+	b.client.Use(middleware.Session(b.sessionStore))
+
 	b.client.Handle("/start", b.handleStart())
 	b.client.Handle("/add-parcel", b.handleAddParcel())
 	b.client.Handle("/register", b.handleRegister())
