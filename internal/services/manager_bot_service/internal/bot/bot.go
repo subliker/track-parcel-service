@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	sso "github.com/subliker/track-parcel-service/internal/pkg/client/sso/grpc"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
@@ -17,15 +17,15 @@ type Bot interface {
 }
 
 type bot struct {
-	client       *tele.Bot
-	bundle       lang.Messages
-	sessionStore session.Store
-	ssoClient    sso.Client
-	logger       logger.Logger
+	client        *tele.Bot
+	bundle        lang.Messages
+	sessionStore  session.Store
+	managerClient manager.Client
+	logger        logger.Logger
 }
 
 // New creates new instance of bot
-func New(cfg config.BotConfig, ss session.Store, logger logger.Logger, sso sso.Client) Bot {
+func New(cfg config.BotConfig, ss session.Store, logger logger.Logger, managerClient manager.Client) Bot {
 	var b bot
 
 	// try to build bot client
@@ -39,7 +39,7 @@ func New(cfg config.BotConfig, ss session.Store, logger logger.Logger, sso sso.C
 	b.client = client
 
 	// set sso client
-	b.ssoClient = sso
+	b.managerClient = managerClient
 
 	// set session store
 	b.sessionStore = ss
@@ -66,6 +66,7 @@ func (b *bot) Run() error {
 func (b *bot) initHandlers() {
 	b.client.Handle("/start", b.handleStart())
 	b.client.Handle("/add-parcel", b.handleAddParcel())
+	b.client.Handle("/register", b.handleRegister())
 
 	b.client.Handle(tele.OnText, b.handleOnText())
 }

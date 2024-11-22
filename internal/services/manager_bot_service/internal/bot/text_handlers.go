@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/models/telegram"
-	ssov1 "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/sso"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
@@ -17,7 +17,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 	logger := b.logger.WithFields("handler", handlerName)
 
 	return func(ctx tele.Context) error {
-		tID := telegram.ID(ctx.Sender().ID)
+		tID := model.TelegramID(ctx.Sender().ID)
 		logger := logger.WithFields("user_id", tID)
 
 		// getting state
@@ -35,8 +35,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 
 		switch st := ss.State().(type) {
 		case state.MakeParcel:
-			st, err := b.fillParcel(ctx, st)
-			if err != nil {
+			if err := b.fillParcel(ctx, &st); err != nil {
 				err := fmt.Errorf(errMsg, err)
 				logger.Error(err)
 				return err
@@ -44,8 +43,26 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 			if st.FillStep == state.MakeParcelFillStepReady {
 				ctx.Send("Посылка готова")
 				logger.Info(st.Parcel)
-				// add parcel in
-				b.ssoClient.RegisterTelegramID(context.Background(), &ssov1.RegisterTelegramIDRequest{TelegramId: ctx.Sender().ID})
+				ss.ClearState()
+				break
+			}
+			ss.SetState(st)
+		case state.Register:
+			if err := b.fillRegister(ctx, &st); err != nil {
+				err := fmt.Errorf(errMsg, err)
+				logger.Error(err)
+				return err
+			}
+			if st.FillStep == state.RegisterFillStepReady {
+				b.managerClient.Register(context.Background(), &managerpb.RegisterRequest{
+					ManagerTelegramId:  int64(st.Manager.TelegramID),
+					ManagerFullName:    st.Manager.FullName,
+					ManagerEmail:       st.Manager.Email,
+					ManagerPhoneNumber: st.Manager.PhoneNumber,
+					ManagerCompany:     st.Manager.Company,
+				})
+				ctx.Send("Регистрация готова")
+				logger.Info(st.Manager)
 				ss.ClearState()
 				break
 			}

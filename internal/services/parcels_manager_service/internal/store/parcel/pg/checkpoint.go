@@ -38,7 +38,7 @@ func (s *store) AddCheckpoint(tNum model.TrackNumber, cp model.Checkpoint) error
 	return nil
 }
 
-func (s *store) GetCheckpoints(trackNum model.TrackNumber, page int, pageSize int) ([]*model.Checkpoint, error) {
+func (s *store) GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize uint64) ([]*model.Checkpoint, error) {
 	logger := s.logger.WithFields("command", "get checkpoints")
 
 	// making checkpoints array
@@ -50,7 +50,9 @@ func (s *store) GetCheckpoints(trackNum model.TrackNumber, page int, pageSize in
 	// build query
 	query, args, err := psql.Select("time", "place", "description").
 		From("checkpoints").
-		Where(squirrel.Eq{"track_number": trackNum}).
+		Where(squirrel.Eq{"parcel_track_number": trackNum}).
+		Limit(pageSize).
+		Offset((page - 1) * pageSize).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of getting checkpoints: %s", err)

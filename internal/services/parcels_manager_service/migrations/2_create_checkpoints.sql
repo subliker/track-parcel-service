@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS checkpoints (
     time TIMESTAMP NOT NULL,
     place VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    parcel_track_number VARCHAR(25) NOT NULL,
     FOREIGN KEY (parcel_track_number) REFERENCES parcels(track_number) ON DELETE CASCADE
 );
 

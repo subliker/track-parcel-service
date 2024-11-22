@@ -27,7 +27,7 @@ func (r *Repository) Register(manager model.Manager) error {
 	// build query
 	query, args, err := psql.Insert("managers").
 		Columns("telegram_id", "full_name", "phone_number", "email", "company", "api_token").
-		Values(&manager.TelegramId, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company, &apiToken).
+		Values(&manager.TelegramID, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company, &apiToken).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of manager inserting: %s", err)
@@ -69,7 +69,7 @@ func (r *Repository) Get(tID model.TelegramID) (model.Manager, error) {
 
 	// executing query
 	row := r.db.QueryRow(query, args...)
-	err = row.Scan(&manager.TelegramId, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company)
+	err = row.Scan(&manager.TelegramID, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company)
 	if errors.Is(err, sql.ErrNoRows) {
 		return manager, store.ErrManagerNotFound
 	} else if err != nil {
@@ -109,4 +109,68 @@ func (r *Repository) GetApiToken(tID model.TelegramID) (model.ManagerApiToken, e
 	}
 
 	return apiToken, nil
+}
+
+func (r *Repository) GetTelegramId(apiToken model.ManagerApiToken) (model.TelegramID, error) {
+	logger := r.logger.WithFields("command", "get telegram id")
+
+	// making telegram id
+	var tID model.TelegramID
+
+	// making query builder
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// build query
+	query, args, err := psql.Select("telegram_id").
+		From("managers").
+		Where(squirrel.Eq{"api_token": apiToken}).
+		ToSql()
+	if err != nil {
+		errMsg := fmt.Errorf("error making query of get telegram id  selecting: %s", err)
+		logger.Error(errMsg)
+		return tID, errMsg
+	}
+
+	// executing query
+	row := r.db.QueryRow(query, args...)
+	err = row.Scan(&tID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return tID, store.ErrManagerNotFound
+	} else if err != nil {
+		return tID, err
+	}
+
+	return tID, nil
+}
+
+func (r *Repository) Exists(tID model.TelegramID) (bool, error) {
+	logger := r.logger.WithFields("command", "exists")
+
+	// making query builder
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// build query
+	query, args, err := psql.
+		Select("1").
+		Prefix("SELECT EXISTS (").
+		From("managers").
+		Where(squirrel.Eq{"telegram_id": tID}).
+		Suffix(")").
+		ToSql()
+	if err != nil {
+		errMsg := fmt.Errorf("error making query of manager exists selecting: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	// executing query
+	var exists bool
+	err = r.db.QueryRow(query, args...).Scan(&exists)
+	if err != nil {
+		errMsg := fmt.Errorf("error execution query of manager exists selecting: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	return exists, nil
 }

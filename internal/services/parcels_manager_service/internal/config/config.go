@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 )
 
@@ -28,7 +29,7 @@ type (
 )
 
 func init() {
-	viper.SetEnvPrefix("ACNT")
+	viper.SetEnvPrefix("PMS")
 
 	// env and default binding
 	viper.SetDefault("grpc.port", 50051)

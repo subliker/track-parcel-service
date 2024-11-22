@@ -1,4 +1,4 @@
-package session
+package lru
 
 type userSession struct {
 	state interface{}

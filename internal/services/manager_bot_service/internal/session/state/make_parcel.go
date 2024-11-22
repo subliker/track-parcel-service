@@ -1,9 +1,9 @@
 package state
 
-import models "github.com/subliker/track-parcel-service/internal/pkg/models/parcel"
+import "github.com/subliker/track-parcel-service/internal/pkg/model"
 
 type MakeParcel struct {
-	Parcel   models.Parcel
+	Parcel   model.Parcel
 	FillStep MakeParcelFillStep
 }
 

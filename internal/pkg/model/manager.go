@@ -18,7 +18,7 @@ func NewManagerApiToken() (ManagerApiToken, error) {
 }
 
 type Manager struct {
-	TelegramId  TelegramID
+	TelegramID  TelegramID
 	FullName    string
 	Email       string
 	PhoneNumber *string

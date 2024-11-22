@@ -2,8 +2,8 @@ package grpc
 
 import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	managerpb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/manager"
-	userpb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/server/grpc/manager"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/server/grpc/user"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package manager;
+package managerpb;
 
-option go_package = "account/manager";
+option go_package = "account/managerpb";
 
 import "google/protobuf/empty.proto";
 
@@ -10,6 +10,8 @@ service Manager {
     rpc Register (RegisterRequest) returns (google.protobuf.Empty);
     rpc GetInfo (GetInfoRequest) returns (GetInfoResponse);
     rpc GetApiToken (GetApiTokenRequest) returns (GetApiTokenResponse);
+    rpc Auth(AuthRequest) returns (google.protobuf.Empty);
+    rpc AuthApiToken(AuthApiTokenRequest) returns (AuthApiTokenResponse);
 }
 
 message RegisterRequest {
@@ -37,4 +39,16 @@ message GetApiTokenRequest {
 
 message GetApiTokenResponse {
     string manager_api_token = 1;
+}
+
+message AuthRequest {
+    int64 manager_telegram_id = 1;
+}
+
+message AuthApiTokenRequest {
+    string manager_api_token = 1;
+}
+
+message AuthApiTokenResponse{
+    int64 manager_telegram_id = 1;
 }
