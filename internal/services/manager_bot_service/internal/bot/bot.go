@@ -8,6 +8,7 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/middleware"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/style"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
 	tele "gopkg.in/telebot.v4"
@@ -65,12 +66,21 @@ func (b *bot) Run() error {
 
 // initHandlers initializes all handlers
 func (b *bot) initHandlers() {
-	// ensure session
-	b.client.Use(middleware.Session(b.sessionStore))
+	// global middlewares:
+	// ensure sessions
+	b.client.Use(middleware.Session(b.logger, b.sessionStore))
 
+	// global handlers
 	b.client.Handle("/start", b.handleStart())
 	b.client.Handle("/add-parcel", b.handleAddParcel())
-	b.client.Handle("/register", b.handleRegister())
-
+	b.client.Handle(&style.MenuBtnAddParcel, b.handleAddParcel())
 	b.client.Handle(tele.OnText, b.handleOnText())
+
+	// groups
+	// group for auth middleware
+	authGroup := b.client.Group()
+	authGroup.Use(middleware.Auth(b.logger, b.managerClient))
+
+	authGroup.Handle("/register", b.handleRegister())
+	authGroup.Handle(&style.MenuBtnRegister, b.handleRegister())
 }

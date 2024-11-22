@@ -1,11 +1,8 @@
 package bot
 
 import (
-	"context"
-
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/style"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
 )
@@ -17,7 +14,7 @@ func (b *bot) handleStart() tele.HandlerFunc {
 		// tID := model.TelegramID(ctx.Sender().ID)
 		// _ = logger.WithFields("user_id", tID)
 
-		ctx.Send(b.bundle.OnStartMessage(ctx.Sender().FirstName))
+		ctx.Send(b.bundle.OnStartMessage(ctx.Sender().FirstName), style.MenuKeyboard)
 		return nil
 	}
 }
@@ -51,16 +48,15 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 		tID := model.TelegramID(ctx.Sender().ID)
 		logger := logger.WithFields("user_id", tID)
 
-		// try to auth by telegram id
-		err := b.managerClient.Auth(context.Background(), &managerpb.AuthRequest{
-			ManagerTelegramId: int64(tID),
-		})
-		if err == nil {
-			return ctx.Send("manager have been already registered")
-		}
-		if err != manager.ErrManagerNotFound {
-			logger.Errorf("manager auth error: %s", err)
+		// check if authorized
+		authorized, ok := ctx.Get("authorized").(bool)
+		if !ok {
+			logger.Error("auth error: authorized is nil")
 			return ctx.Send("internal error")
+		}
+
+		if authorized {
+			return ctx.Send("manager have been already registered")
 		}
 
 		// get session
