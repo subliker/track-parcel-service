@@ -78,7 +78,11 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 			return ctx.Send("internal error")
 		}
 
-		session.SetState(state.Register{})
+		session.SetState(state.Register{
+			Manager: model.Manager{
+				TelegramID: tID,
+			},
+		})
 
 		return nil
 	}

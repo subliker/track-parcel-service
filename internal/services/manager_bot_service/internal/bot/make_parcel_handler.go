@@ -9,7 +9,7 @@ import (
 )
 
 // TODO ADD LANG n VALIDATION n TIME PARSING
-func (b *bot) fillParcel(ctx tele.Context, st state.MakeParcel) (state.MakeParcel, error) {
+func (b *bot) fillParcel(ctx tele.Context, st *state.MakeParcel) error {
 	st.FillStep++
 
 	fillBundle := b.bundle.States().MakeParcel()
@@ -39,5 +39,5 @@ func (b *bot) fillParcel(ctx tele.Context, st state.MakeParcel) (state.MakeParce
 		st.FillStep = state.MakeParcelFillStepReady
 	}
 
-	return st, nil
+	return nil
 }

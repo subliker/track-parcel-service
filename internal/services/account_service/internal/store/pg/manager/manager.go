@@ -27,7 +27,7 @@ func (r *Repository) Register(manager model.Manager) error {
 	// build query
 	query, args, err := psql.Insert("managers").
 		Columns("telegram_id", "full_name", "phone_number", "email", "company", "api_token").
-		Values(&manager.TelegramId, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company, &apiToken).
+		Values(&manager.TelegramID, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company, &apiToken).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of manager inserting: %s", err)
@@ -69,7 +69,7 @@ func (r *Repository) Get(tID model.TelegramID) (model.Manager, error) {
 
 	// executing query
 	row := r.db.QueryRow(query, args...)
-	err = row.Scan(&manager.TelegramId, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company)
+	err = row.Scan(&manager.TelegramID, &manager.FullName, &manager.PhoneNumber, &manager.Email, &manager.Company)
 	if errors.Is(err, sql.ErrNoRows) {
 		return manager, store.ErrManagerNotFound
 	} else if err != nil {

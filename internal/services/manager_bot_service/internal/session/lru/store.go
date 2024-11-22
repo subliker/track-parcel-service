@@ -93,7 +93,7 @@ func (s *store) Ensure(tID model.TelegramID) error {
 func (s *store) EnsureGet(tID model.TelegramID) (session.Session, error) {
 	// try to add session
 	err := s.Add(tID)
-	if !errors.Is(err, session.ErrSessionIsAlreadyExist) {
+	if !errors.Is(err, session.ErrSessionIsAlreadyExist) && err != nil {
 		return nil, err
 	}
 

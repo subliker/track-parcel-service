@@ -56,14 +56,14 @@ func (c *client) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInf
 		case codes.NotFound:
 			return nil, ErrManagerNotFound
 		case codes.Internal:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return nil, ErrInternal
 		default:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return nil, ErrUnexpected
 		}
 	}
-	logger.Infof(errMsg, "non grpc error")
+	logger.Errorf(errMsg, "non grpc error")
 	return nil, ErrUnexpected
 }
 
@@ -85,14 +85,14 @@ func (c *client) GetApiToken(ctx context.Context, in *pb.GetApiTokenRequest) (*p
 		case codes.NotFound:
 			return nil, ErrManagerNotFound
 		case codes.Internal:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return nil, ErrInternal
 		default:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return nil, ErrUnexpected
 		}
 	}
-	logger.Infof(errMsg, "non grpc error")
+	logger.Errorf(errMsg, "non grpc error")
 	return nil, ErrUnexpected
 }
 
@@ -114,14 +114,14 @@ func (c *client) Auth(ctx context.Context, in *pb.AuthRequest) error {
 		case codes.NotFound:
 			return ErrManagerNotFound
 		case codes.Internal:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return ErrInternal
 		default:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return ErrUnexpected
 		}
 	}
-	logger.Infof(errMsg, "non grpc error")
+	logger.Errorf(errMsg, "non grpc error")
 	return ErrUnexpected
 }
 
@@ -143,13 +143,13 @@ func (c *client) AuthApiToken(ctx context.Context, in *pb.AuthApiTokenRequest) (
 		case codes.NotFound:
 			return nil, ErrManagerNotFound
 		case codes.Internal:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return nil, ErrInternal
 		default:
-			logger.Info(errMsg)
+			logger.Error(errMsg)
 			return nil, ErrUnexpected
 		}
 	}
-	logger.Infof(errMsg, "non grpc error")
+	logger.Errorf(errMsg, "non grpc error")
 	return nil, ErrUnexpected
 }

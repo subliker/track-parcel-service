@@ -27,7 +27,7 @@ func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emp
 
 	// add manager to store
 	if err := s.repo.Register(model.Manager{
-		TelegramId:  model.TelegramID(req.ManagerTelegramId),
+		TelegramID:  model.TelegramID(req.ManagerTelegramId),
 		FullName:    req.ManagerFullName,
 		Email:       req.ManagerEmail,
 		PhoneNumber: req.ManagerPhoneNumber,
