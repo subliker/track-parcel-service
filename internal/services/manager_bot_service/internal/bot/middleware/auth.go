@@ -32,3 +32,24 @@ func Auth(logger logger.Logger, managerClient manager.Client) tele.MiddlewareFun
 		}
 	}
 }
+
+func Authorized(logger logger.Logger) tele.MiddlewareFunc {
+	logger = logger.WithFields("middleware", "authorized")
+	const errMsg = "manager authorized error: %s"
+	return func(next tele.HandlerFunc) tele.HandlerFunc {
+		return func(ctx tele.Context) error {
+			authorized, ok := ctx.Get("authorized").(bool)
+			if !ok {
+				ctx.Send("internal error")
+				err := fmt.Errorf(errMsg, "auth middleware dropped")
+				logger.Error(err)
+				return err
+			}
+			if !authorized {
+				ctx.Send("you are not authorized")
+				return nil
+			}
+			return next(ctx)
+		}
+	}
+}

@@ -22,7 +22,7 @@ const (
 )
 
 func SetRegister(ss session.Session, tID model.TelegramID) {
-	ss.SetState(&Register{
+	ss.SetState(Register{
 		Manager: model.Manager{
 			TelegramID: tID,
 		},

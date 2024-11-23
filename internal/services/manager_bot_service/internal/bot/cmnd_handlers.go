@@ -70,6 +70,7 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 
 		// set register state
 		state.SetRegister(session, tID)
+		ctx.Send(b.bundle.States().Register().FullName())
 
 		return nil
 	}

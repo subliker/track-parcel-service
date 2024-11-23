@@ -25,7 +25,7 @@ const (
 )
 
 func SetMakeParcel(ss session.Session) {
-	ss.SetState(&MakeParcel{})
+	ss.SetState(MakeParcel{})
 }
 
 func (mp *MakeParcel) Ended() bool {

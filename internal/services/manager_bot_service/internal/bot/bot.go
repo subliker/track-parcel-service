@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/middleware"
@@ -19,20 +20,28 @@ type Bot interface {
 }
 
 type bot struct {
-	client        *tele.Bot
-	bundle        lang.Messages
-	sessionStore  session.Store
-	managerClient manager.Client
-	logger        logger.Logger
+	client               *tele.Bot
+	bundle               lang.Messages
+	sessionStore         session.Store
+	managerClient        manager.Client
+	parcelsManagerClient pm.Client
+	logger               logger.Logger
+}
+
+type BotOptions struct {
+	Cfg                  config.BotConfig
+	SessionStore         session.Store
+	ManagerClient        manager.Client
+	ParcelsManagerClient pm.Client
 }
 
 // New creates new instance of bot
-func New(cfg config.BotConfig, ss session.Store, logger logger.Logger, managerClient manager.Client) Bot {
+func New(logger logger.Logger, opts BotOptions) Bot {
 	var b bot
 
 	// try to build bot client
 	client, err := tele.NewBot(tele.Settings{
-		Token:   cfg.Token,
+		Token:   opts.Cfg.Token,
 		Poller:  &tele.LongPoller{Timeout: time.Second * 10},
 		OnError: b.OnError,
 	})
@@ -41,14 +50,17 @@ func New(cfg config.BotConfig, ss session.Store, logger logger.Logger, managerCl
 	}
 	b.client = client
 
-	// set sso client
-	b.managerClient = managerClient
+	// set manager client
+	b.managerClient = opts.ManagerClient
+
+	// set parcels manager client
+	b.parcelsManagerClient = opts.ParcelsManagerClient
 
 	// set session store
-	b.sessionStore = ss
+	b.sessionStore = opts.SessionStore
 
 	// language initialization
-	b.bundle = lang.MessagesForOrDefault(cfg.Language)
+	b.bundle = lang.MessagesForOrDefault(opts.Cfg.Language)
 
 	// set logger
 	b.logger = logger.WithFields("layer", "bot")
@@ -70,20 +82,23 @@ func (b *bot) initHandlers() {
 	// global middlewares:
 	// ensure sessions
 	b.client.Use(middleware.Session(b.logger, b.sessionStore))
+	b.client.Use(middleware.Auth(b.logger, b.managerClient))
 
 	// global handlers
 	b.client.Handle("/start", b.handleStart())
-	b.client.Handle("/add-parcel", b.handleAddParcel())
-	b.client.Handle(&style.MenuBtnAddParcel, b.handleAddParcel())
-	b.client.Handle(tele.OnText, b.handleOnText())
+	// handle register
+	b.client.Handle("/register", b.handleRegister())
+	b.client.Handle(&style.MenuBtnRegister, b.handleRegister())
 
 	// groups
-	// group for auth middleware
+	// group for authorized managers middleware
 	authGroup := b.client.Group()
-	authGroup.Use(middleware.Auth(b.logger, b.managerClient))
-	// handle register
-	authGroup.Handle("/register", b.handleRegister())
-	authGroup.Handle(&style.MenuBtnRegister, b.handleRegister())
+	authGroup.Use(middleware.Authorized(b.logger))
+	// handle make parcel
+	authGroup.Handle("/add-parcel", b.handleAddParcel())
+	authGroup.Handle(&style.MenuBtnAddParcel, b.handleAddParcel())
+	// handle text
+	authGroup.Handle(tele.OnText, b.handleOnText())
 }
 
 func (b *bot) OnError(err error, ctx tele.Context) {

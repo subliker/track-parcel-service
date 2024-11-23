@@ -2,37 +2,48 @@ package app
 
 import (
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot"
-	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
 )
 
-type App struct {
-	bot           bot.Bot
-	managerClient manager.Client
+type App interface {
+	Run()
+}
+
+type app struct {
+	bot                  bot.Bot
+	managerClient        manager.Client
+	parcelsManagerClient pm.Client
 
 	logger logger.Logger
 }
 
-func New(cfg config.Config,
-	logger logger.Logger,
-	bot bot.Bot,
-	managerClient manager.Client) App {
-	var a App
+type AppOptions struct {
+	Bot                  bot.Bot
+	ManagerClient        manager.Client
+	ParcelsManagerClient pm.Client
+}
+
+func New(logger logger.Logger, opts AppOptions) App {
+	var a app
 
 	// set logger
 	a.logger = logger.WithFields("layer", "app")
 
 	// set bot
-	a.bot = bot
+	a.bot = opts.Bot
 
 	// set manager client
-	a.managerClient = managerClient
+	a.managerClient = opts.ManagerClient
 
-	return a
+	// set parcels manager client
+	a.parcelsManagerClient = opts.ParcelsManagerClient
+
+	return &a
 }
 
-func (a *App) Run() {
+func (a *app) Run() {
 	// running bot
 	a.logger.Fatal(a.bot.Run())
 }

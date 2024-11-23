@@ -47,7 +47,7 @@ type statesmakeParcel interface{
     ForecastDate() string
     ForecastDateIncorrectTime() string
     Description() string
-    Ready() string
+    Ready(trackNumber string) string
 }
 type statesregister interface{
     FullName() string
@@ -91,8 +91,8 @@ func (ru_RU_statesmakeParcel) ForecastDateIncorrectTime() string {
 func (ru_RU_statesmakeParcel) Description() string {
     return "Введите описание для посылки"
 }
-func (ru_RU_statesmakeParcel) Ready() string {
-    return "Посылка была добавлена в систему"
+func (ru_RU_statesmakeParcel) Ready(trackNumber string) string {
+    return fmt.Sprintf("Посылка была добавлена в систему. Ее трек номер: %s", trackNumber)
 }
 func (ru_RU_states) Register() statesregister {
     return ru_RU_statesregister{}

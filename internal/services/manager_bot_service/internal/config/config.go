@@ -5,15 +5,17 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/validation"
 )
 
 type Config struct {
-	Bot            BotConfig      `validate:"required" mapstructure:"bot"`
-	Session        SessionConfig  `mapstructure:"session"`
-	ManagerService manager.Config `validate:"required" mapstructure:"managerservice"`
+	Bot                  BotConfig      `validate:"required" mapstructure:"bot"`
+	Session              SessionConfig  `mapstructure:"session"`
+	ManagerClient        manager.Config `validate:"required" mapstructure:"managerclient"`
+	ParcelsManagerClient pm.Config      `validate:"required" mapstructure:"pmclient"`
 }
 
 type BotConfig struct {
