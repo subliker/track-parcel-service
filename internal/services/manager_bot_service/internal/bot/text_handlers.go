@@ -31,17 +31,18 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 			if err := b.fillParcel(ctx, &st); err != nil {
 				return err
 			}
-			if st.FillStep == state.MakeParcelFillStepReady {
-				ctx.Send("Посылка готова")
+			if st.Ended() {
+				ctx.Send(b.bundle.States().MakeParcel().Ready())
 				ss.ClearState()
 				break
+			} else {
+				ss.SetState(st)
 			}
-			ss.SetState(st)
 		case state.Register:
 			if err := b.fillRegister(ctx, &st); err != nil {
 				return err
 			}
-			if st.FillStep == state.RegisterFillStepReady {
+			if st.Ended() {
 				err := b.managerClient.Register(context.Background(), &managerpb.RegisterRequest{
 					ManagerTelegramId:  int64(st.Manager.TelegramID),
 					ManagerFullName:    st.Manager.FullName,
@@ -57,11 +58,12 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 					ctx.Send("register ended with internal error")
 					return nil
 				}
-				ctx.Send("Регистрация готова")
+				ctx.Send(b.bundle.States().Register().Ready())
 				ss.ClearState()
 				break
+			} else {
+				ss.SetState(st)
 			}
-			ss.SetState(st)
 		}
 
 		return nil

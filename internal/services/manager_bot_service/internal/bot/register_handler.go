@@ -11,30 +11,29 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 
 	st.FillStep++
 
-	// TODO add bundle
+	fillBundle := b.bundle.States().Register()
 	switch st.FillStep {
 	case state.RegisterFillStepFullName:
 		st.Manager.FullName = ctx.Text()
-		ctx.Send("enter email")
+		ctx.Send(fillBundle.Email())
 	case state.RegisterFillStepEmail:
 		st.Manager.Email = ctx.Text()
-		ctx.Send("enter phone number")
+		ctx.Send(fillBundle.PhoneNumber())
 	case state.RegisterFillStepPhoneNumber:
 		if ctx.Text() == "NO" {
 			st.Manager.PhoneNumber = nil
-			break
+		} else {
+			t := ctx.Text()
+			st.Manager.PhoneNumber = &t
 		}
-		t := ctx.Text()
-		st.Manager.PhoneNumber = &t
-		ctx.Send("enter company")
+		ctx.Send(fillBundle.Company())
 	case state.RegisterFillStepCompany:
 		if ctx.Text() == "NO" {
 			st.Manager.Company = nil
-			break
+		} else {
+			t := ctx.Text()
+			st.Manager.Company = &t
 		}
-		t := ctx.Text()
-		st.Manager.Company = &t
-		ctx.Send("register ready")
 		st.FillStep = state.RegisterFillStepReady
 	}
 
