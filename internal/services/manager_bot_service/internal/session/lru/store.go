@@ -29,7 +29,7 @@ func New(logger logger.Logger) session.Store {
 
 	// set logger
 	s.logger = logger.WithFields("layer", "session store")
-
+	s.logger.Info("session store was created")
 	return &s
 }
 

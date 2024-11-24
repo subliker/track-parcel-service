@@ -20,10 +20,16 @@ func main() {
 	cfg := config.Get()
 
 	// creating new manager service client
-	managerClient := manager.New(context.Background(), logger, cfg.ManagerClient)
+	managerClient, err := manager.New(context.Background(), logger, cfg.ManagerClient)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	// creating new parcels manager service client
-	parcelsManagerClient := pm.New(context.Background(), logger, cfg.ParcelsManagerClient)
+	parcelsManagerClient, err := pm.New(context.Background(), logger, cfg.ParcelsManagerClient)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	// creating lru session store
 	store := lru.New(logger)
@@ -43,5 +49,5 @@ func main() {
 		ParcelsManagerClient: parcelsManagerClient,
 	})
 	// running app
-	a.Run()
+	a.Run(context.Background())
 }

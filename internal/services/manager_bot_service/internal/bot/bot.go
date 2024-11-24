@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"errors"
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
@@ -11,11 +10,12 @@ import (
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/middleware"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
+	"golang.org/x/net/context"
 	tele "gopkg.in/telebot.v4"
 )
 
 type Bot interface {
-	Run() error
+	Run(context.Context) error
 }
 
 type bot struct {
@@ -68,13 +68,24 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 	// handlers init
 	b.initHandlers()
 
+	b.logger.Infof("bot was built. Hello, I'm %s", b.client.Me.FirstName)
 	return &b
 }
 
 // Run runs bot after initialization
-func (b *bot) Run() error {
-	b.client.Start()
-	return errors.New("bot stopped")
+func (b *bot) Run(ctx context.Context) error {
+	go func() {
+		b.client.Start()
+	}()
+	b.logger.Info("bot is running")
+
+	// wait until context will be canceled
+	<-ctx.Done()
+
+	// stop bot
+	b.client.Close()
+
+	return nil
 }
 
 // initHandlers initializes all handlers
@@ -104,6 +115,8 @@ func (b *bot) initHandlers() {
 	addParcelHandler := b.handleAddParcel()
 	authGroup.Handle("/add-parcel", addParcelHandler)
 	authGroup.Handle(&menuBtnAddParcel, addParcelHandler)
+
+	b.logger.Info("handlers were initialized")
 }
 
 func (b *bot) OnError(err error, ctx tele.Context) {
