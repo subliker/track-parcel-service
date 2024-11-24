@@ -1,0 +1,25 @@
+services:
+  pgs1:
+    container_name: users
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: subliker
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: qwe123123
+  pgs2:
+    container_name: parcels
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: subliker
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: qwe123123
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"

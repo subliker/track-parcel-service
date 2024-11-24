@@ -29,7 +29,7 @@ func New(logger logger.Logger) session.Store {
 
 	// set logger
 	s.logger = logger.WithFields("layer", "session store")
-
+	s.logger.Info("session store was created")
 	return &s
 }
 
@@ -88,20 +88,4 @@ func (s *store) Ensure(tID model.TelegramID) error {
 	}
 
 	return nil
-}
-
-func (s *store) EnsureGet(tID model.TelegramID) (session.Session, error) {
-	// try to add session
-	err := s.Add(tID)
-	if !errors.Is(err, session.ErrSessionIsAlreadyExist) && err != nil {
-		return nil, err
-	}
-
-	ss, ok := s.cache.Get(tID)
-	if !ok {
-		errMsg := errors.New("ensure get error: session add or get semantic problem")
-		s.logger.Error(errMsg)
-		return nil, errMsg
-	}
-	return ss, nil
 }

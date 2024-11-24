@@ -113,3 +113,35 @@ func (s *store) GetInfo(trackNum model.TrackNumber) (model.Parcel, error) {
 
 	return p, nil
 }
+
+func (s *store) Exists(trackNum model.TrackNumber) (bool, error) {
+	logger := s.logger.WithFields("command", "exists")
+
+	// making query builder
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// build query
+	query, args, err := psql.
+		Select("1").
+		Prefix("SELECT EXISTS (").
+		From("parcels").
+		Where(squirrel.Eq{"track_number": trackNum}).
+		Suffix(")").
+		ToSql()
+	if err != nil {
+		errMsg := fmt.Errorf("error making query of parcel exists selecting: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	// executing query
+	var exists bool
+	err = s.db.QueryRow(query, args...).Scan(&exists)
+	if err != nil {
+		errMsg := fmt.Errorf("error execution query of parcel exists selecting: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	return exists, nil
+}

@@ -2,7 +2,6 @@ package pm
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
@@ -27,7 +26,7 @@ func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pb.AddCheckpointRequ
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)
-		return nil, status.Error(codes.NotFound, errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
 	}
 
 	return nil, nil
@@ -37,16 +36,24 @@ func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRe
 	logger := s.logger.WithFields("handler", "get checkpoints")
 	const errMsg = "error get checkpoints for parcel(%s): %s"
 
-	// get checkpoints from store
-	cps, err := s.store.GetCheckpoints(model.TrackNumber(req.TrackNumber), req.Page, req.PageSize)
-	if errors.Is(err, parcel.ErrParcelNotFound) {
-		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
-		return nil, status.Error(codes.NotFound, errMsg)
-	}
+	// check if parcel exists
+	exists, err := s.store.Exists(model.TrackNumber(req.TrackNumber))
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
+	}
+	if !exists {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, parcel.ErrParcelNotFound)
 		return nil, status.Error(codes.NotFound, errMsg)
+	}
+
+	// get checkpoints from store
+	cps, err := s.store.GetCheckpoints(model.TrackNumber(req.TrackNumber), req.Page, req.PageSize)
+	if err != nil {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
 	}
 
 	// transfer to proto checkpoints

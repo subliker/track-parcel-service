@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS managers (
 );
 
 CREATE INDEX IF NOT EXISTS idx_managers_telegram_id ON managers(telegram_id);
+CREATE INDEX IF NOT EXISTS idx_managers_api_token ON managers(api_token);
 
 -- +goose Down
 DROP TABLE IF EXISTS managers;
