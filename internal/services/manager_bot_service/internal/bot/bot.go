@@ -103,7 +103,6 @@ func (b *bot) initHandlers() {
 	// handle add parcel
 	addParcelHandler := b.handleAddParcel()
 	authGroup.Handle("/add-parcel", addParcelHandler)
-	b.logger.Info(menuBtnAddParcel)
 	authGroup.Handle(&menuBtnAddParcel, addParcelHandler)
 }
 

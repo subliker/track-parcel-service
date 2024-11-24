@@ -62,7 +62,7 @@ func (b *bot) fillParcel(ctx tele.Context, st *state.MakeParcel) error {
 			break
 		}
 		st.Parcel.ForecastDate = fd
-		ctx.Send(fillBundle.Description())
+		b.logger.Error(ctx.Send(fillBundle.Description()))
 	case state.MakeParcelFillDescription:
 		st.Parcel.Description = ctx.Text()
 		st.FillStep++
