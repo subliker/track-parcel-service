@@ -2,12 +2,9 @@ package bot
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pmpb"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -58,23 +55,6 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				return err
 			}
 			if st.Ended() {
-				m := st.Manager
-				err := b.managerClient.Register(context.Background(), &managerpb.RegisterRequest{
-					ManagerTelegramId:  int64(m.TelegramID),
-					ManagerFullName:    m.FullName,
-					ManagerEmail:       m.Email,
-					ManagerPhoneNumber: m.PhoneNumber,
-					ManagerCompany:     m.Company,
-				})
-				if errors.Is(err, manager.ErrManagerIsAlreadyExist) {
-					ctx.Send("you have been already registered")
-					return err
-				}
-				if err != nil {
-					ctx.Send("register ended with internal error")
-					return err
-				}
-				ctx.Send(b.bundle.States().Register().Ready())
 				ss.ClearState()
 				break
 			} else {

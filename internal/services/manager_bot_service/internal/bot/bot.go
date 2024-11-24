@@ -9,7 +9,6 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/middleware"
-	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/style"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
 	tele "gopkg.in/telebot.v4"
@@ -41,9 +40,10 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 
 	// try to build bot client
 	client, err := tele.NewBot(tele.Settings{
-		Token:   opts.Cfg.Token,
-		Poller:  &tele.LongPoller{Timeout: time.Second * 10},
-		OnError: b.OnError,
+		Token:     opts.Cfg.Token,
+		Poller:    &tele.LongPoller{Timeout: time.Second * 10},
+		OnError:   b.OnError,
+		ParseMode: tele.ModeMarkdown,
 	})
 	if err != nil {
 		logger.Fatalf("error building bot: %s", err)
@@ -85,10 +85,12 @@ func (b *bot) initHandlers() {
 	b.client.Use(middleware.Auth(b.logger, b.managerClient))
 
 	// global handlers
+	// handle text
+	b.client.Handle(tele.OnText, b.handleOnText())
+	// handle start
 	b.client.Handle("/start", b.handleStart())
 	// handle register
 	b.client.Handle("/register", b.handleRegister())
-	b.client.Handle(&style.MenuBtnRegister, b.handleRegister())
 
 	// groups
 	// group for authorized managers middleware
@@ -96,9 +98,6 @@ func (b *bot) initHandlers() {
 	authGroup.Use(middleware.Authorized(b.logger))
 	// handle make parcel
 	authGroup.Handle("/add-parcel", b.handleAddParcel())
-	authGroup.Handle(&style.MenuBtnAddParcel, b.handleAddParcel())
-	// handle text
-	authGroup.Handle(tele.OnText, b.handleOnText())
 }
 
 func (b *bot) OnError(err error, ctx tele.Context) {

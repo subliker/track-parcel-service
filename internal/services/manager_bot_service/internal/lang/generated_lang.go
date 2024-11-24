@@ -33,8 +33,27 @@ func MessagesForOrDefault(tag string) Messages {
 }
 
 type Messages interface{
-    OnStartMessage(user_name string) string
+    StartMessage() startMessage
+    Register() register
     States() states
+}
+type startMessage interface{
+    Head(user_name string) string
+    Main() string
+    Markup() startMessagemarkup
+}
+type startMessagemarkup interface{
+    Register() string
+}
+type register interface{
+    Points() registerpoints
+}
+type registerpoints interface{
+    FullName() string
+    Email() string
+    PhoneNumber() string
+    Company() string
+    Ready(name string, email string, phoneNumber string, company string) string
 }
 type states interface{
     MakeParcel() statesmakeParcel
@@ -58,12 +77,76 @@ type statesregister interface{
 }
 
 type ru_RU_Messages struct{}
-func (ru_RU_Messages) OnStartMessage(user_name string) string {
+func (ru_RU_Messages) StartMessage() startMessage {
+    return ru_RU_startMessage{}
+}
+type ru_RU_startMessage struct{}
+func (ru_RU_startMessage) Head(user_name string) string {
     if user_name == "" {
-        return "Привет! Это тестовый бот для менеджеров"
+        return "✨ Добро пожаловать! ✨"
     } else {
-        return fmt.Sprintf("Привет, %s! Это тестовый бот для менеджеров", user_name)
+        return fmt.Sprintf("✨ Добро пожаловать, %s! ✨", user_name)
     }
+}
+func (ru_RU_startMessage) Main() string {
+    return "_Мы упрощаем работу менеджеров с посылками! С помощью нашего бота вы сможете:_" + "\n" +
+        "" + "\n" +
+        " • 📦 Легко добавлять и отслеживать посылки" + "\n" +
+        " • 🗺️ Добавлять чекпоинты с подробностями" + "\n" +
+        " • 🔍 Быстро находить нужную информацию" + "\n" +
+        "" + "\n" +
+        "_Начните с регистрации, чтобы открыть все возможности бота!_" + "\n" +
+        "*Кнопка*: \"✅ Зарегистрироваться\""
+}
+func (ru_RU_startMessage) Markup() startMessagemarkup {
+    return ru_RU_startMessagemarkup{}
+}
+type ru_RU_startMessagemarkup struct{}
+func (ru_RU_startMessagemarkup) Register() string {
+    return "✅ Зарегистрироваться"
+}
+func (ru_RU_Messages) Register() register {
+    return ru_RU_register{}
+}
+type ru_RU_register struct{}
+func (ru_RU_register) Points() registerpoints {
+    return ru_RU_registerpoints{}
+}
+type ru_RU_registerpoints struct{}
+func (ru_RU_registerpoints) FullName() string {
+    return "Давайте начнем с вашего имени! 📝" + "\n" +
+        "_Напишите, пожалуйста, ваше полное имя, чтобы мы могли обращаться к вам по имени. Это и последующие поля будет отображаться публично, так что убедитесь, что вы не против!_" + "\n" +
+        "" + "\n" +
+        "_Пример: Иванов Иван Иванович_"
+}
+func (ru_RU_registerpoints) Email() string {
+    return "Теперь нам нужно ваш email! 📧" + "\n" +
+        "_Это поможет вашим получателям поддерживать с вами связь по почте._" + "\n" +
+        "" + "\n" +
+        "_Пример: ivanov@example.com_"
+}
+func (ru_RU_registerpoints) PhoneNumber() string {
+    return "Теперь давайте добавим ваш номер телефона! 📱" + "\n" +
+        "_Этот шаг опционален, но если хотите, чтобы получатели могли связаться с вами по телефону — укажите номер._" + "\n" +
+        "" + "\n" +
+        "_Пример: +7 (999) 123-45-67_"
+}
+func (ru_RU_registerpoints) Company() string {
+    return "Укажите, пожалуйста, название вашей компании! 🏢" + "\n" +
+        "_Это поле опционально, но если у вас есть компания, то добавьте ее сюда. Название компании будет видно публично._" + "\n" +
+        "" + "\n" +
+        "_Пример: ООО 'ТехноПарт'_"
+}
+func (ru_RU_registerpoints) Ready(name string, email string, phoneNumber string, company string) string {
+    return "Поздравляем, ваш профиль успешно создан! 🎉" + "\n" +
+        "Теперь вы можете начать использовать все функции бота. Мы рады приветствовать вас в нашем сообществе! 🙌" + "\n" +
+        "Вот что теперь видят получатели:" + "\n" +
+        fmt.Sprintf("*Имя:* %s", name) + "\n" +
+        fmt.Sprintf("*Email:* %s", email) + "\n" +
+        fmt.Sprintf("*Телефон* %s", phoneNumber) + "\n" +
+        fmt.Sprintf("*Компания:* %s", company) + "\n" +
+        "" + "\n" +
+        "_Если нужно изменить какие-то данные, вы всегда можете это сделать в настройках профиля. 👇_"
 }
 func (ru_RU_Messages) States() states {
     return ru_RU_states{}
