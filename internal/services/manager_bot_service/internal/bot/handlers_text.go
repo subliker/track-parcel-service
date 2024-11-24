@@ -1,18 +1,22 @@
 package bot
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pmpb"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	tele "gopkg.in/telebot.v4"
 )
 
-func (b *bot) handleOnText() tele.HandlerFunc {
+var dontSpecifyKetboard *tele.ReplyMarkup
+var btnDontSpecify tele.Btn
 
+func (b *bot) handleOnText() tele.HandlerFunc {
+	dontSpecifyKetboard = b.client.NewMarkup()
+
+	btnDontSpecify = dontSpecifyKetboard.Data(b.bundle.Common().Markup().BtnDontSpecify(), "dont-specify")
+
+	dontSpecifyKetboard.Inline(dontSpecifyKetboard.Row(btnDontSpecify))
 	return func(ctx tele.Context) error {
 		// set handler name
 		ctx.Set("handler", "on text")
@@ -31,21 +35,8 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				return err
 			}
 			if st.Ended() {
-				p := st.Parcel
-				res, err := b.parcelsManagerClient.AddParcel(context.Background(), &pmpb.AddParcelRequest{
-					ParcelName:           p.Name,
-					ManagerTelegramId:    int64(p.ManagerID),
-					ParcelRecipient:      p.Recipient,
-					ParcelArrivalAddress: p.ArrivalAddress,
-					ParcelForecastDate:   timestamppb.New(p.ForecastDate),
-					ParcelDescription:    p.Description,
-				})
-				if err != nil {
-					ctx.Send("register ended with internal error")
-					return err
-				}
-				ctx.Send(b.bundle.States().MakeParcel().Ready(res.TrackNumber))
 				ss.ClearState()
+				b.handleMenu()(ctx)
 				break
 			} else {
 				ss.SetState(st)
@@ -56,6 +47,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 			}
 			if st.Ended() {
 				ss.ClearState()
+				b.handleMenu()(ctx)
 				break
 			} else {
 				ss.SetState(st)
@@ -65,5 +57,13 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 		}
 
 		return nil
+	}
+}
+
+func (b *bot) handleDontSpecify() tele.HandlerFunc {
+	return func(ctx tele.Context) error {
+		ctx.Set("dont-specify", true)
+		ctx.Respond()
+		return b.handleOnText()(ctx)
 	}
 }

@@ -91,13 +91,20 @@ func (b *bot) initHandlers() {
 	b.client.Handle("/start", b.handleStart())
 	// handle register
 	b.client.Handle("/register", b.handleRegister())
+	// don't specify data handler
+	b.client.Handle(&btnDontSpecify, b.handleDontSpecify())
 
 	// groups
 	// group for authorized managers middleware
 	authGroup := b.client.Group()
 	authGroup.Use(middleware.Authorized(b.logger))
-	// handle make parcel
-	authGroup.Handle("/add-parcel", b.handleAddParcel())
+	// handle menu
+	authGroup.Handle("/menu", b.handleMenu())
+	// handle add parcel
+	addParcelHandler := b.handleAddParcel()
+	authGroup.Handle("/add-parcel", addParcelHandler)
+	b.logger.Info(menuBtnAddParcel)
+	authGroup.Handle(&menuBtnAddParcel, addParcelHandler)
 }
 
 func (b *bot) OnError(err error, ctx tele.Context) {

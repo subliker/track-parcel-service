@@ -53,6 +53,8 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 	// set state handler
 	ctx.Set("state_handler", "fill register")
 
+	notSpecify, _ := ctx.Get("dont-specify").(bool)
+
 	st.FillStep++
 
 	fillBundle := b.bundle.Register().Points()
@@ -62,22 +64,24 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 		ctx.Send(fillBundle.Email())
 	case state.RegisterFillStepEmail:
 		st.Manager.Email = ctx.Text()
-		ctx.Send(fillBundle.PhoneNumber())
+
+		ctx.Send(fillBundle.PhoneNumber(), dontSpecifyKetboard)
 	case state.RegisterFillStepPhoneNumber:
-		if ctx.Text() == "NO" {
+		if notSpecify {
 			st.Manager.PhoneNumber = nil
 		} else {
 			t := ctx.Text()
 			st.Manager.PhoneNumber = &t
 		}
-		ctx.Send(fillBundle.Company())
+		ctx.Send(fillBundle.Company(), dontSpecifyKetboard)
 	case state.RegisterFillStepCompany:
-		if ctx.Text() == "NO" {
+		if notSpecify {
 			st.Manager.Company = nil
 		} else {
 			t := ctx.Text()
 			st.Manager.Company = &t
 		}
+		st.FillStep++
 		fallthrough
 	case state.RegisterFillStepReady:
 		err := b.sendRegister(ctx, st.Manager)

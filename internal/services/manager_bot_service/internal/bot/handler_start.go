@@ -13,6 +13,12 @@ func (b *bot) handleStart() tele.HandlerFunc {
 		// set handler name
 		ctx.Set("handler", "start")
 
+		// redirect if authorized
+		authorized, _ := ctx.Get("authorized").(bool)
+		if authorized {
+			return b.handleMenu()(ctx)
+		}
+
 		ctx.Send(b.bundle.StartMessage().Head(ctx.Sender().FirstName)+"\n"+b.bundle.StartMessage().Main(), mk)
 		return nil
 	}
