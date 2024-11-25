@@ -1,10 +1,10 @@
-package manager
+package user
 
 import (
 	"context"
 	"fmt"
 
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
+	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/userpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -25,7 +25,7 @@ func (c *client) Register(ctx context.Context, in *pb.RegisterRequest) error {
 
 		switch grpcStatus.Code() {
 		case codes.AlreadyExists:
-			return ErrManagerIsAlreadyExist
+			return ErrUserIsAlreadyExist
 		case codes.Internal:
 			logger.Error(errMsg)
 			return ErrInternal
@@ -54,36 +54,7 @@ func (c *client) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInf
 
 		switch grpcStatus.Code() {
 		case codes.NotFound:
-			return nil, ErrManagerNotFound
-		case codes.Internal:
-			logger.Error(errMsg)
-			return nil, ErrInternal
-		default:
-			logger.Error(errMsg)
-			return nil, ErrUnexpected
-		}
-	}
-	logger.Errorf(errMsg, "non grpc error")
-	return nil, ErrUnexpected
-}
-
-func (c *client) GetApiToken(ctx context.Context, in *pb.GetApiTokenRequest) (*pb.GetApiTokenResponse, error) {
-	logger := c.logger.WithFields("request", "get api token")
-	const errMsg = "request get api token error: %s"
-
-	// api call
-	res, err := c.api.GetApiToken(ctx, in)
-	if err == nil {
-		return res, nil
-	}
-
-	// handle errors
-	if grpcStatus, ok := status.FromError(err); ok {
-		errMsg := fmt.Errorf(errMsg, grpcStatus.Message())
-
-		switch grpcStatus.Code() {
-		case codes.NotFound:
-			return nil, ErrManagerNotFound
+			return nil, ErrUserNotFound
 		case codes.Internal:
 			logger.Error(errMsg)
 			return nil, ErrInternal
@@ -112,7 +83,7 @@ func (c *client) Auth(ctx context.Context, in *pb.AuthRequest) error {
 
 		switch grpcStatus.Code() {
 		case codes.NotFound:
-			return ErrManagerNotFound
+			return ErrUserNotFound
 		case codes.Internal:
 			logger.Error(errMsg)
 			return ErrInternal
@@ -123,33 +94,4 @@ func (c *client) Auth(ctx context.Context, in *pb.AuthRequest) error {
 	}
 	logger.Errorf(errMsg, "non grpc error")
 	return ErrUnexpected
-}
-
-func (c *client) AuthApiToken(ctx context.Context, in *pb.AuthApiTokenRequest) (*pb.AuthApiTokenResponse, error) {
-	logger := c.logger.WithFields("request", "auth api token")
-	const errMsg = "request auth api token error: %s"
-
-	// api call
-	res, err := c.api.AuthApiToken(ctx, in)
-	if err == nil {
-		return res, nil
-	}
-
-	// handle errors
-	if grpcStatus, ok := status.FromError(err); ok {
-		errMsg := fmt.Errorf(errMsg, grpcStatus.Message())
-
-		switch grpcStatus.Code() {
-		case codes.NotFound:
-			return nil, ErrManagerNotFound
-		case codes.Internal:
-			logger.Error(errMsg)
-			return nil, ErrInternal
-		default:
-			logger.Error(errMsg)
-			return nil, ErrUnexpected
-		}
-	}
-	logger.Errorf(errMsg, "non grpc error")
-	return nil, ErrUnexpected
 }
