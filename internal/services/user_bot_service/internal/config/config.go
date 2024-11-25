@@ -14,7 +14,7 @@ import (
 type Config struct {
 	Bot        BotConfig     `validate:"required" mapstructure:"bot"`
 	Session    SessionConfig `mapstructure:"session"`
-	UserClient user.Config   `validate:"required" mapstructure:"managerclient"`
+	UserClient user.Config   `validate:"required" mapstructure:"userclient"`
 	// ParcelsUserClient pu.Config      `validate:"required" mapstructure:"puclient"`
 }
 

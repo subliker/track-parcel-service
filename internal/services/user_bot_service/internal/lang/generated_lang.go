@@ -66,7 +66,7 @@ type menu interface{
     Markup() menumarkup
 }
 type menumarkup interface{
-    AddParcel() string
+    CheckParcel() string
 }
 
 type ru_RU_Messages struct{}
@@ -151,15 +151,15 @@ func (ru_RU_Messages) Menu() menu {
 type ru_RU_menu struct{}
 func (ru_RU_menu) Main() string {
     return "Добро пожаловать в наш сервис! 🙌" + "\n" +
-        "Здесь вы можете легко управлять посылками и добавлять новые. Всё, что вам нужно — выбрать нужное действие из меню ниже. 📦" + "\n" +
+        "Здесь вы можете легко отслеживать посылки. Всё, что вам нужно — выбрать нужное действие из меню ниже. 📦" + "\n" +
         "Готовы начать? Выберите одну из *опций*!"
 }
 func (ru_RU_menu) Markup() menumarkup {
     return ru_RU_menumarkup{}
 }
 type ru_RU_menumarkup struct{}
-func (ru_RU_menumarkup) AddParcel() string {
-    return "📦 Добавить посылку"
+func (ru_RU_menumarkup) CheckParcel() string {
+    return "📦 Проверить посылку"
 }
 
 

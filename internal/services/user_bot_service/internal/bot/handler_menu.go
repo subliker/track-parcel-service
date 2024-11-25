@@ -2,16 +2,16 @@ package bot
 
 import tele "gopkg.in/telebot.v4"
 
-var menuBtnGetInfoParcel tele.Btn
+var menuBtnCheckParcel tele.Btn
 
 func (b *bot) handleMenu() tele.HandlerFunc {
 	mk := b.client.NewMarkup()
 	mk.ResizeKeyboard = true
 	mk.OneTimeKeyboard = true
 
-	menuBtnGetInfoParcel = mk.Text(b.bundle.Menu().Markup().AddParcel())
+	menuBtnCheckParcel = mk.Text(b.bundle.Menu().Markup().CheckParcel())
 
-	mk.Reply(mk.Row(menuBtnGetInfoParcel))
+	mk.Reply(mk.Row(menuBtnCheckParcel))
 	return func(ctx tele.Context) error {
 		// set handler name
 		ctx.Set("handler", "menu")
