@@ -74,12 +74,6 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 			st.User.PhoneNumber = &t
 		}
 		st.FillStep++
-		fallthrough
-	case state.RegisterFillStepReady:
-		err := b.sendRegister(ctx, st.User)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

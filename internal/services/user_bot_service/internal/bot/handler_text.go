@@ -35,8 +35,24 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				return err
 			}
 			if st.Ended() {
+				if err := b.sendRegister(ctx, st.User); err != nil {
+					return err
+				}
 				ss.ClearState()
 				b.handleMenu()(ctx)
+				break
+			} else {
+				ss.SetState(st)
+			}
+		case state.CheckParcel:
+			if err := b.fillCheckParcel(ctx, &st); err != nil {
+				return err
+			}
+			if st.Ended() {
+				if err := b.sendCheckParcel(ctx, st.TrackNum); err != nil {
+					return err
+				}
+				ss.ClearState()
 				break
 			} else {
 				ss.SetState(st)

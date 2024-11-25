@@ -110,6 +110,8 @@ func (b *bot) initHandlers() {
 	authGroup.Use(middleware.Authorized(b.logger))
 	// handle menu
 	authGroup.Handle("/menu", b.handleMenu())
+	// handle check parcel
+	authGroup.Handle(&menuBtnCheckParcel, b.handleCheckParcel())
 
 	b.logger.Info("handlers were initialized")
 }
