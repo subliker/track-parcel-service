@@ -6,10 +6,10 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/session/lru"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/app"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
-	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/lru"
 )
 
 func main() {

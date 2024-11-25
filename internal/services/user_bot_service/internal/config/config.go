@@ -4,18 +4,18 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
+	// "github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/validation"
 )
 
 type Config struct {
-	Bot                  BotConfig      `validate:"required" mapstructure:"bot"`
-	Session              SessionConfig  `mapstructure:"session"`
-	ManagerClient        manager.Config `validate:"required" mapstructure:"managerclient"`
-	ParcelsManagerClient pm.Config      `validate:"required" mapstructure:"pmclient"`
+	Bot        BotConfig     `validate:"required" mapstructure:"bot"`
+	Session    SessionConfig `mapstructure:"session"`
+	UserClient user.Config   `validate:"required" mapstructure:"managerclient"`
+	// ParcelsUserClient pu.Config      `validate:"required" mapstructure:"puclient"`
 }
 
 type BotConfig struct {
@@ -29,7 +29,7 @@ type SessionConfig struct {
 }
 
 func init() {
-	viper.SetEnvPrefix("MBOT")
+	viper.SetEnvPrefix("UBOT")
 
 	// env and default binding
 	viper.BindEnv("bot.token")
@@ -38,9 +38,9 @@ func init() {
 	viper.SetDefault("session.count", 1024)
 	viper.SetDefault("session.ttl", int64(time.Hour*48))
 
-	viper.SetDefault("managerclient.target", "localhost:50051")
+	viper.SetDefault("userclient.target", "localhost:50051")
 
-	viper.SetDefault("pmclient.target", "localhost:50052")
+	viper.SetDefault("puclient.target", "localhost:50053")
 }
 
 func Get() Config {

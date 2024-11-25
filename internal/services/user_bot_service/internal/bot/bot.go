@@ -3,13 +3,12 @@ package bot
 import (
 	"time"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
-	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/bot/middleware"
-	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/config"
-	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
+	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/bot/middleware"
+	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/config"
+	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"
 	"golang.org/x/net/context"
 	tele "gopkg.in/telebot.v4"
 )
@@ -19,20 +18,18 @@ type Bot interface {
 }
 
 type bot struct {
-	client               *tele.Bot
-	bundle               lang.Messages
-	sessionStore         session.Store
-	managerClient        manager.Client
-	parcelsManagerClient pm.Client
+	client       *tele.Bot
+	bundle       lang.Messages
+	sessionStore session.Store
+	userClient   user.Client
 
 	logger logger.Logger
 }
 
 type BotOptions struct {
-	Cfg                  config.BotConfig
-	SessionStore         session.Store
-	ManagerClient        manager.Client
-	ParcelsManagerClient pm.Client
+	Cfg          config.BotConfig
+	SessionStore session.Store
+	UserClient   user.Client
 }
 
 // New creates new instance of bot
@@ -52,10 +49,9 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 	b.client = client
 
 	// set manager client
-	b.managerClient = opts.ManagerClient
+	b.userClient = opts.UserClient
 
-	// set parcels manager client
-	b.parcelsManagerClient = opts.ParcelsManagerClient
+	// set parcels user client
 
 	// set session store
 	b.sessionStore = opts.SessionStore
@@ -94,7 +90,7 @@ func (b *bot) initHandlers() {
 	// global middlewares:
 	// ensure sessions
 	b.client.Use(middleware.Session(b.logger, b.sessionStore))
-	b.client.Use(middleware.Auth(b.logger, b.managerClient))
+	b.client.Use(middleware.Auth(b.logger, b.userClient))
 
 	// global handlers
 	// handle text
@@ -114,10 +110,6 @@ func (b *bot) initHandlers() {
 	authGroup.Use(middleware.Authorized(b.logger))
 	// handle menu
 	authGroup.Handle("/menu", b.handleMenu())
-	// handle add parcel
-	addParcelHandler := b.handleAddParcel()
-	authGroup.Handle("/add-parcel", addParcelHandler)
-	authGroup.Handle(&menuBtnAddParcel, addParcelHandler)
 
 	b.logger.Info("handlers were initialized")
 }

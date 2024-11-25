@@ -9,12 +9,12 @@ import (
 	tele "gopkg.in/telebot.v4"
 )
 
-func Text(logger logger.Logger, sessionStore session.Store) tele.MiddlewareFunc {
+func Session(logger logger.Logger, sessionStore session.Store) tele.MiddlewareFunc {
 	logger = logger.WithFields("middleware", "session")
 	const errMsg = "ensure session error: %s"
 	return func(next tele.HandlerFunc) tele.HandlerFunc {
 		return func(ctx tele.Context) error {
-			// ensure manager session
+			// ensure user session
 			if err := sessionStore.Ensure(model.TelegramID(ctx.Sender().ID)); err != nil {
 				ctx.Send("internal error")
 				err = fmt.Errorf(errMsg, err)
