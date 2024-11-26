@@ -7,8 +7,7 @@ import (
 
 	"github.com/pressly/goose/v3"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/config"
-	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
+	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
 var migrateMode bool
@@ -23,7 +22,7 @@ type store struct {
 }
 
 // New creates new instance of postgres parcel store
-func New(logger logger.Logger, cfg config.DBConfig) (parcel.Store, error) {
+func New(logger logger.Logger, cfg Config) (parcel.Store, error) {
 	logger = logger.WithFields("layer", "parcel postgres store")
 
 	// pgs connection string

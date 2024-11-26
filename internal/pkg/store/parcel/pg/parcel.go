@@ -7,7 +7,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
+	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
 func (s *store) Add(p model.Parcel) (model.TrackNumber, error) {

@@ -18,18 +18,10 @@ type (
 		Port    int           `mapstructure:"port"`
 		Timeout time.Duration `mapstructure:"timeout"`
 	}
-
-	DBConfig struct {
-		Host     string `mapstructure:"host"`
-		Port     int    `mapstructure:"port"`
-		User     string `mapstructure:"user"`
-		Password string `mapstructure:"password"`
-		DBName   string `mapstructure:"dbname"`
-	}
 )
 
 func init() {
-	viper.SetEnvPrefix("PM")
+	viper.SetEnvPrefix("PU")
 
 	// env and default binding
 	viper.SetDefault("grpc.port", 50051)

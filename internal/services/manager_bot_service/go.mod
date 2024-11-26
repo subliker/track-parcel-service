@@ -2,7 +2,7 @@ module github.com/subliker/track-parcel-service/internal/services/manager_bot_se
 
 replace github.com/subliker/track-parcel-service/internal/pkg => ../../pkg
 
-go 1.22.7
+go 1.22.9
 
 require (
 	github.com/subliker/track-parcel-service/internal/pkg v0.0.0-00010101000000-000000000000

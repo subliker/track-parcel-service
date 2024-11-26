@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func NewServer(logger logger.Logger, store parcel.Store) *grpc.Server {
+func NewServer(logger logger.Logger, store parcel.ManagerStore) *grpc.Server {
 	// making new grpc server
 	s := grpc.NewServer()
 

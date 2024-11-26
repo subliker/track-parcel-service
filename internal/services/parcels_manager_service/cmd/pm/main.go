@@ -4,10 +4,10 @@ import (
 	"flag"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/app"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/server/grpc"
-	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel/pg"
 )
 
 func main() {

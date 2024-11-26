@@ -4,4 +4,4 @@ version: '3'
 
 tasks:
   run:
-    - go run ./cmd/pms/main.go
+    - go run ./cmd/pm/main.go

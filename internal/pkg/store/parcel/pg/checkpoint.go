@@ -6,7 +6,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
+	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
 func (s *store) AddCheckpoint(tNum model.TrackNumber, cp model.Checkpoint) error {

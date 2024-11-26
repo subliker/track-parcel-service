@@ -2,14 +2,14 @@ module github.com/subliker/track-parcel-service/internal/services/parcels_manage
 
 replace github.com/subliker/track-parcel-service/internal/pkg => ../../pkg
 
-go 1.23.3
+go 1.22.9
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/pressly/goose/v3 v3.22.1
 	github.com/spf13/viper v1.19.0
 	github.com/subliker/track-parcel-service/internal/pkg v0.0.0-00010101000000-000000000000
-	google.golang.org/grpc v1.67.1
+	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.35.1
 )
 

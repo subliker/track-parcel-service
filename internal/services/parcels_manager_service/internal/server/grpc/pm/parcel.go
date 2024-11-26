@@ -7,7 +7,7 @@ import (
 
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pmpb"
-	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
+	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"

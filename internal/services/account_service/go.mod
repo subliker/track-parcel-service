@@ -2,7 +2,7 @@ module github.com/subliker/track-parcel-service/internal/services/account_servic
 
 replace github.com/subliker/track-parcel-service/internal/pkg => ../../pkg
 
-go 1.22.7
+go 1.22.9
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

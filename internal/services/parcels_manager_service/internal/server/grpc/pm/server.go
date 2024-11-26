@@ -9,12 +9,12 @@ import (
 type ServerApi struct {
 	pb.UnimplementedParcelsManagerServer
 
-	store  parcel.Store
+	store  parcel.ManagerStore
 	logger logger.Logger
 }
 
 // New creates new instance of server api
-func New(logger logger.Logger, store parcel.Store) *ServerApi {
+func New(logger logger.Logger, store parcel.ManagerStore) *ServerApi {
 	return &ServerApi{
 		store:  store,
 		logger: logger.WithFields("layer", "grpc server api", "server", "parcels manager"),
