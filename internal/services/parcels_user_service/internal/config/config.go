@@ -6,12 +6,13 @@ import (
 	"github.com/spf13/viper"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
 )
 
 type (
 	Config struct {
 		GRPC GRPCConfig `mapstructure:"grpc"`
-		DB   DBConfig   `mapstructure:"db"`
+		DB   pg.Config  `mapstructure:"db"`
 	}
 
 	GRPCConfig struct {

@@ -9,3 +9,4 @@ tasks:
     cmds:
       - protoc -I ./internal/pkg/proto/ ./internal/pkg/proto/account/* --go_out=./internal/pkg/proto/gen/go --go-grpc_out=./internal/pkg/proto/gen/go
       - protoc -I ./internal/pkg/proto/ ./internal/pkg/proto/pm/pm.proto --go_out=./internal/pkg/proto/gen/go --go-grpc_out=./internal/pkg/proto/gen/go 
+      - protoc -I ./internal/pkg/proto/ ./internal/pkg/proto/pu/pu.proto --go_out=./internal/pkg/proto/gen/go --go-grpc_out=./internal/pkg/proto/gen/go 

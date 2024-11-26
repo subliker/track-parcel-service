@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package pupb;
+
+option go_package = "pupb/";
+
+import "google/protobuf/timestamp.proto";
+
+service ParcelsManager {
+    rpc GetParcel (GetParcelRequest) returns (GetParcelResponse);
+    rpc GetCheckpoints(GetCheckpointsRequest) returns (GetCheckpointsResponse);
+}
+
+enum ParcelStatus {
+    UNKNOWN = 0;
+    PENDING = 1;
+    IN_TRANSIT = 2;
+    DELIVERED = 3;
+    CANCELED = 4;
+}
+
+message GetParcelRequest {
+    string track_number = 1;
+}
+
+message GetParcelResponse {
+    string parcel_name = 1;
+    int64 manager_telegram_id = 2;
+    string parcel_recipient = 3;
+    string parcel_arrival_address = 4;
+    google.protobuf.Timestamp parcel_forecast_date = 5;
+    string parcel_description = 8;
+    ParcelStatus parcel_status = 9;
+}
+
+message GetCheckpointsRequest {
+    string track_number = 1;
+    uint64 page = 2;
+    uint64 page_size = 3;
+}
+
+message GetCheckpointsResponse {
+    repeated Checkpoint checkpoints = 1;
+}
+
+message Checkpoint {
+    google.protobuf.Timestamp time = 1;
+    string place = 2;
+    string description = 3;
+}
