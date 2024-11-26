@@ -13,6 +13,6 @@ func NewServer(logger logger.Logger, store parcel.UserStore) *grpc.Server {
 	s := grpc.NewServer()
 
 	// register server
-	pupb.RegisterParcelsManagerServer(s, pu.New(logger, store))
+	pupb.RegisterParcelsUserServer(s, pu.New(logger, store))
 	return s
 }

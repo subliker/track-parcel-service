@@ -8,15 +8,15 @@ import (
 	tele "gopkg.in/telebot.v4"
 )
 
-var dontSpecifyKetboard *tele.ReplyMarkup
+var dontSpecifyKeyboard *tele.ReplyMarkup
 var btnDontSpecify tele.Btn
 
 func (b *bot) handleOnText() tele.HandlerFunc {
-	dontSpecifyKetboard = b.client.NewMarkup()
+	dontSpecifyKeyboard = b.client.NewMarkup()
 
-	btnDontSpecify = dontSpecifyKetboard.Data(b.bundle.Common().Markup().BtnDontSpecify(), "dont-specify")
+	btnDontSpecify = dontSpecifyKeyboard.Data(b.bundle.Common().Markup().BtnDontSpecify(), "dont-specify")
 
-	dontSpecifyKetboard.Inline(dontSpecifyKetboard.Row(btnDontSpecify))
+	dontSpecifyKeyboard.Inline(dontSpecifyKeyboard.Row(btnDontSpecify))
 	return func(ctx tele.Context) error {
 		// set handler name
 		ctx.Set("handler", "on text")
@@ -35,6 +35,9 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				return err
 			}
 			if st.Ended() {
+				if err := b.sendParcel(ctx, st.Parcel); err != nil {
+					return err
+				}
 				ss.ClearState()
 				b.handleMenu()(ctx)
 				break
@@ -46,6 +49,9 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 				return err
 			}
 			if st.Ended() {
+				if err := b.sendRegister(ctx, st.Manager); err != nil {
+					return err
+				}
 				ss.ClearState()
 				b.handleMenu()(ctx)
 				break

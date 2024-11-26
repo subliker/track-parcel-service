@@ -6,7 +6,7 @@ option go_package = "pupb/";
 
 import "google/protobuf/timestamp.proto";
 
-service ParcelsManager {
+service ParcelsUser {
     rpc GetParcel (GetParcelRequest) returns (GetParcelResponse);
     rpc GetCheckpoints(GetCheckpointsRequest) returns (GetCheckpointsResponse);
 }

@@ -53,6 +53,7 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 	// set state handler
 	ctx.Set("state_handler", "fill register")
 
+	// check on don't specify button pressed
 	notSpecify, _ := ctx.Get("dont-specify").(bool)
 
 	st.FillStep++
@@ -64,8 +65,7 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 		ctx.Send(fillBundle.Email())
 	case state.RegisterFillStepEmail:
 		st.User.Email = ctx.Text()
-
-		ctx.Send(fillBundle.PhoneNumber(), dontSpecifyKetboard)
+		ctx.Send(fillBundle.PhoneNumber(), dontSpecifyKeyboard)
 	case state.RegisterFillStepPhoneNumber:
 		if notSpecify {
 			st.User.PhoneNumber = nil
@@ -73,6 +73,7 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 			t := ctx.Text()
 			st.User.PhoneNumber = &t
 		}
+
 		st.FillStep++
 	}
 

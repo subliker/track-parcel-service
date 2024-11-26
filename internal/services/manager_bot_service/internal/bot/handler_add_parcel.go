@@ -65,13 +65,8 @@ func (b *bot) fillParcel(ctx tele.Context, st *state.MakeParcel) error {
 		b.logger.Error(ctx.Send(fillBundle.Description()))
 	case state.MakeParcelFillDescription:
 		st.Parcel.Description = ctx.Text()
+
 		st.FillStep++
-		fallthrough
-	case state.MakeParcelFillStepReady:
-		err := b.sendParcel(ctx, st.Parcel)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

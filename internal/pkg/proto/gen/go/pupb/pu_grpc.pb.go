@@ -19,139 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ParcelsManager_GetParcel_FullMethodName      = "/pupb.ParcelsManager/GetParcel"
-	ParcelsManager_GetCheckpoints_FullMethodName = "/pupb.ParcelsManager/GetCheckpoints"
+	ParcelsUser_GetParcel_FullMethodName      = "/pupb.ParcelsUser/GetParcel"
+	ParcelsUser_GetCheckpoints_FullMethodName = "/pupb.ParcelsUser/GetCheckpoints"
 )
 
-// ParcelsManagerClient is the client API for ParcelsManager service.
+// ParcelsUserClient is the client API for ParcelsUser service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ParcelsManagerClient interface {
+type ParcelsUserClient interface {
 	GetParcel(ctx context.Context, in *GetParcelRequest, opts ...grpc.CallOption) (*GetParcelResponse, error)
 	GetCheckpoints(ctx context.Context, in *GetCheckpointsRequest, opts ...grpc.CallOption) (*GetCheckpointsResponse, error)
 }
 
-type parcelsManagerClient struct {
+type parcelsUserClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewParcelsManagerClient(cc grpc.ClientConnInterface) ParcelsManagerClient {
-	return &parcelsManagerClient{cc}
+func NewParcelsUserClient(cc grpc.ClientConnInterface) ParcelsUserClient {
+	return &parcelsUserClient{cc}
 }
 
-func (c *parcelsManagerClient) GetParcel(ctx context.Context, in *GetParcelRequest, opts ...grpc.CallOption) (*GetParcelResponse, error) {
+func (c *parcelsUserClient) GetParcel(ctx context.Context, in *GetParcelRequest, opts ...grpc.CallOption) (*GetParcelResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetParcelResponse)
-	err := c.cc.Invoke(ctx, ParcelsManager_GetParcel_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ParcelsUser_GetParcel_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *parcelsManagerClient) GetCheckpoints(ctx context.Context, in *GetCheckpointsRequest, opts ...grpc.CallOption) (*GetCheckpointsResponse, error) {
+func (c *parcelsUserClient) GetCheckpoints(ctx context.Context, in *GetCheckpointsRequest, opts ...grpc.CallOption) (*GetCheckpointsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetCheckpointsResponse)
-	err := c.cc.Invoke(ctx, ParcelsManager_GetCheckpoints_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ParcelsUser_GetCheckpoints_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ParcelsManagerServer is the server API for ParcelsManager service.
-// All implementations must embed UnimplementedParcelsManagerServer
+// ParcelsUserServer is the server API for ParcelsUser service.
+// All implementations must embed UnimplementedParcelsUserServer
 // for forward compatibility.
-type ParcelsManagerServer interface {
+type ParcelsUserServer interface {
 	GetParcel(context.Context, *GetParcelRequest) (*GetParcelResponse, error)
 	GetCheckpoints(context.Context, *GetCheckpointsRequest) (*GetCheckpointsResponse, error)
-	mustEmbedUnimplementedParcelsManagerServer()
+	mustEmbedUnimplementedParcelsUserServer()
 }
 
-// UnimplementedParcelsManagerServer must be embedded to have
+// UnimplementedParcelsUserServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedParcelsManagerServer struct{}
+type UnimplementedParcelsUserServer struct{}
 
-func (UnimplementedParcelsManagerServer) GetParcel(context.Context, *GetParcelRequest) (*GetParcelResponse, error) {
+func (UnimplementedParcelsUserServer) GetParcel(context.Context, *GetParcelRequest) (*GetParcelResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetParcel not implemented")
 }
-func (UnimplementedParcelsManagerServer) GetCheckpoints(context.Context, *GetCheckpointsRequest) (*GetCheckpointsResponse, error) {
+func (UnimplementedParcelsUserServer) GetCheckpoints(context.Context, *GetCheckpointsRequest) (*GetCheckpointsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCheckpoints not implemented")
 }
-func (UnimplementedParcelsManagerServer) mustEmbedUnimplementedParcelsManagerServer() {}
-func (UnimplementedParcelsManagerServer) testEmbeddedByValue()                        {}
+func (UnimplementedParcelsUserServer) mustEmbedUnimplementedParcelsUserServer() {}
+func (UnimplementedParcelsUserServer) testEmbeddedByValue()                     {}
 
-// UnsafeParcelsManagerServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ParcelsManagerServer will
+// UnsafeParcelsUserServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ParcelsUserServer will
 // result in compilation errors.
-type UnsafeParcelsManagerServer interface {
-	mustEmbedUnimplementedParcelsManagerServer()
+type UnsafeParcelsUserServer interface {
+	mustEmbedUnimplementedParcelsUserServer()
 }
 
-func RegisterParcelsManagerServer(s grpc.ServiceRegistrar, srv ParcelsManagerServer) {
-	// If the following call pancis, it indicates UnimplementedParcelsManagerServer was
+func RegisterParcelsUserServer(s grpc.ServiceRegistrar, srv ParcelsUserServer) {
+	// If the following call pancis, it indicates UnimplementedParcelsUserServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ParcelsManager_ServiceDesc, srv)
+	s.RegisterService(&ParcelsUser_ServiceDesc, srv)
 }
 
-func _ParcelsManager_GetParcel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ParcelsUser_GetParcel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetParcelRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ParcelsManagerServer).GetParcel(ctx, in)
+		return srv.(ParcelsUserServer).GetParcel(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ParcelsManager_GetParcel_FullMethodName,
+		FullMethod: ParcelsUser_GetParcel_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ParcelsManagerServer).GetParcel(ctx, req.(*GetParcelRequest))
+		return srv.(ParcelsUserServer).GetParcel(ctx, req.(*GetParcelRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ParcelsManager_GetCheckpoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ParcelsUser_GetCheckpoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetCheckpointsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ParcelsManagerServer).GetCheckpoints(ctx, in)
+		return srv.(ParcelsUserServer).GetCheckpoints(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ParcelsManager_GetCheckpoints_FullMethodName,
+		FullMethod: ParcelsUser_GetCheckpoints_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ParcelsManagerServer).GetCheckpoints(ctx, req.(*GetCheckpointsRequest))
+		return srv.(ParcelsUserServer).GetCheckpoints(ctx, req.(*GetCheckpointsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ParcelsManager_ServiceDesc is the grpc.ServiceDesc for ParcelsManager service.
+// ParcelsUser_ServiceDesc is the grpc.ServiceDesc for ParcelsUser service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ParcelsManager_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pupb.ParcelsManager",
-	HandlerType: (*ParcelsManagerServer)(nil),
+var ParcelsUser_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "pupb.ParcelsUser",
+	HandlerType: (*ParcelsUserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetParcel",
-			Handler:    _ParcelsManager_GetParcel_Handler,
+			Handler:    _ParcelsUser_GetParcel_Handler,
 		},
 		{
 			MethodName: "GetCheckpoints",
-			Handler:    _ParcelsManager_GetCheckpoints_Handler,
+			Handler:    _ParcelsUser_GetCheckpoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
