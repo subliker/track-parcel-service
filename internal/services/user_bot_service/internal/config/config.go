@@ -4,18 +4,18 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	// "github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/validation"
 )
 
 type Config struct {
-	Bot        BotConfig     `validate:"required" mapstructure:"bot"`
-	Session    SessionConfig `mapstructure:"session"`
-	UserClient user.Config   `validate:"required" mapstructure:"userclient"`
-	// ParcelsUserClient pu.Config      `validate:"required" mapstructure:"puclient"`
+	Bot               BotConfig     `validate:"required" mapstructure:"bot"`
+	Session           SessionConfig `mapstructure:"session"`
+	UserClient        user.Config   `validate:"required" mapstructure:"userclient"`
+	ParcelsUserClient pu.Config     `validate:"required" mapstructure:"puclient"`
 }
 
 type BotConfig struct {

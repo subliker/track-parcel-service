@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/bot/middleware"
@@ -21,15 +22,18 @@ type bot struct {
 	client       *tele.Bot
 	bundle       lang.Messages
 	sessionStore session.Store
-	userClient   user.Client
+
+	userClient        user.Client
+	parcelsUserClient pu.Client
 
 	logger logger.Logger
 }
 
 type BotOptions struct {
-	Cfg          config.BotConfig
-	SessionStore session.Store
-	UserClient   user.Client
+	Cfg               config.BotConfig
+	SessionStore      session.Store
+	UserClient        user.Client
+	ParcelsUserClient pu.Client
 }
 
 // New creates new instance of bot
@@ -52,6 +56,7 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 	b.userClient = opts.UserClient
 
 	// set parcels user client
+	b.parcelsUserClient = opts.ParcelsUserClient
 
 	// set session store
 	b.sessionStore = opts.SessionStore
@@ -102,7 +107,7 @@ func (b *bot) initHandlers() {
 	b.client.Handle("/register", registerHandler)
 	b.client.Handle(&startBtnRegister, registerHandler)
 	// don't specify data handler
-	b.client.Handle(&btnDontSpecify, b.handleDontSpecify())
+	b.client.Handle(&btnNotSpecify, b.handleDontSpecify())
 
 	// groups
 	// group for authorized managers middleware
@@ -112,6 +117,8 @@ func (b *bot) initHandlers() {
 	authGroup.Handle("/menu", b.handleMenu())
 	// handle check parcel
 	authGroup.Handle(&menuBtnCheckParcel, b.handleCheckParcel())
+	// on refresh show parcel
+	// authGroup.Handle(&showParcelBtnRefresh)
 
 	b.logger.Info("handlers were initialized")
 }

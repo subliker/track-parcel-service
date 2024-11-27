@@ -36,6 +36,7 @@ type Messages interface{
     Common() common
     StartMessage() startMessage
     Register() register
+    CheckParcel() checkParcel
     Menu() menu
 }
 type common interface{
@@ -60,6 +61,9 @@ type registerpoints interface{
     Email() string
     PhoneNumber() string
     Ready(name string, email string, phoneNumber string) string
+}
+type checkParcel interface{
+    Main(name string, recipient string, arrivalAddress string, forecastDate string, description string, status string) string
 }
 type menu interface{
     Main() string
@@ -144,6 +148,19 @@ func (ru_RU_registerpoints) Ready(name string, email string, phoneNumber string)
         fmt.Sprintf("*Телефон* %s", phoneNumber) + "\n" +
         "" + "\n" +
         "_Если нужно изменить какие-то данные, вы всегда можете это сделать в настройках профиля. 👇_"
+}
+func (ru_RU_Messages) CheckParcel() checkParcel {
+    return ru_RU_checkParcel{}
+}
+type ru_RU_checkParcel struct{}
+func (ru_RU_checkParcel) Main(name string, recipient string, arrivalAddress string, forecastDate string, description string, status string) string {
+    return "Вот информация по вашей посылке:" + "\n" +
+        fmt.Sprintf("Наименование: %s", name) + "\n" +
+        fmt.Sprintf("Получатель: %s", recipient) + "\n" +
+        fmt.Sprintf("Адрес доставки: %s", arrivalAddress) + "\n" +
+        fmt.Sprintf("Ожидаемая дата доставки: %s", forecastDate) + "\n" +
+        fmt.Sprintf("Описание: %s", description) + "\n" +
+        fmt.Sprintf("Статус: %s", status)
 }
 func (ru_RU_Messages) Menu() menu {
     return ru_RU_menu{}

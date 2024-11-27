@@ -11,6 +11,9 @@ import (
 )
 
 type Client interface {
+	GetParcel(ctx context.Context, in *pb.GetParcelRequest) (*pb.GetParcelResponse, error)
+	GetCheckpoints(ctx context.Context, in *pb.GetCheckpointsRequest) (*pb.GetCheckpointsResponse, error)
+	Close() error
 }
 
 type client struct {

@@ -1,15 +1,75 @@
 package state
 
-import "github.com/subliker/track-parcel-service/internal/pkg/session"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"time"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pupb"
+	"github.com/subliker/track-parcel-service/internal/pkg/session"
+	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"
+)
+
+// CheckParcel is state to request parcel from parcels user service
 type CheckParcel struct {
-	TrackNum string
+	TrackNum model.TrackNumber
 }
 
+// SetCheckParcel sets empty check parcel state in user session
 func SetCheckParcel(ss session.Session) {
 	ss.SetState(CheckParcel{})
 }
 
-func (c *CheckParcel) Ended() bool {
+// done returns true if all state data is filled up
+func (c *CheckParcel) done() bool {
 	return c.TrackNum != ""
+}
+
+// Next starts one of iterations to fill state up and returns true if all state data is filled up
+func (c *CheckParcel) Next(text string) (bool, error) {
+	c.TrackNum = model.TrackNumber(text)
+	return c.done(), nil
+}
+
+// Ready completes all data and send request
+func (c *CheckParcel) Ready(
+	parcelsUserClient pu.Client,
+	sendParcel func(text string),
+	bundle lang.Messages,
+) error {
+	// check if state done
+	if !c.done() {
+		return ErrStateNotDone
+	}
+
+	// request parcel
+	res, err := parcelsUserClient.GetParcel(context.Background(), &pupb.GetParcelRequest{
+		TrackNumber: string(c.TrackNum),
+	})
+	if errors.Is(err, pu.ErrParcelNotFound) {
+		return ErrResNotFound
+	}
+	if err != nil {
+		return err
+	}
+
+	// enum convert
+	parcelStatus, ok := model.StatusValue[res.ParcelStatus.String()]
+	if !ok {
+		return fmt.Errorf("parcel response status incorrect value: %s", res.ParcelStatus.String())
+	}
+
+	// show parcel
+	sendParcel(bundle.CheckParcel().Main(
+		res.ParcelName,
+		res.ParcelRecipient,
+		res.ParcelArrivalAddress,
+		res.ParcelForecastDate.AsTime().Format(time.RFC1123),
+		res.ParcelDescription,
+		string(parcelStatus),
+	))
+	return nil
 }

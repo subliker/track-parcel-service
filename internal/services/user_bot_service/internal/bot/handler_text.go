@@ -1,27 +1,35 @@
 package bot
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
 )
 
-var dontSpecifyKeyboard *tele.ReplyMarkup
-var btnDontSpecify tele.Btn
+var btnNotSpecify tele.Btn
+
+func (b *bot) notSpecifyKeyboard(data string) *tele.ReplyMarkup {
+	k := b.client.NewMarkup()
+	btn := btnNotSpecify
+	btn.Data = data
+	k.Inline(k.Row(btn))
+	return k
+}
 
 func (b *bot) handleOnText() tele.HandlerFunc {
-	dontSpecifyKeyboard = b.client.NewMarkup()
-
-	btnDontSpecify = dontSpecifyKeyboard.Data(b.bundle.Common().Markup().BtnDontSpecify(), "dont-specify")
-
-	dontSpecifyKeyboard.Inline(dontSpecifyKeyboard.Row(btnDontSpecify))
+	btnNotSpecify = (&tele.ReplyMarkup{}).Data(b.bundle.Common().Markup().BtnDontSpecify(), "not-specify", "0")
 	return func(ctx tele.Context) error {
 		// set handler name
 		ctx.Set("handler", "on text")
 
 		tID := model.TelegramID(ctx.Sender().ID)
+
+		// get not specify
+		notSpecifyField, _ := ctx.Get("not-specify-field").(uint)
 
 		// getting state
 		ss, err := b.sessionStore.Get(tID)
@@ -31,32 +39,12 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 		}
 		switch st := ss.State().(type) {
 		case state.Register:
-			if err := b.fillRegister(ctx, &st); err != nil {
-				return err
-			}
-			if st.Ended() {
-				if err := b.sendRegister(ctx, st.User); err != nil {
-					return err
-				}
-				ss.ClearState()
-				b.handleMenu()(ctx)
-				break
-			} else {
-				ss.SetState(st)
-			}
+			return b.onRegisterState(ctx, ss, st, notSpecifyField)
 		case state.CheckParcel:
-			if err := b.fillCheckParcel(ctx, &st); err != nil {
-				return err
-			}
-			if st.Ended() {
-				if err := b.sendCheckParcel(ctx, st.TrackNum); err != nil {
-					return err
-				}
-				ss.ClearState()
+			if notSpecifyField > 0 {
 				break
-			} else {
-				ss.SetState(st)
 			}
+			return b.onCheckParcelState(ctx, ss, st)
 		default:
 			ctx.Send("Некорректный ввод")
 		}
@@ -67,7 +55,13 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 
 func (b *bot) handleDontSpecify() tele.HandlerFunc {
 	return func(ctx tele.Context) error {
-		ctx.Set("dont-specify", true)
+		data := ctx.Callback().Data
+		field, err := strconv.Atoi(data)
+		if err != nil {
+			return errors.New("incorrect callback data")
+		}
+
+		ctx.Set("not-specify-field", uint(field))
 		ctx.Respond()
 		return b.handleOnText()(ctx)
 	}

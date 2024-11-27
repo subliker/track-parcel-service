@@ -1,13 +1,12 @@
 package bot
 
 import (
-	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/userpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
 )
@@ -49,59 +48,44 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 	}
 }
 
-func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
-	// set state handler
-	ctx.Set("state_handler", "fill register")
-
-	// check on don't specify button pressed
-	notSpecify, _ := ctx.Get("dont-specify").(bool)
-
-	st.FillStep++
-
-	fillBundle := b.bundle.Register().Points()
-	switch st.FillStep {
-	case state.RegisterFillStepFullName:
-		st.User.FullName = ctx.Text()
-		ctx.Send(fillBundle.Email())
-	case state.RegisterFillStepEmail:
-		st.User.Email = ctx.Text()
-		ctx.Send(fillBundle.PhoneNumber(), dontSpecifyKeyboard)
-	case state.RegisterFillStepPhoneNumber:
-		if notSpecify {
-			st.User.PhoneNumber = nil
-		} else {
-			t := ctx.Text()
-			st.User.PhoneNumber = &t
+func (b *bot) onRegisterState(
+	ctx tele.Context, ss session.Session,
+	st state.Register, notSpecifyField uint,
+) error {
+	// make fill iteration
+	ended, err := st.Next(
+		ctx.Text(),
+		func(text string, optionalField state.RegisterFillStep) {
+			if optionalField > 0 {
+				ctx.Send(text, b.notSpecifyKeyboard(strconv.Itoa(int(optionalField))))
+				return
+			}
+			ctx.Send(text)
+		},
+		b.bundle,
+		state.RegisterFillStep(notSpecifyField),
+	)
+	// ignore incorrect not specify
+	if err != nil && err != state.ErrIncorrectNotSpecify {
+		return err
+	}
+	// send
+	if ended {
+		err := st.Ready(
+			b.userClient,
+			func(text string) {
+				ctx.Send(text)
+			},
+			b.bundle,
+		)
+		if err != nil {
+			ctx.Send("internal error")
 		}
-
-		st.FillStep++
-	}
-
-	return nil
-}
-
-func (b *bot) sendRegister(ctx tele.Context, u model.User) error {
-	err := b.userClient.Register(context.Background(), &userpb.RegisterRequest{
-		UserTelegramId:  int64(u.TelegramID),
-		UserFullName:    u.FullName,
-		UserEmail:       u.Email,
-		UserPhoneNumber: u.PhoneNumber,
-	})
-	if errors.Is(err, user.ErrUserIsAlreadyExist) {
-		ctx.Send("you have been already registered")
+		ss.ClearState()
+		b.handleMenu()(ctx)
 		return err
+	} else {
+		ss.SetState(st)
 	}
-	if err != nil {
-		ctx.Send("register ended with internal error")
-		return err
-	}
-
-	// optional
-	var phoneNumber string
-	if u.PhoneNumber != nil {
-		phoneNumber = *u.PhoneNumber
-	}
-
-	ctx.Send(b.bundle.Register().Points().Ready(u.FullName, u.Email, phoneNumber))
 	return nil
 }

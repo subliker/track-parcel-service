@@ -19,9 +19,10 @@ type Bot interface {
 }
 
 type bot struct {
-	client               *tele.Bot
-	bundle               lang.Messages
-	sessionStore         session.Store
+	client       *tele.Bot
+	bundle       lang.Messages
+	sessionStore session.Store
+
 	managerClient        manager.Client
 	parcelsManagerClient pm.Client
 

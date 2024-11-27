@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/bot"
 )
@@ -17,15 +18,17 @@ type App interface {
 }
 
 type app struct {
-	bot        bot.Bot
-	userClient user.Client
+	bot               bot.Bot
+	userClient        user.Client
+	parcelsUserClient pu.Client
 
 	logger logger.Logger
 }
 
 type AppOptions struct {
-	Bot        bot.Bot
-	UserClient user.Client
+	Bot               bot.Bot
+	UserClient        user.Client
+	ParcelsUserClient pu.Client
 }
 
 func New(logger logger.Logger, opts AppOptions) App {
@@ -41,6 +44,7 @@ func New(logger logger.Logger, opts AppOptions) App {
 	a.userClient = opts.UserClient
 
 	// set parcels user client
+	a.parcelsUserClient = opts.ParcelsUserClient
 
 	a.logger.Info("app was built")
 	return &a
