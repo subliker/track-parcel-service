@@ -17,6 +17,6 @@ CREATE TABLE IF NOT EXISTS parcels (
 CREATE INDEX IF NOT EXISTS idx_parcels_track_number ON parcels(track_number);
 
 -- +goose Down
-DROP TYPE IF EXISTS PARCEL_STATUS;
-
 DROP TABLE IF EXISTS parcels;
+
+DROP TYPE IF EXISTS PARCEL_STATUS;

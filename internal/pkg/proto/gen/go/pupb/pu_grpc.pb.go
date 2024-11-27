@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,8 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ParcelsUser_GetParcel_FullMethodName      = "/pupb.ParcelsUser/GetParcel"
-	ParcelsUser_GetCheckpoints_FullMethodName = "/pupb.ParcelsUser/GetCheckpoints"
+	ParcelsUser_GetParcel_FullMethodName          = "/pupb.ParcelsUser/GetParcel"
+	ParcelsUser_GetCheckpoints_FullMethodName     = "/pupb.ParcelsUser/GetCheckpoints"
+	ParcelsUser_AddSubscription_FullMethodName    = "/pupb.ParcelsUser/AddSubscription"
+	ParcelsUser_DeleteSubscription_FullMethodName = "/pupb.ParcelsUser/DeleteSubscription"
 )
 
 // ParcelsUserClient is the client API for ParcelsUser service.
@@ -29,6 +32,8 @@ const (
 type ParcelsUserClient interface {
 	GetParcel(ctx context.Context, in *GetParcelRequest, opts ...grpc.CallOption) (*GetParcelResponse, error)
 	GetCheckpoints(ctx context.Context, in *GetCheckpointsRequest, opts ...grpc.CallOption) (*GetCheckpointsResponse, error)
+	AddSubscription(ctx context.Context, in *AddSubscriptionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteSubscription(ctx context.Context, in *DeleteSubscriptionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type parcelsUserClient struct {
@@ -59,12 +64,34 @@ func (c *parcelsUserClient) GetCheckpoints(ctx context.Context, in *GetCheckpoin
 	return out, nil
 }
 
+func (c *parcelsUserClient) AddSubscription(ctx context.Context, in *AddSubscriptionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ParcelsUser_AddSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *parcelsUserClient) DeleteSubscription(ctx context.Context, in *DeleteSubscriptionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ParcelsUser_DeleteSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ParcelsUserServer is the server API for ParcelsUser service.
 // All implementations must embed UnimplementedParcelsUserServer
 // for forward compatibility.
 type ParcelsUserServer interface {
 	GetParcel(context.Context, *GetParcelRequest) (*GetParcelResponse, error)
 	GetCheckpoints(context.Context, *GetCheckpointsRequest) (*GetCheckpointsResponse, error)
+	AddSubscription(context.Context, *AddSubscriptionRequest) (*emptypb.Empty, error)
+	DeleteSubscription(context.Context, *DeleteSubscriptionRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedParcelsUserServer()
 }
 
@@ -80,6 +107,12 @@ func (UnimplementedParcelsUserServer) GetParcel(context.Context, *GetParcelReque
 }
 func (UnimplementedParcelsUserServer) GetCheckpoints(context.Context, *GetCheckpointsRequest) (*GetCheckpointsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCheckpoints not implemented")
+}
+func (UnimplementedParcelsUserServer) AddSubscription(context.Context, *AddSubscriptionRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSubscription not implemented")
+}
+func (UnimplementedParcelsUserServer) DeleteSubscription(context.Context, *DeleteSubscriptionRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSubscription not implemented")
 }
 func (UnimplementedParcelsUserServer) mustEmbedUnimplementedParcelsUserServer() {}
 func (UnimplementedParcelsUserServer) testEmbeddedByValue()                     {}
@@ -138,6 +171,42 @@ func _ParcelsUser_GetCheckpoints_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ParcelsUser_AddSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddSubscriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ParcelsUserServer).AddSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ParcelsUser_AddSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ParcelsUserServer).AddSubscription(ctx, req.(*AddSubscriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ParcelsUser_DeleteSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteSubscriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ParcelsUserServer).DeleteSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ParcelsUser_DeleteSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ParcelsUserServer).DeleteSubscription(ctx, req.(*DeleteSubscriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ParcelsUser_ServiceDesc is the grpc.ServiceDesc for ParcelsUser service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +221,14 @@ var ParcelsUser_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCheckpoints",
 			Handler:    _ParcelsUser_GetCheckpoints_Handler,
+		},
+		{
+			MethodName: "AddSubscription",
+			Handler:    _ParcelsUser_AddSubscription_Handler,
+		},
+		{
+			MethodName: "DeleteSubscription",
+			Handler:    _ParcelsUser_DeleteSubscription_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
