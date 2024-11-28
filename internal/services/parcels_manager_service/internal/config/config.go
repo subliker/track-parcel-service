@@ -12,12 +12,17 @@ import (
 type (
 	Config struct {
 		GRPC GRPCConfig `mapstructure:"grpc"`
+		REST RESTConfig `validate:"required" mapstructure:"res"`
 		DB   pg.Config  `mapstructure:"db"`
 	}
 
 	GRPCConfig struct {
 		Port    int           `mapstructure:"port"`
 		Timeout time.Duration `mapstructure:"timeout"`
+	}
+
+	RESTConfig struct {
+		Port int `validate:"required" mapstructure:"port"`
 	}
 
 	DBConfig struct {

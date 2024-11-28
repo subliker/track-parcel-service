@@ -10,6 +10,14 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
+func (s *store) CheckAccess(trackNum model.TrackNumber, tID model.TelegramID) (bool, error) {
+	p, err := s.GetInfo(trackNum)
+	if err != nil {
+		return false, err
+	}
+	return p.ManagerID == tID, nil
+}
+
 func (s *store) Add(p model.Parcel) (model.TrackNumber, error) {
 	logger := s.logger.WithFields("command", "add")
 

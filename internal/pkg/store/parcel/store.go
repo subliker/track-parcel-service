@@ -5,6 +5,7 @@ import (
 )
 
 type Store interface {
+	CheckAccess(model.TrackNumber, model.TelegramID) (bool, error)
 	Add(model.Parcel) (model.TrackNumber, error)
 	Delete(model.TrackNumber) error
 	GetInfo(model.TrackNumber) (model.Parcel, error)

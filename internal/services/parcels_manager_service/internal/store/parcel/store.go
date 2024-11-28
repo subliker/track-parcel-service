@@ -1,8 +1,11 @@
 package parcel
 
-import "github.com/subliker/track-parcel-service/internal/pkg/model"
+import (
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
+)
 
 type ManagerStore interface {
+	CheckAccess(model.TrackNumber, model.TelegramID) (bool, error)
 	Add(model.Parcel) (model.TrackNumber, error)
 	Delete(model.TrackNumber) error
 	GetInfo(model.TrackNumber) (model.Parcel, error)

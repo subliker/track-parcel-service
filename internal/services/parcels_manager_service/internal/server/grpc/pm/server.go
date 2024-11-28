@@ -9,7 +9,8 @@ import (
 type ServerApi struct {
 	pb.UnimplementedParcelsManagerServer
 
-	store  parcel.ManagerStore
+	store parcel.ManagerStore
+
 	logger logger.Logger
 }
 
