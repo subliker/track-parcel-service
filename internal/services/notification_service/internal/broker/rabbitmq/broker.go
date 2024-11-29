@@ -13,15 +13,15 @@ type Broker struct {
 	conn *amqp.Connection
 	ch   *amqp.Channel
 
-	deliveryProducer *delivery.Producer
-	eventsConsumer   *events.Consumer
+	deliveryProducer delivery.Producer
+	eventsConsumer   events.Consumer
 }
 
 func New(cfg config.RabbitMQConfig) (*Broker, error) {
 	var b Broker
 
 	// open mq connection
-	conn, err := amqp.Dial(fmt.Sprint("amqp://%s:%s@%s/", cfg.User, cfg.Password, cfg.Host))
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/", cfg.User, cfg.Password, cfg.Host))
 	if err != nil {
 		return nil, err
 	}

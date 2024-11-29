@@ -2,13 +2,18 @@ package events
 
 import "github.com/streadway/amqp"
 
-type Consumer struct {
-	ch *amqp.Channel
-	q  amqp.Queue
+type Consumer interface {
+	Listen()
 }
 
-func New(ch *amqp.Channel) (*Consumer, error) {
-	var c Consumer
+type consumer struct {
+	ch   *amqp.Channel
+	msgs <-chan amqp.Delivery
+	q    amqp.Queue
+}
+
+func New(ch *amqp.Channel) (*consumer, error) {
+	var c consumer
 
 	eventsQueue, err := ch.QueueDeclare(
 		"notification_events",
@@ -20,5 +25,14 @@ func New(ch *amqp.Channel) (*Consumer, error) {
 	}
 	c.q = eventsQueue
 
+	eventsMsgs, err := ch.Consume(
+		eventsQueue.Name, "",
+		false, false, false,
+		false, nil,
+	)
+	c.msgs = eventsMsgs
+
 	return &c, nil
 }
+
+func (c *consumer) Listen() {}
