@@ -45,9 +45,6 @@ func (s *store) AddCheckpoint(tNum model.TrackNumber, cp model.Checkpoint) error
 func (s *store) GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize uint64) ([]*model.Checkpoint, error) {
 	logger := s.logger.WithFields("command", "get checkpoints")
 
-	// making checkpoints array
-	cps := make([]*model.Checkpoint, 0)
-
 	// making query builder
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
@@ -61,7 +58,7 @@ func (s *store) GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of getting checkpoints: %s", err)
 		logger.Error(errMsg)
-		return cps, errMsg
+		return nil, errMsg
 	}
 
 	// executing query
@@ -69,14 +66,19 @@ func (s *store) GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize
 	if err != nil {
 		errMsg := fmt.Errorf("error executing of getting checkpoints: %s", err)
 		logger.Error(errMsg)
-		return cps, errMsg
+		return nil, errMsg
 	}
+
+	// making checkpoints array
+	cps := make([]*model.Checkpoint, 0)
 
 	// rows appending
 	for rows.Next() {
 		var cp model.Checkpoint
 		if err := rows.Scan(&cp.Time, &cp.Place, &cp.Description); err != nil {
-			return nil, fmt.Errorf("failed to scan row: %s", err)
+			errMsg := fmt.Errorf("failed to scan row: %s", err)
+			logger.Error(errMsg)
+			return nil, errMsg
 		}
 		cps = append(cps, &cp)
 	}

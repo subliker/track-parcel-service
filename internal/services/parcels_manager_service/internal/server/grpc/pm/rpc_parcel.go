@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 	"google.golang.org/grpc/codes"
@@ -14,32 +15,32 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *ServerApi) AddParcel(ctx context.Context, req *pb.AddParcelRequest) (*pb.AddParcelResponse, error) {
+func (s *ServerApi) AddParcel(ctx context.Context, req *pmpb.AddParcelRequest) (*pmpb.AddParcelResponse, error) {
 	logger := s.logger.WithFields("handler", "add parcel")
 	const errMsg = "error add parcel: %s"
 
 	// add parcel to store
 	trackNum, err := s.store.Add(model.Parcel{
-		Name:           req.ParcelName,
-		ManagerID:      model.TelegramID(req.ManagerTelegramId),
-		Recipient:      req.ParcelRecipient,
-		ArrivalAddress: req.ParcelArrivalAddress,
-		ForecastDate:   req.ParcelForecastDate.AsTime(),
-		Description:    req.ParcelDescription,
-		Status:         model.Status(req.ParcelStatus.String()),
+		Name:           req.Parcel.Name,
+		ManagerID:      model.TelegramID(req.Parcel.ManagerTelegramId),
+		Recipient:      req.Parcel.Recipient,
+		ArrivalAddress: req.Parcel.ArrivalAddress,
+		ForecastDate:   req.Parcel.ForecastDate.AsTime(),
+		Description:    req.Parcel.Description,
+		Status:         model.Status(req.Parcel.Status.String()),
 	})
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, err)
 		logger.Error(errMsg)
-		return &pb.AddParcelResponse{}, status.Error(codes.Internal, errMsg)
+		return &pmpb.AddParcelResponse{}, status.Error(codes.Internal, errMsg)
 	}
 
-	return &pb.AddParcelResponse{
+	return &pmpb.AddParcelResponse{
 		TrackNumber: string(trackNum),
 	}, nil
 }
 
-func (s *ServerApi) DeleteParcel(ctx context.Context, req *pb.DeleteParcelRequest) (*emptypb.Empty, error) {
+func (s *ServerApi) DeleteParcel(ctx context.Context, req *pmpb.DeleteParcelRequest) (*emptypb.Empty, error) {
 	logger := s.logger.WithFields("handler", "delete parcel")
 	const errMsg = "error delete parcel(%s): %s"
 
@@ -58,7 +59,7 @@ func (s *ServerApi) DeleteParcel(ctx context.Context, req *pb.DeleteParcelReques
 	return nil, nil
 }
 
-func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*pb.GetParcelResponse, error) {
+func (s *ServerApi) GetParcel(ctx context.Context, req *pmpb.GetParcelRequest) (*pmpb.GetParcelResponse, error) {
 	logger := s.logger.WithFields("handler", "get parcel info")
 	const errMsg = "error get parcel(%s): %s"
 
@@ -74,13 +75,15 @@ func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*p
 		return nil, status.Error(codes.Internal, errMsg)
 	}
 
-	return &pb.GetParcelResponse{
-		ParcelName:           p.Name,
-		ManagerTelegramId:    int64(p.ManagerID),
-		ParcelRecipient:      p.Recipient,
-		ParcelArrivalAddress: p.ArrivalAddress,
-		ParcelForecastDate:   timestamppb.New(p.ForecastDate),
-		ParcelDescription:    p.Description,
-		ParcelStatus:         pb.ParcelStatus(pb.ParcelStatus_value[string(p.Status)]),
+	return &pmpb.GetParcelResponse{
+		Parcel: &parcelpb.Parcel{
+			Name:              p.Name,
+			ManagerTelegramId: int64(p.ManagerID),
+			Recipient:         p.Recipient,
+			ArrivalAddress:    p.ArrivalAddress,
+			ForecastDate:      timestamppb.New(p.ForecastDate),
+			Description:       p.Description,
+			Status:            parcelpb.Status(parcelpb.Status_value[string(p.Status)]),
+		},
 	}, nil
 }

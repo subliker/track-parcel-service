@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
+	parcelpb "github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
+	pmpb "github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 	"google.golang.org/grpc/codes"
@@ -14,15 +15,15 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pb.AddCheckpointRequest) (*emptypb.Empty, error) {
+func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pmpb.AddCheckpointRequest) (*emptypb.Empty, error) {
 	logger := s.logger.WithFields("handler", "add checkpoint")
 	const errMsg = "error add checkpoint for parcel(%s): %s"
 
 	// add checkpoint to store
 	err := s.store.AddCheckpoint(model.TrackNumber(req.TrackNumber), model.Checkpoint{
-		Time:        req.Time.AsTime(),
-		Place:       req.Place,
-		Description: req.Description,
+		Time:        req.Checkpoint.Time.AsTime(),
+		Place:       req.Checkpoint.Place,
+		Description: req.Checkpoint.Description,
 	})
 	if errors.Is(err, parcel.ErrIncorrectForeignTrackNumber) {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
@@ -38,7 +39,7 @@ func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pb.AddCheckpointRequ
 	return nil, nil
 }
 
-func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRequest) (*pb.GetCheckpointsResponse, error) {
+func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pmpb.GetCheckpointsRequest) (*pmpb.GetCheckpointsResponse, error) {
 	logger := s.logger.WithFields("handler", "get checkpoints")
 	const errMsg = "error get checkpoints for parcel(%s): %s"
 
@@ -63,17 +64,17 @@ func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRe
 	}
 
 	// transfer to proto checkpoints
-	protoCps := make([]*pb.Checkpoint, len(cps))
+	protoCps := make([]*parcelpb.Checkpoint, len(cps))
 	for i := range protoCps {
 		cp := cps[i]
-		protoCps[i] = &pb.Checkpoint{
+		protoCps[i] = &parcelpb.Checkpoint{
 			Time:        timestamppb.New(cp.Time),
 			Place:       cp.Place,
 			Description: cp.Description,
 		}
 	}
 
-	return &pb.GetCheckpointsResponse{
+	return &pmpb.GetCheckpointsResponse{
 		Checkpoints: protoCps,
 	}, nil
 }
