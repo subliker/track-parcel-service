@@ -18,14 +18,14 @@ type app struct {
 	parcelServer *grpc.Server
 	grpcConfig   config.GRPCConfig
 
-	store parcel.Store
+	store parcel.ManagerStore
 
 	logger logger.Logger
 }
 
 func New(cfg config.Config,
 	logger logger.Logger,
-	store parcel.Store,
+	store parcel.ManagerStore,
 	parcelServer *grpc.Server) App {
 	var a app
 

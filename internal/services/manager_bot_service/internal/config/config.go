@@ -38,7 +38,9 @@ func init() {
 	viper.SetDefault("session.count", 1024)
 	viper.SetDefault("session.ttl", int64(time.Hour*48))
 
-	viper.SetDefault("sso.target", "localhost:50051")
+	viper.SetDefault("managerclient.target", "localhost:50051")
+
+	viper.SetDefault("pmclient.target", "localhost:50052")
 }
 
 func Get() Config {

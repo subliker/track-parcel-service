@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,8 +18,9 @@ func (s *ServerApi) Register(ctx context.Context, req *pb.RegisterRequest) (*emp
 
 	// add user to store
 	if err := s.repo.Register(model.User{
-		TelegramId:  model.TelegramID(req.UserTelegramId),
+		TelegramID:  model.TelegramID(req.UserTelegramId),
 		FullName:    req.UserFullName,
+		Email:       req.UserEmail,
 		PhoneNumber: req.UserPhoneNumber,
 	}); err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.UserTelegramId, err)

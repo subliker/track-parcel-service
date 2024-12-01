@@ -1,7 +1,8 @@
 package model
 
 type User struct {
-	TelegramId  TelegramID
+	TelegramID  TelegramID
 	FullName    string
+	Email       string
 	PhoneNumber *string
 }

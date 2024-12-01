@@ -18,8 +18,8 @@ func (r *Repository) Register(user model.User) error {
 
 	// build query
 	query, args, err := psql.Insert("users").
-		Columns("telegram_id", "full_name", "phone_number").
-		Values(user.TelegramId, user.FullName, user.PhoneNumber).
+		Columns("telegram_id", "full_name", "email", "phone_number").
+		Values(user.TelegramID, user.FullName, user.Email, user.PhoneNumber).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of user inserting: %s", err)
@@ -61,7 +61,7 @@ func (r *Repository) Get(tID model.TelegramID) (model.User, error) {
 
 	// executing query
 	row := r.db.QueryRow(query, args...)
-	err = row.Scan(&u.TelegramId, &u.FullName, &u.PhoneNumber)
+	err = row.Scan(&u.TelegramID, &u.FullName, &u.PhoneNumber)
 	if errors.Is(err, sql.ErrNoRows) {
 		return u, store.ErrUserNotFound
 	}

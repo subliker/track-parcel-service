@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package notificationpb;
+
+option go_package = "github.com/subliker/track-parcel-service/internal/pkg/gen/notificationpb";
+
+import "parcel/parcel.proto";
+
+message Event {
+    string track_number = 1;
+    parcelpb.Checkpoint checkpoint = 2;
+}
+
+message Delivery {
+    int64 user_telegram_id = 1;
+    string track_number = 2;
+    parcelpb.Checkpoint checkpoint = 3;
+}

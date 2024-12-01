@@ -2,20 +2,20 @@ module github.com/subliker/track-parcel-service/internal/services/account_servic
 
 replace github.com/subliker/track-parcel-service/internal/pkg => ../../pkg
 
-go 1.22.2
+go 1.22.9
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.19.0
 	github.com/subliker/track-parcel-service/internal/pkg v0.0.0-00010101000000-000000000000
-	google.golang.org/grpc v1.67.1
+	google.golang.org/grpc v1.68.0
 )
 
 require (
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sync v0.9.0 // indirect
 )
 
 require (
@@ -26,7 +26,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
-	github.com/pressly/goose/v3 v3.22.1
+	github.com/pressly/goose/v3 v3.23.0
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

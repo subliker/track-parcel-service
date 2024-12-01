@@ -5,3 +5,5 @@ version: '3'
 tasks:
   run:
     - go run ./cmd/acnt/main.go
+  run-migrate:
+    - go run ./cmd/acnt/main.go -migrate

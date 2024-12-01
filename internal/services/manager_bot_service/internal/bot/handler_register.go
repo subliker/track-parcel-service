@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
 )
@@ -53,6 +53,7 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 	// set state handler
 	ctx.Set("state_handler", "fill register")
 
+	// check on don't specify button pressed
 	notSpecify, _ := ctx.Get("dont-specify").(bool)
 
 	st.FillStep++
@@ -64,8 +65,7 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 		ctx.Send(fillBundle.Email())
 	case state.RegisterFillStepEmail:
 		st.Manager.Email = ctx.Text()
-
-		ctx.Send(fillBundle.PhoneNumber(), dontSpecifyKetboard)
+		ctx.Send(fillBundle.PhoneNumber(), dontSpecifyKeyboard)
 	case state.RegisterFillStepPhoneNumber:
 		if notSpecify {
 			st.Manager.PhoneNumber = nil
@@ -73,7 +73,7 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 			t := ctx.Text()
 			st.Manager.PhoneNumber = &t
 		}
-		ctx.Send(fillBundle.Company(), dontSpecifyKetboard)
+		ctx.Send(fillBundle.Company(), dontSpecifyKeyboard)
 	case state.RegisterFillStepCompany:
 		if notSpecify {
 			st.Manager.Company = nil
@@ -82,12 +82,6 @@ func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
 			st.Manager.Company = &t
 		}
 		st.FillStep++
-		fallthrough
-	case state.RegisterFillStepReady:
-		err := b.sendRegister(ctx, st.Manager)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

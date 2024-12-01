@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package pupb;
+
+option go_package = "github.com/subliker/track-parcel-service/internal/pkg/gen/pupb";
+
+import "google/protobuf/empty.proto";
+import "parcel/parcel.proto";
+
+service ParcelsUser {
+    rpc GetParcel (GetParcelRequest) returns (GetParcelResponse);
+    rpc GetCheckpoints(GetCheckpointsRequest) returns (GetCheckpointsResponse);
+    rpc AddSubscription(AddSubscriptionRequest) returns (google.protobuf.Empty);
+    rpc DeleteSubscription(DeleteSubscriptionRequest) returns (google.protobuf.Empty);
+}
+
+message GetParcelRequest {
+    string track_number = 1;
+    int64 user_telegram_id = 2;
+}
+
+message GetParcelResponse {
+    parcelpb.Parcel parcel = 1;
+    bool user_subscribed = 2;
+}
+
+message GetCheckpointsRequest {
+    string track_number = 1;
+    uint64 page = 2;
+    uint64 page_size = 3;
+}
+
+message GetCheckpointsResponse {
+    repeated parcelpb.Checkpoint checkpoints = 1;
+}
+
+message AddSubscriptionRequest {
+    string track_number = 1;
+    int64 user_telegram_id = 2;
+}
+
+message DeleteSubscriptionRequest {
+    string track_number = 1;
+    int64 user_telegram_id = 2;
+}

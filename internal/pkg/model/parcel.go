@@ -51,6 +51,14 @@ const (
 	StatusCanceled  Status = "CANCELED"
 )
 
+var StatusValue = map[string]Status{
+	"UNKNOWN":    StatusUnknown,
+	"PENDING":    StatusPending,
+	"IN_TRANSIT": StatusInTransit,
+	"DELIVERED":  StatusDelivered,
+	"CANCELED":   StatusCanceled,
+}
+
 type Checkpoint struct {
 	Time        time.Time
 	Place       string

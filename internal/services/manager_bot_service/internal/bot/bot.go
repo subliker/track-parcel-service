@@ -19,12 +19,14 @@ type Bot interface {
 }
 
 type bot struct {
-	client               *tele.Bot
-	bundle               lang.Messages
-	sessionStore         session.Store
+	client       *tele.Bot
+	bundle       lang.Messages
+	sessionStore session.Store
+
 	managerClient        manager.Client
 	parcelsManagerClient pm.Client
-	logger               logger.Logger
+
+	logger logger.Logger
 }
 
 type BotOptions struct {
@@ -101,7 +103,9 @@ func (b *bot) initHandlers() {
 	// handle start
 	b.client.Handle("/start", b.handleStart())
 	// handle register
-	b.client.Handle("/register", b.handleRegister())
+	registerHandler := b.handleRegister()
+	b.client.Handle("/register", registerHandler)
+	b.client.Handle(&startBtnRegister, registerHandler)
 	// don't specify data handler
 	b.client.Handle(&btnDontSpecify, b.handleDontSpecify())
 

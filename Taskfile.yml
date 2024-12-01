@@ -7,5 +7,12 @@ tasks:
     - go install github.com/MrNemo64/go-n-i18n/cmd/i18n@latest
   proto:
     cmds:
-      - protoc -I ./internal/pkg/proto/ ./internal/pkg/proto/account/* --go_out=./internal/pkg/proto/gen/go --go-grpc_out=./internal/pkg/proto/gen/go
-      - protoc -I ./internal/pkg/proto/ ./internal/pkg/proto/pm/pm.proto --go_out=./internal/pkg/proto/gen/go --go-grpc_out=./internal/pkg/proto/gen/go 
+      - mkdir -p ./internal/pkg/gen
+      - |
+        protoc -I ./internal/pkg/proto/ --go_out=./internal/pkg/ --go-grpc_out=./internal/pkg/ \
+        --go_opt=module=github.com/subliker/track-parcel-service/internal/pkg --go-grpc_opt=module=github.com/subliker/track-parcel-service/internal/pkg \
+        ./internal/pkg/proto/parcel/parcel.proto \
+        ./internal/pkg/proto/account/* \
+        ./internal/pkg/proto/pm/pm.proto \
+        ./internal/pkg/proto/pu/pu.proto \
+        ./internal/pkg/proto/notification/notification.proto                        
