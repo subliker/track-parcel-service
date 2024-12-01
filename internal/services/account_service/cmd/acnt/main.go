@@ -16,10 +16,10 @@ func main() {
 	// creating logger
 	logger := zap.NewLogger()
 
-	// reading cfg
+	// reading config
 	cfg := config.Get()
 
-	// creating store
+	// creating parcel store
 	store, err := pg.New(logger, cfg.DB)
 	if err != nil {
 		logger.Fatalf("error store create: %s", err)

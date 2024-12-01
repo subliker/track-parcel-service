@@ -3,6 +3,7 @@ package bot
 import (
 	"time"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq/delivery"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
@@ -26,6 +27,8 @@ type bot struct {
 	userClient        user.Client
 	parcelsUserClient pu.Client
 
+	deliveryConsumer delivery.Consumer
+
 	logger logger.Logger
 }
 
@@ -34,6 +37,7 @@ type BotOptions struct {
 	SessionStore      session.Store
 	UserClient        user.Client
 	ParcelsUserClient pu.Client
+	DeliveryConsumer  delivery.Consumer
 }
 
 // New creates new instance of bot
@@ -69,6 +73,9 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 
 	// handlers init
 	b.initHandlers()
+
+	// set delivery consumer
+	b.deliveryConsumer = opts.DeliveryConsumer
 
 	b.logger.Infof("bot was built. Hello, I'm %s", b.client.Me.FirstName)
 	return &b

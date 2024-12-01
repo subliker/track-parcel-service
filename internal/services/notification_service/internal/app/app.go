@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/dispatcher"
@@ -17,17 +19,29 @@ type app struct {
 	logger logger.Logger
 }
 
-func New(broker rabbitmq.Broker, dispatcher dispatcher.Notification) App {
+func New(logger logger.Logger, broker rabbitmq.Broker, dispatcher dispatcher.Notification) App {
 	var a app
 
+	// setting broker
 	a.broker = broker
 
+	// setting dispatcher
 	a.dispatcher = dispatcher
+
+	// setting logger
+	a.logger = logger.WithFields("layer", "app")
 
 	return &a
 }
 
 func (a *app) Run() error {
+	// starting dispatcher
+	if err := a.dispatcher.Run(); err != nil {
+		errMsg := fmt.Errorf("running dispatcher error: %s", err)
+		a.logger.Error(errMsg)
+		return errMsg
+	}
+
 	return nil
 }
 

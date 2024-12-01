@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -10,6 +11,9 @@ import (
 func init() {
 	logger := zap.Logger.WithFields("layer", "config")
 
+	// ensure config dir exists
+	os.MkdirAll("./configs", os.ModePerm)
+
 	// config file setup
 	viper.SetConfigFile("./configs/config.toml")
 	viper.SetConfigType("toml")
@@ -18,7 +22,7 @@ func init() {
 
 	// reading config
 	if err := viper.ReadInConfig(); err != nil {
-		logger.Errorf("error reading config: %s", err)
+		logger.Fatalf("error reading config: %s", err)
 	}
 
 	// reading environments
