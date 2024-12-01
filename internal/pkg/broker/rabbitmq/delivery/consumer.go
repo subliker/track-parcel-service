@@ -1,4 +1,4 @@
-package event
+package delivery
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 type Consumer interface {
-	Listen() <-chan *notificationpb.Event
+	Listen() <-chan *notificationpb.Delivery
 }
 
 type consumer struct {
@@ -18,53 +18,55 @@ type consumer struct {
 	msgs <-chan amqp.Delivery
 	q    amqp.Queue
 
-	events chan *notificationpb.Event
+	delivery chan *notificationpb.Delivery
 
 	logger logger.Logger
 }
 
-func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
+func NewConsumer(ch *amqp.Channel) (Consumer, error) {
 	var c consumer
 
-	eventsQueue, err := ch.QueueDeclare(
-		"notification_events",
+	deliveryQueue, err := ch.QueueDeclare(
+		"notification_delivery",
 		true, false, false,
 		false, nil,
 	)
 	if err != nil {
 		return nil, err
 	}
-	c.q = eventsQueue
+	c.q = deliveryQueue
 
-	eventsMsgs, err := ch.Consume(
-		eventsQueue.Name, "",
+	deliveryMsgs, err := ch.Consume(
+		deliveryQueue.Name, "",
 		false, false, false,
 		false, nil,
 	)
-	c.msgs = eventsMsgs
+	c.msgs = deliveryMsgs
 
-	c.events = make(chan *notificationpb.Event)
+	c.delivery = make(chan *notificationpb.Delivery)
 	go c.receive()
 
 	return &c, nil
 }
 
-func (c *consumer) Listen() <-chan *notificationpb.Event {
-	return c.events
+func (c *consumer) Listen() <-chan *notificationpb.Delivery {
+	return c.delivery
 }
 
 func (c *consumer) receive() {
 	for msg := range c.msgs {
-		event := notificationpb.Event{}
+		event := notificationpb.Delivery{}
 
 		// deserialization
 		err := proto.Unmarshal(msg.Body, &event)
 		if err != nil {
 			errMsg := fmt.Errorf("error proto message deserialization: %s", err)
 			c.logger.Error(errMsg)
+			msg.Nack(false, true)
 			continue
 		}
 
-		c.events <- &event
+		c.delivery <- &event
+		msg.Ack(false)
 	}
 }

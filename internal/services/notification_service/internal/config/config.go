@@ -2,19 +2,16 @@ package config
 
 import (
 	"github.com/spf13/viper"
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
 )
 
 type (
 	Config struct {
-		RabbitMQ RabbitMQConfig `mapstructure:"rabbitmq"`
-	}
-
-	RabbitMQConfig struct {
-		User     string `mapstructure:"user"`
-		Password string `mapstructure:"password"`
-		Host     string `mapstructure:"host"`
+		RabbitMQ rabbitmq.Config `mapstructure:"rabbitmq"`
+		DB       pg.Config       `mapstructure:"db"`
 	}
 )
 

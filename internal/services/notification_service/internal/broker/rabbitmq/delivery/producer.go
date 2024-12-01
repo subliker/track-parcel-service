@@ -20,7 +20,7 @@ type producer struct {
 	logger logger.Logger
 }
 
-func New(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
+func NewProducer(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
 	var p producer
 
 	deliveryQueue, err := ch.QueueDeclare(
