@@ -1,8 +1,8 @@
 package user
 
 import (
+	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 )
 

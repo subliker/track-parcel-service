@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package managerpb;
 
-option go_package = "account/managerpb";
+option go_package = "github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb";
 
 import "google/protobuf/empty.proto";
 

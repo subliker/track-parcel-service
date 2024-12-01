@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/pupb"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pupb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

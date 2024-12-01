@@ -5,7 +5,7 @@ import (
 
 	"github.com/streadway/amqp"
 	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/broker/rabbitmq/delivery"
-	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/broker/rabbitmq/events"
+	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/broker/rabbitmq/event"
 	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/config"
 )
 
@@ -14,7 +14,7 @@ type Broker struct {
 	ch   *amqp.Channel
 
 	deliveryProducer delivery.Producer
-	eventsConsumer   events.Consumer
+	eventsConsumer   event.Consumer
 }
 
 func New(cfg config.RabbitMQConfig) (*Broker, error) {
@@ -41,7 +41,7 @@ func New(cfg config.RabbitMQConfig) (*Broker, error) {
 	}
 	b.deliveryProducer = deliveryProducer
 
-	eventsConsumer, err := events.New(ch)
+	eventsConsumer, err := event.New(ch)
 	if err != nil {
 		return nil, fmt.Errorf("error making events consumer: %s", err)
 	}

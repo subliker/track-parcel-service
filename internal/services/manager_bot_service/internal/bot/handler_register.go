@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
 )

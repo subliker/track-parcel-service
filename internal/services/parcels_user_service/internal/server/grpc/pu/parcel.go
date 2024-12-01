@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/pupb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	pb "github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pupb"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

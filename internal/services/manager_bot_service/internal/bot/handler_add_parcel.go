@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pmpb"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	tele "gopkg.in/telebot.v4"
@@ -74,12 +75,14 @@ func (b *bot) fillParcel(ctx tele.Context, st *state.MakeParcel) error {
 
 func (b *bot) sendParcel(ctx tele.Context, p model.Parcel) error {
 	res, err := b.parcelsManagerClient.AddParcel(context.Background(), &pmpb.AddParcelRequest{
-		ParcelName:           p.Name,
-		ManagerTelegramId:    int64(p.ManagerID),
-		ParcelRecipient:      p.Recipient,
-		ParcelArrivalAddress: p.ArrivalAddress,
-		ParcelForecastDate:   timestamppb.New(p.ForecastDate),
-		ParcelDescription:    p.Description,
+		Parcel: &parcelpb.Parcel{
+			Name:              p.Name,
+			ManagerTelegramId: int64(p.ManagerID),
+			Recipient:         p.Recipient,
+			ArrivalAddress:    p.ArrivalAddress,
+			ForecastDate:      timestamppb.New(p.ForecastDate),
+			Description:       p.Description,
+		},
 	})
 	if err != nil {
 		ctx.Send("add parcel ended with internal error")

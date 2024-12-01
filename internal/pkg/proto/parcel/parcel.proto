@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package parcelpb;
+
+option go_package = "github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb";
+
+import "google/protobuf/timestamp.proto";
+
+message Parcel {
+    string track_number = 1;
+    string name = 2;
+    int64 manager_telegram_id = 3;
+    string recipient = 4;
+    string arrival_address = 5;
+    google.protobuf.Timestamp forecast_date = 6;
+    string description = 7;
+    Status status = 8;
+}
+
+enum Status {
+    UNKNOWN = 0;
+    PENDING = 1;
+    IN_TRANSIT = 2;
+    DELIVERED = 3;
+    CANCELED = 4;
+}
+
+message Checkpoint {
+    google.protobuf.Timestamp time = 1;
+    string place = 2;
+    string description = 3;
+    Status parcel_status = 4;
+}

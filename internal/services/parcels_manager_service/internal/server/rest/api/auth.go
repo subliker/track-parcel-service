@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/managerpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
 )
 
 func (s *Server) authApiTokenMiddleware() mux.MiddlewareFunc {

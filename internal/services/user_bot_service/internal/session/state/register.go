@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"
 )

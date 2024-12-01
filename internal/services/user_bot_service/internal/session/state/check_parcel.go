@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/pupb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
-	"github.com/subliker/track-parcel-service/internal/pkg/proto/gen/go/pupb"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"
 )
@@ -57,18 +57,18 @@ func (c *CheckParcel) Ready(
 	}
 
 	// enum convert
-	parcelStatus, ok := model.StatusValue[res.ParcelStatus.String()]
+	parcelStatus, ok := model.StatusValue[res.Parcel.Status.String()]
 	if !ok {
-		return fmt.Errorf("parcel response status incorrect value: %s", res.ParcelStatus.String())
+		return fmt.Errorf("parcel response status incorrect value: %s", res.Parcel.Status.String())
 	}
 
 	// show parcel
 	sendParcel(bundle.CheckParcel().Main(
-		res.ParcelName,
-		res.ParcelRecipient,
-		res.ParcelArrivalAddress,
-		res.ParcelForecastDate.AsTime().Format(time.RFC1123),
-		res.ParcelDescription,
+		res.Parcel.Name,
+		res.Parcel.Recipient,
+		res.Parcel.ArrivalAddress,
+		res.Parcel.ForecastDate.AsTime().Format(time.RFC1123),
+		res.Parcel.Description,
 		string(parcelStatus),
 	))
 	return nil
