@@ -27,8 +27,7 @@ func (s *store) AddCheckpoint(tNum model.TrackNumber, cp model.Checkpoint) error
 	}
 
 	// executing query
-	res, err := s.db.Exec(query, args...)
-	if err != nil {
+	if _, err := s.db.Exec(query, args...); err != nil {
 		if sqlErr, ok := err.(*pq.Error); ok {
 			// if foreign key error
 			if sqlErr.Code == "23053" {
@@ -40,7 +39,6 @@ func (s *store) AddCheckpoint(tNum model.TrackNumber, cp model.Checkpoint) error
 		return errMsg
 	}
 
-	logger.Info(res)
 	return nil
 }
 

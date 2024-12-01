@@ -61,7 +61,7 @@ func (s *store) Delete(trackNum model.TrackNumber) error {
 		Where(squirrel.Eq{"track_number": trackNum}).
 		ToSql()
 	if err != nil {
-		errMsg := fmt.Errorf("error making query of parcel inserting: %s", err)
+		errMsg := fmt.Errorf("error making query of parcel deleting: %s", err)
 		logger.Error(errMsg)
 		return errMsg
 	}
@@ -69,7 +69,7 @@ func (s *store) Delete(trackNum model.TrackNumber) error {
 	// executing query
 	res, err := s.db.Exec(query, args...)
 	if err != nil {
-		errMsg := fmt.Errorf("error executing of parcel inserting: %s", err)
+		errMsg := fmt.Errorf("error executing of parcel deleting: %s", err)
 		logger.Error(errMsg)
 		return errMsg
 	}
@@ -77,7 +77,7 @@ func (s *store) Delete(trackNum model.TrackNumber) error {
 	// check if was deleted
 	aff, err := res.RowsAffected()
 	if err != nil {
-		errMsg := fmt.Errorf("error getting rows affected after parcel inserting: %s", err)
+		errMsg := fmt.Errorf("error getting rows affected after parcel deleting: %s", err)
 		logger.Error(errMsg)
 		return errMsg
 	}
@@ -85,7 +85,6 @@ func (s *store) Delete(trackNum model.TrackNumber) error {
 		return parcel.ErrParcelNotFound
 	}
 
-	logger.Info(res)
 	return nil
 }
 

@@ -14,7 +14,7 @@ import (
 )
 
 func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*pb.GetParcelResponse, error) {
-	logger := s.logger.WithFields("handler", "get parcel info")
+	logger := s.logger.WithFields("handler", "get parcel")
 	const errMsg = "error get parcel(%s): %s"
 
 	// get parcel from store

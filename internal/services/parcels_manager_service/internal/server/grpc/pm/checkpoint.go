@@ -2,6 +2,7 @@ package pm
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
@@ -23,6 +24,11 @@ func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pb.AddCheckpointRequ
 		Place:       req.Place,
 		Description: req.Description,
 	})
+	if errors.Is(err, parcel.ErrIncorrectForeignTrackNumber) {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.NotFound, errMsg)
+	}
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)
