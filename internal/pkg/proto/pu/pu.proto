@@ -29,13 +29,12 @@ message GetParcelRequest {
 
 message GetParcelResponse {
     string parcel_name = 1;
-    int64 manager_telegram_id = 2;
-    string parcel_recipient = 3;
-    string parcel_arrival_address = 4;
-    google.protobuf.Timestamp parcel_forecast_date = 5;
-    string parcel_description = 8;
-    ParcelStatus parcel_status = 9;
-    bool subscribed = 10;
+    string parcel_recipient = 2;
+    string parcel_arrival_address = 3;
+    google.protobuf.Timestamp parcel_forecast_date = 4;
+    string parcel_description = 5;
+    ParcelStatus parcel_status = 6;
+    bool user_subscribed = 7;
 }
 
 message GetCheckpointsRequest {

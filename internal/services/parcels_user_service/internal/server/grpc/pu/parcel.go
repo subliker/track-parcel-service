@@ -31,12 +31,11 @@ func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*p
 
 	return &pb.GetParcelResponse{
 		ParcelName:           p.Name,
-		ManagerTelegramId:    int64(p.ManagerID),
 		ParcelRecipient:      p.Recipient,
 		ParcelArrivalAddress: p.ArrivalAddress,
 		ParcelForecastDate:   timestamppb.New(p.ForecastDate),
 		ParcelDescription:    p.Description,
 		ParcelStatus:         pb.ParcelStatus(pb.ParcelStatus_value[string(p.Status)]),
-		Subscribed:           subscribed,
+		UserSubscribed:       subscribed,
 	}, nil
 }
