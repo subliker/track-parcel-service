@@ -15,10 +15,15 @@ type Broker interface {
 type broker struct {
 	conn *amqp.Connection
 	ch   *amqp.Channel
+
+	logger logger.Logger
 }
 
 func New(logger logger.Logger, cfg Config) (Broker, error) {
 	var b broker
+
+	// setting logger
+	b.logger = logger.WithFields("layer", "broker")
 
 	// open mq connection
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/", cfg.User, cfg.Password, cfg.Host))
@@ -26,6 +31,7 @@ func New(logger logger.Logger, cfg Config) (Broker, error) {
 		return nil, err
 	}
 	b.conn = conn
+	b.logger.Infof("broker was connected to %s", conn.LocalAddr())
 
 	// getting channel
 	ch, err := conn.Channel()
@@ -34,6 +40,7 @@ func New(logger logger.Logger, cfg Config) (Broker, error) {
 	}
 	b.ch = ch
 
+	b.logger.Info("broker was successfully created")
 	return &b, nil
 }
 

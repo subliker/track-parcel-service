@@ -26,6 +26,10 @@ type consumer struct {
 func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 	var c consumer
 
+	// setting logger
+	c.logger = logger.WithFields("layer", "event consumer")
+
+	// queue declaring
 	eventsQueue, err := ch.QueueDeclare(
 		"notification_events",
 		true, false, false,
@@ -36,6 +40,7 @@ func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 	}
 	c.q = eventsQueue
 
+	// getting consumer channel
 	eventsMsgs, err := ch.Consume(
 		eventsQueue.Name, "",
 		false, false, false,
@@ -43,9 +48,11 @@ func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 	)
 	c.msgs = eventsMsgs
 
+	// start messages receiving
 	c.events = make(chan *notificationpb.Event)
 	go c.receive()
 
+	c.logger.Info("event consumer was successfully created")
 	return &c, nil
 }
 
@@ -54,6 +61,7 @@ func (c *consumer) Listen() <-chan *notificationpb.Event {
 }
 
 func (c *consumer) receive() {
+	c.logger.Info("receiving messages running...")
 	for msg := range c.msgs {
 		event := notificationpb.Event{}
 
@@ -67,4 +75,5 @@ func (c *consumer) receive() {
 
 		c.events <- &event
 	}
+	c.logger.Info("receiving messages stopped")
 }

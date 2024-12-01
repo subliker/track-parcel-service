@@ -23,6 +23,10 @@ type producer struct {
 func NewProducer(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
 	var p producer
 
+	// setting logger
+	p.logger = logger.WithFields("layer", "delivery producer")
+
+	// queue declaring
 	deliveryQueue, err := ch.QueueDeclare(
 		"notification_delivery",
 		true, false, false,
@@ -33,7 +37,7 @@ func NewProducer(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
 	}
 	p.q = deliveryQueue
 
-	p.logger = logger.WithFields("producer", "delivery")
+	p.logger.Info("delivery producer was successfully created")
 	return &p, nil
 }
 

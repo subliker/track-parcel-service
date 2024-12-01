@@ -35,6 +35,8 @@ func New(logger logger.Logger, broker rabbitmq.Broker, dispatcher dispatcher.Not
 }
 
 func (a *app) Run() error {
+	a.logger.Info("app running...")
+
 	// starting dispatcher
 	if err := a.dispatcher.Run(); err != nil {
 		errMsg := fmt.Errorf("running dispatcher error: %s", err)
@@ -42,6 +44,7 @@ func (a *app) Run() error {
 		return errMsg
 	}
 
+	a.logger.Info("app stopped")
 	return nil
 }
 

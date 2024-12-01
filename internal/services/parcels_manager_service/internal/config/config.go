@@ -7,6 +7,7 @@ import (
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
+	"github.com/subliker/track-parcel-service/internal/pkg/validation"
 )
 
 type (
@@ -51,9 +52,16 @@ func init() {
 func Get() Config {
 	logger := zap.NewLogger().WithFields("layer", "config")
 
+	// viper config unmarshaling
 	cfg := Config{}
 	if err := viper.Unmarshal(&cfg); err != nil {
 		logger.Fatalf("error unmarshal config: %s", err)
+	}
+
+	// config validation
+	err := validation.V.Struct(cfg)
+	if err != nil {
+		logger.Fatalf("config validation error: %s", err)
 	}
 
 	return cfg

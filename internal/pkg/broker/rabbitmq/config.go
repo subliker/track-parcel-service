@@ -1,7 +1,7 @@
 package rabbitmq
 
 type Config struct {
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
+	User     string `validate:"required" mapstructure:"user"`
+	Password string `validate:"required" mapstructure:"password"`
 	Host     string `mapstructure:"host"`
 }
