@@ -126,7 +126,7 @@ func (s *store) GetUserInfo(trackNum model.TrackNumber, userTID model.TelegramID
 
 	// making parcel struct
 	var p model.Parcel
-	subscribed := false
+	subscriptionID := 0
 
 	// making query builder
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
@@ -154,7 +154,7 @@ func (s *store) GetUserInfo(trackNum model.TrackNumber, userTID model.TelegramID
 
 	// executing query
 	row := s.db.QueryRow(query, args...)
-	err = row.Scan(&p.Name, &p.Recipient, &p.ArrivalAddress, &p.ForecastDate, &p.Description, &p.Status, &subscribed)
+	err = row.Scan(&p.Name, &p.Recipient, &p.ArrivalAddress, &p.ForecastDate, &p.Description, &p.Status, &subscriptionID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return p, false, parcel.ErrParcelNotFound
 	}
@@ -162,7 +162,7 @@ func (s *store) GetUserInfo(trackNum model.TrackNumber, userTID model.TelegramID
 		return p, false, err
 	}
 
-	return p, subscribed, nil
+	return p, subscriptionID != 0, nil
 }
 
 func (s *store) Exists(trackNum model.TrackNumber) (bool, error) {
