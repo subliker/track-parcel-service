@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/streadway/amqp"
+	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/broker/rabbitmq/delivery"
 	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/broker/rabbitmq/event"
 	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/config"
@@ -17,7 +18,7 @@ type Broker struct {
 	eventsConsumer   event.Consumer
 }
 
-func New(cfg config.RabbitMQConfig) (*Broker, error) {
+func New(logger logger.Logger, cfg config.RabbitMQConfig) (*Broker, error) {
 	var b Broker
 
 	// open mq connection
@@ -35,7 +36,7 @@ func New(cfg config.RabbitMQConfig) (*Broker, error) {
 	b.ch = ch
 
 	// make producers and consumers
-	deliveryProducer, err := delivery.New(ch)
+	deliveryProducer, err := delivery.New(logger, ch)
 	if err != nil {
 		return nil, fmt.Errorf("error making delivery producer: %s", err)
 	}

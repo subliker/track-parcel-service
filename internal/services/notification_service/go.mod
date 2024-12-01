@@ -8,6 +8,7 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/streadway/amqp v1.1.0
 	github.com/subliker/track-parcel-service/internal/pkg v0.0.0-00010101000000-000000000000
+	google.golang.org/protobuf v1.35.2
 )
 
 require (

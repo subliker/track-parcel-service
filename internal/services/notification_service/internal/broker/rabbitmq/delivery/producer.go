@@ -1,17 +1,26 @@
 package delivery
 
-import "github.com/streadway/amqp"
+import (
+	"fmt"
+
+	"github.com/streadway/amqp"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/notificationpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/logger"
+	"google.golang.org/protobuf/proto"
+)
 
 type Producer interface {
-	Publish() error
+	Publish(*notificationpb.Delivery) error
 }
 
 type producer struct {
 	ch *amqp.Channel
 	q  amqp.Queue
+
+	logger logger.Logger
 }
 
-func New(ch *amqp.Channel) (Producer, error) {
+func New(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
 	var p producer
 
 	deliveryQueue, err := ch.QueueDeclare(
@@ -24,9 +33,34 @@ func New(ch *amqp.Channel) (Producer, error) {
 	}
 	p.q = deliveryQueue
 
+	p.logger = logger.WithFields("producer", "delivery")
 	return &p, nil
 }
 
-func (p *producer) Publish() error {
+func (p *producer) Publish(delivery *notificationpb.Delivery) error {
+	// protobuf serialization
+	body, err := proto.Marshal(delivery)
+	if err != nil {
+		errMsg := fmt.Errorf("error marshaling proto message: %s", err)
+		p.logger.Error(errMsg)
+		return errMsg
+	}
+
+	// publishing
+	err = p.ch.Publish(
+		"",
+		p.q.Name,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/x-protobuf",
+			Body:        body,
+		},
+	)
+	if err != nil {
+		errMsg := fmt.Errorf("error publishing proto message: %s", err)
+		p.logger.Error(errMsg)
+		return errMsg
+	}
 	return nil
 }
