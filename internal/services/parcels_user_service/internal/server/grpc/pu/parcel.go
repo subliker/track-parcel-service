@@ -18,7 +18,7 @@ func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*p
 	const errMsg = "error get parcel(%s): %s"
 
 	// get parcel from store
-	p, err := s.store.GetInfo(model.TrackNumber(req.TrackNumber))
+	p, subscribed, err := s.store.GetUserInfo(model.TrackNumber(req.TrackNumber), model.TelegramID(req.UserTelegramId))
 	if errors.Is(err, parcel.ErrParcelNotFound) {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		return nil, status.Error(codes.NotFound, errMsg)
@@ -37,5 +37,6 @@ func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*p
 		ParcelForecastDate:   timestamppb.New(p.ForecastDate),
 		ParcelDescription:    p.Description,
 		ParcelStatus:         pb.ParcelStatus(pb.ParcelStatus_value[string(p.Status)]),
+		Subscribed:           subscribed,
 	}, nil
 }

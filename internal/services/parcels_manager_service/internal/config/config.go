@@ -42,7 +42,7 @@ func init() {
 	viper.SetDefault("grpc.timeout", time.Second)
 
 	viper.SetDefault("db.host", "localhost")
-	viper.SetDefault("db.port", 3306)
+	viper.SetDefault("db.port", 5433)
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
 	viper.BindEnv("db.dbname")

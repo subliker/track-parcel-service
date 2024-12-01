@@ -7,7 +7,7 @@ import (
 )
 
 type ServerApi struct {
-	pb.UnsafeParcelsUserServer
+	pb.UnimplementedParcelsUserServer
 
 	store  parcel.UserStore
 	logger logger.Logger

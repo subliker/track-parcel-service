@@ -5,3 +5,5 @@ version: '3'
 tasks:
   run:
     - go run ./cmd/pm/main.go
+  run-migrate:
+    - go run ./cmd/pm/main.go -migrate
