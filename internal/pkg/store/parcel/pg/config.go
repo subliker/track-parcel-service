@@ -5,5 +5,5 @@ type Config struct {
 	Port     int    `mapstructure:"port"`
 	User     string `validate:"required" mapstructure:"user"`
 	Password string `validate:"required" mapstructure:"password"`
-	DBName   string `validate:"required" mapstructure:"dbname"`
+	DB       string `validate:"required" mapstructure:"db"`
 }

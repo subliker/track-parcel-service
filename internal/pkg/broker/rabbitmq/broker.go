@@ -49,5 +49,11 @@ func (b *broker) Chan() *amqp.Channel {
 }
 
 func (b *broker) Close() error {
+	// connection close
+	if err := b.conn.Close(); err != nil {
+		b.logger.Warnf("broker connection closed with error: %s", err)
+	}
+
+	b.logger.Info("broker was closed")
 	return nil
 }

@@ -26,7 +26,7 @@ func New(logger logger.Logger, cfg Config) (parcel.Store, error) {
 	logger = logger.WithFields("layer", "parcel postgres store")
 
 	// pgs connection string
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName)
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DB)
 
 	// opening sql connection
 	db, err := sql.Open("postgres", dsn)
@@ -58,4 +58,5 @@ func New(logger logger.Logger, cfg Config) (parcel.Store, error) {
 
 func (s *store) Close() {
 	s.db.Close()
+	s.logger.Info("store stopped")
 }

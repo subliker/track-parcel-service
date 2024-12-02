@@ -11,7 +11,7 @@ import (
 
 // Producer publishes notifications(delivery) for customers.
 type Producer interface {
-	// Publish publishes notification(delivery)
+	// Publish publishes notifications(delivery)
 	Publish(*notificationpb.Delivery) error
 }
 

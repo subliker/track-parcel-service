@@ -49,6 +49,9 @@ func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 		false, false, false,
 		false, nil,
 	)
+	if err != nil {
+		return nil, err
+	}
 	c.msgs = deliveryMsgs
 
 	// start messages receiving

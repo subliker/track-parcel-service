@@ -51,7 +51,11 @@ func main() {
 	dispatcher := dispatcher.New(logger, eventConsumer, deliverProducer, store)
 
 	// creating new instance of app
-	app := app.New(logger, broker, dispatcher)
+	app := app.New(logger, app.AppOptions{
+		Store:      store,
+		Dispatcher: dispatcher,
+		Broker:     broker,
+	})
 	// running app
 	app.Run(ctx)
 }

@@ -11,15 +11,18 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/dispatcher"
+	"github.com/subliker/track-parcel-service/internal/services/notification_service/internal/store/parcel"
 )
 
 // App is interface to control app.
-// Closing app closes all app services
+// Closing app closes all app services.
 type App interface {
 	// Run starts app and stops all internal services when ctx done.
 	Run(context.Context) error
 }
 type app struct {
+	store parcel.NotificationStore
+
 	broker rabbitmq.Broker
 
 	dispatcher dispatcher.Notification
@@ -27,22 +30,28 @@ type app struct {
 	logger logger.Logger
 }
 
-// New creates new app instance
-func New(
-	logger logger.Logger,
-	broker rabbitmq.Broker,
-	dispatcher dispatcher.Notification,
-) App {
+// AppOptions is struct for building app arguments
+type AppOptions struct {
+	Store      parcel.NotificationStore
+	Dispatcher dispatcher.Notification
+	Broker     rabbitmq.Broker
+}
+
+// New creates new instance of app
+func New(logger logger.Logger, opts AppOptions) App {
 	var a app
 
 	// setting logger
 	a.logger = logger.WithFields("layer", "app")
 
+	// setting store
+	a.store = opts.Store
+
 	// setting broker
-	a.broker = broker
+	a.broker = opts.Broker
 
 	// setting dispatcher
-	a.dispatcher = dispatcher
+	a.dispatcher = opts.Dispatcher
 
 	a.logger.Info("app was created")
 	return &a
@@ -88,6 +97,9 @@ func (a *app) Run(ctx context.Context) error {
 	if err := a.broker.Close(); err != nil {
 		a.logger.Warn(err)
 	}
+
+	// stop store
+	a.store.Close()
 
 	a.logger.Info("app was gracefully shutdowned :)")
 	return nil

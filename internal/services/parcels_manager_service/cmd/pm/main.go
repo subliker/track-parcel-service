@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
@@ -43,7 +44,12 @@ func main() {
 	parcelServer := grpc.NewServer(logger, store, eventProducer)
 
 	// creating new instance of app
-	a := app.New(cfg, logger, store, parcelServer, broker)
+	a := app.New(logger, app.AppOptions{
+		Config:       cfg,
+		Store:        store,
+		ParcelServer: parcelServer,
+		Broker:       broker,
+	})
 	// running app
-	a.Run()
+	a.Run(context.Background())
 }

@@ -15,4 +15,10 @@ tasks:
         ./internal/pkg/proto/account/* \
         ./internal/pkg/proto/pm/pm.proto \
         ./internal/pkg/proto/pu/pu.proto \
-        ./internal/pkg/proto/notification/notification.proto                        
+        ./internal/pkg/proto/notification/notification.proto
+  set-example:
+    desc: Set example configurations in all services
+    cmds:
+      - cp -f .example.env .env
+      - task --taskfile internal/services/notification_service/Taskfile.yml set-example           
+      - task --taskfile internal/services/parcels_manager_service/Taskfile.yml set-example           

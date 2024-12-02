@@ -1,8 +1,13 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"net"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
@@ -11,8 +16,11 @@ import (
 	"google.golang.org/grpc"
 )
 
+// App is interface to control app.
+// Closing app closes all app services.
 type App interface {
-	Run() error
+	// Run starts app and stops all internal services when ctx done.
+	Run(context.Context) error
 }
 
 type app struct {
@@ -26,39 +34,95 @@ type app struct {
 	logger logger.Logger
 }
 
-func New(cfg config.Config,
-	logger logger.Logger,
-	store parcel.ManagerStore,
-	parcelServer *grpc.Server,
-	broker rabbitmq.Broker) App {
+// AppOptions is struct for building app arguments
+type AppOptions struct {
+	Config       config.Config
+	Store        parcel.ManagerStore
+	ParcelServer *grpc.Server
+	Broker       rabbitmq.Broker
+}
+
+// New creates new instance of app
+func New(logger logger.Logger, opts AppOptions) App {
 	var a app
 
 	// setting config
-	a.grpcConfig = cfg.GRPC
+	a.grpcConfig = opts.Config.GRPC
 
 	// setting logger
 	a.logger = logger.WithFields("layer", "app")
 
 	// setting store
-	a.store = store
+	a.store = opts.Store
 
 	// setting parcel server
-	a.parcelServer = parcelServer
+	a.parcelServer = opts.ParcelServer
 
 	// setting broker
-	a.broker = broker
+	a.broker = opts.Broker
 	return &a
 }
 
-func (a *app) Run() error {
+func (a *app) Run(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// receive sys signals
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
 	// creating new new listener
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", a.grpcConfig.Port))
 	if err != nil {
 		a.logger.Fatal(err)
 	}
 
-	// running server
-	a.logger.Infof("starting grpc server at port %d...", a.grpcConfig.Port)
-	a.logger.Fatal(a.parcelServer.Serve(lis))
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		// starting serving server
+		a.logger.Infof("starting grpc server at port %d...", a.grpcConfig.Port)
+		if err := a.parcelServer.Serve(lis); err != nil {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				errMsg := fmt.Errorf("serving grpc server error: %s", err)
+				a.logger.Error(errMsg)
+				cancel()
+			}
+		}
+	}()
+	a.logger.Info("app running...")
+
+	// wait until signal will come or context will end
+	select {
+	case <-quit:
+		a.logger.Info("shutdown signal received")
+	case <-ctx.Done():
+		a.logger.Info("context canceled")
+	}
+
+	a.logger.Info("stopping all services")
+	// stop services
+	cancel()
+	// closing net listener
+	if err := lis.Close(); err != nil {
+		a.logger.Warnf("net listener closing ended with error: %s", err)
+	}
+	// wait until services will be stopped
+	wg.Wait()
+
+	// stop broker
+	if err := a.broker.Close(); err != nil {
+		a.logger.Warn(err)
+	}
+
+	// close store
+	a.store.Close()
+
+	a.logger.Info("app was gracefully shutdowned :)")
 	return nil
 }
