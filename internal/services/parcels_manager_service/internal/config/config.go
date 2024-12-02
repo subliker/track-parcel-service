@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
@@ -12,9 +13,10 @@ import (
 
 type (
 	Config struct {
-		GRPC GRPCConfig `mapstructure:"grpc"`
-		REST RESTConfig `validate:"required" mapstructure:"res"`
-		DB   pg.Config  `mapstructure:"db"`
+		GRPC     GRPCConfig      `mapstructure:"grpc"`
+		REST     RESTConfig      `validate:"required" mapstructure:"rest"`
+		DB       pg.Config       `validate:"required" mapstructure:"db"`
+		RabbitMQ rabbitmq.Config `validate:"required" mapstructure:"rabbitmq"`
 	}
 
 	GRPCConfig struct {
@@ -47,6 +49,10 @@ func init() {
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
 	viper.BindEnv("db.dbname")
+
+	viper.BindEnv("rabbitmq.user")
+	viper.BindEnv("rabbitmq.password")
+	viper.SetDefault("rabbitmq.host", "localhost")
 }
 
 func Get() Config {

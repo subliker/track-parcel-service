@@ -43,8 +43,10 @@ func New(
 
 // Run runs notification dispatcher
 func (n *notification) Run() error {
+	n.logger.Info("notification dispatcher running...")
 	// handling events
 	n.handleEvents()
 
+	n.logger.Info("notification dispatcher stopped")
 	return nil
 }

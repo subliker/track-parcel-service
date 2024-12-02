@@ -29,8 +29,11 @@ func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 	// setting logger
 	c.logger = logger.WithFields("layer", "delivery consumer")
 
+	// setting channel
+	c.ch = ch
+
 	// queue declaring
-	deliveryQueue, err := ch.QueueDeclare(
+	deliveryQueue, err := c.ch.QueueDeclare(
 		"notification_delivery",
 		true, false, false,
 		false, nil,

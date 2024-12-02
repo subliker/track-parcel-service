@@ -29,8 +29,11 @@ func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 	// setting logger
 	c.logger = logger.WithFields("layer", "event consumer")
 
+	// setting channel
+	c.ch = ch
+
 	// queue declaring
-	eventsQueue, err := ch.QueueDeclare(
+	eventsQueue, err := c.ch.QueueDeclare(
 		"notification_events",
 		true, false, false,
 		false, nil,
@@ -70,9 +73,11 @@ func (c *consumer) receive() {
 		if err != nil {
 			errMsg := fmt.Errorf("error proto message deserialization: %s", err)
 			c.logger.Error(errMsg)
+			msg.Nack(false, false)
 			continue
 		}
 
+		msg.Ack(false)
 		c.events <- &event
 	}
 	c.logger.Info("receiving messages stopped")

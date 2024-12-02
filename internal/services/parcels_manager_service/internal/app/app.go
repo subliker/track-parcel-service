@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
@@ -20,26 +21,32 @@ type app struct {
 
 	store parcel.ManagerStore
 
+	broker rabbitmq.Broker
+
 	logger logger.Logger
 }
 
 func New(cfg config.Config,
 	logger logger.Logger,
 	store parcel.ManagerStore,
-	parcelServer *grpc.Server) App {
+	parcelServer *grpc.Server,
+	broker rabbitmq.Broker) App {
 	var a app
 
-	// set config
+	// setting config
 	a.grpcConfig = cfg.GRPC
 
-	// set logger
+	// setting logger
 	a.logger = logger.WithFields("layer", "app")
 
-	// set store
+	// setting store
 	a.store = store
 
-	// set parcel server
+	// setting parcel server
 	a.parcelServer = parcelServer
+
+	// setting broker
+	a.broker = broker
 	return &a
 }
 

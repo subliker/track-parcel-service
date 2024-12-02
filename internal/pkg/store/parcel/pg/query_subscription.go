@@ -89,7 +89,7 @@ func (s *store) ParcelSubscribers(trackNum model.TrackNumber) ([]model.TelegramI
 	// build query
 	query, args, err := psql.Select("user_id").
 		From("subscriptions").
-		Where(squirrel.Eq{"track_number": trackNum}).
+		Where(squirrel.Eq{"parcel_track_number": trackNum}).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of getting parcels subscribers: %s", err)
