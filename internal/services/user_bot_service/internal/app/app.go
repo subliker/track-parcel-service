@@ -7,6 +7,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
@@ -22,6 +23,8 @@ type app struct {
 	userClient        user.Client
 	parcelsUserClient pu.Client
 
+	broker rabbitmq.Broker
+
 	logger logger.Logger
 }
 
@@ -29,6 +32,7 @@ type AppOptions struct {
 	Bot               bot.Bot
 	UserClient        user.Client
 	ParcelsUserClient pu.Client
+	Broker            rabbitmq.Broker
 }
 
 func New(logger logger.Logger, opts AppOptions) App {
@@ -45,6 +49,9 @@ func New(logger logger.Logger, opts AppOptions) App {
 
 	// set parcels user client
 	a.parcelsUserClient = opts.ParcelsUserClient
+
+	// set broker
+	a.broker = opts.Broker
 
 	a.logger.Info("app was built")
 	return &a

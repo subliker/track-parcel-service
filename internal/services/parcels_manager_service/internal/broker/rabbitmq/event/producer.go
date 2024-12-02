@@ -1,4 +1,4 @@
-package delivery
+package event
 
 import (
 	"fmt"
@@ -9,10 +9,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// Producer publishes notifications(delivery) for customers.
 type Producer interface {
-	// Publish publishes notification(delivery)
-	Publish(*notificationpb.Delivery) error
+	Publish(*notificationpb.Event) error
 }
 
 type producer struct {
@@ -22,19 +20,18 @@ type producer struct {
 	logger logger.Logger
 }
 
-// NewProducer creates new instance of delivery producer
 func NewProducer(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
 	var p producer
 
 	// setting logger
-	p.logger = logger.WithFields("layer", "delivery producer")
+	p.logger = logger.WithFields("layer", "event producer")
 
 	// setting channel
 	p.ch = ch
 
 	// queue declaring
 	deliveryQueue, err := p.ch.QueueDeclare(
-		"notification_delivery",
+		"notification_events",
 		true, false, false,
 		false, nil,
 	)
@@ -43,13 +40,13 @@ func NewProducer(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
 	}
 	p.q = deliveryQueue
 
-	p.logger.Info("delivery producer was successfully created")
+	p.logger.Info("event producer was successfully created")
 	return &p, nil
 }
 
-func (p *producer) Publish(delivery *notificationpb.Delivery) error {
+func (p *producer) Publish(event *notificationpb.Event) error {
 	// protobuf serialization
-	body, err := proto.Marshal(delivery)
+	body, err := proto.Marshal(event)
 	if err != nil {
 		errMsg := fmt.Errorf("error marshaling proto message: %s", err)
 		p.logger.Error(errMsg)

@@ -23,10 +23,17 @@ type consumer struct {
 	logger logger.Logger
 }
 
-func NewConsumer(ch *amqp.Channel) (Consumer, error) {
+func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 	var c consumer
 
-	deliveryQueue, err := ch.QueueDeclare(
+	// setting logger
+	c.logger = logger.WithFields("layer", "delivery consumer")
+
+	// setting channel
+	c.ch = ch
+
+	// queue declaring
+	deliveryQueue, err := c.ch.QueueDeclare(
 		"notification_delivery",
 		true, false, false,
 		false, nil,
@@ -36,6 +43,7 @@ func NewConsumer(ch *amqp.Channel) (Consumer, error) {
 	}
 	c.q = deliveryQueue
 
+	// getting consumer channel
 	deliveryMsgs, err := ch.Consume(
 		deliveryQueue.Name, "",
 		false, false, false,
@@ -43,9 +51,11 @@ func NewConsumer(ch *amqp.Channel) (Consumer, error) {
 	)
 	c.msgs = deliveryMsgs
 
+	// start messages receiving
 	c.delivery = make(chan *notificationpb.Delivery)
 	go c.receive()
 
+	c.logger.Info("delivery consumer was successfully created")
 	return &c, nil
 }
 
@@ -54,6 +64,7 @@ func (c *consumer) Listen() <-chan *notificationpb.Delivery {
 }
 
 func (c *consumer) receive() {
+	c.logger.Info("receiving messages running...")
 	for msg := range c.msgs {
 		event := notificationpb.Delivery{}
 
@@ -69,4 +80,5 @@ func (c *consumer) receive() {
 		c.delivery <- &event
 		msg.Ack(false)
 	}
+	c.logger.Info("receiving messages stopped")
 }

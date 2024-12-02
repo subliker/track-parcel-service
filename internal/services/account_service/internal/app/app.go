@@ -29,17 +29,17 @@ func New(cfg config.Config,
 	accountServer *grpc.Server) App {
 	var a app
 
-	// set config
+	// setting config
 	a.grpcConfig = cfg.GRPC
 
-	// set logger
-	a.logger = logger.WithFields("layer", "app")
-
-	// set store
+	// setting store
 	a.store = store
 
-	// set account server
+	// setting account server
 	a.accountServer = accountServer
+
+	// setting logger
+	a.logger = logger.WithFields("layer", "app")
 	return &a
 }
 

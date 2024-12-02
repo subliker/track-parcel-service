@@ -20,22 +20,13 @@ type zapLogger struct {
 	logger *zap.SugaredLogger
 }
 
+const logDir = "./logs"
+
 // New creates sugared zap logger with common config.
 // It logs into writer from params.
 func NewLogger() logger.Logger {
 	// making log file
-	ex, err := os.Executable()
-	if err != nil {
-		log.Fatalf("error getting exec path: %s", err)
-	}
-
-	// TEMP!!!
-	logDir := filepath.Join(filepath.Dir(ex), "logs")
-	if _, err := os.Stat(logDir); err != nil {
-		if err := os.MkdirAll(logDir, os.ModePerm); err != nil {
-			log.Fatalf("error mkdir all(%s): %s", logDir, err)
-		}
-	}
+	os.MkdirAll(logDir, os.ModePerm)
 
 	logFile, err := os.OpenFile(filepath.Join(logDir, "main.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {

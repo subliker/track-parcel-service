@@ -1,0 +1,8 @@
+[rabbitmq]
+user="admin"
+password="password"
+
+[db]
+user="subliker"
+password="qwe123123"
+db="postgres"

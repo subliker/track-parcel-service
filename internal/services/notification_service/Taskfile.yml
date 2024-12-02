@@ -4,4 +4,10 @@ version: '3'
 
 tasks:
   run:
-    - go run ./cmd/not/main.go
+    desc: Run service
+    cmds:
+      - go run ./cmd/not/main.go
+  set-example:
+    desc: Set example configuration
+    cmds:
+      - cp -f configs/config.example.toml configs/config.toml        

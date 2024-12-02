@@ -4,16 +4,19 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
+	"github.com/subliker/track-parcel-service/internal/pkg/validation"
 )
 
 type (
 	Config struct {
-		GRPC GRPCConfig `mapstructure:"grpc"`
-		REST RESTConfig `validate:"required" mapstructure:"res"`
-		DB   pg.Config  `mapstructure:"db"`
+		GRPC     GRPCConfig      `mapstructure:"grpc"`
+		REST     RESTConfig      `validate:"required" mapstructure:"rest"`
+		DB       pg.Config       `validate:"required" mapstructure:"db"`
+		RabbitMQ rabbitmq.Config `validate:"required" mapstructure:"rabbitmq"`
 	}
 
 	GRPCConfig struct {
@@ -46,14 +49,25 @@ func init() {
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
 	viper.BindEnv("db.dbname")
+
+	viper.BindEnv("rabbitmq.user")
+	viper.BindEnv("rabbitmq.password")
+	viper.SetDefault("rabbitmq.host", "localhost")
 }
 
 func Get() Config {
 	logger := zap.NewLogger().WithFields("layer", "config")
 
+	// viper config unmarshaling
 	cfg := Config{}
 	if err := viper.Unmarshal(&cfg); err != nil {
 		logger.Fatalf("error unmarshal config: %s", err)
+	}
+
+	// config validation
+	err := validation.V.Struct(cfg)
+	if err != nil {
+		logger.Fatalf("config validation error: %s", err)
 	}
 
 	return cfg

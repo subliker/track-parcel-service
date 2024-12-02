@@ -3,7 +3,7 @@ package pg
 type Config struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
-	DBName   string `mapstructure:"dbname"`
+	User     string `validate:"required" mapstructure:"user"`
+	Password string `validate:"required" mapstructure:"password"`
+	DBName   string `validate:"required" mapstructure:"dbname"`
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/notificationpb"
 	parcelpb "github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
 	pmpb "github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
@@ -35,6 +36,12 @@ func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pmpb.AddCheckpointRe
 		logger.Error(errMsg)
 		return nil, status.Error(codes.Internal, errMsg)
 	}
+
+	// publishing event
+	s.eventProducer.Publish(&notificationpb.Event{
+		TrackNumber: req.TrackNumber,
+		Checkpoint:  req.Checkpoint,
+	})
 
 	return nil, nil
 }
