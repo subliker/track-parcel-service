@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
@@ -30,8 +32,11 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	// app context
+	ctx := context.Background()
+
 	// making event consumer
-	eventConsumer, err := event.NewConsumer(logger, broker.Chan())
+	eventConsumer, err := event.NewConsumer(ctx, logger, broker.Chan())
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -48,5 +53,5 @@ func main() {
 	// creating new instance of app
 	app := app.New(logger, broker, dispatcher)
 	// running app
-	app.Run()
+	app.Run(ctx)
 }

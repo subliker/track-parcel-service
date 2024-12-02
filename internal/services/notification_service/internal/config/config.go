@@ -28,7 +28,7 @@ func init() {
 	viper.SetDefault("db.port", 5433)
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
-	viper.BindEnv("db.dbname")
+	viper.BindEnv("db.name")
 }
 
 func Get() Config {

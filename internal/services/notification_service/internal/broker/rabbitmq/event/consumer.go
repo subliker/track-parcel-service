@@ -1,6 +1,7 @@
 package event
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/streadway/amqp"
@@ -9,8 +10,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// Consumer receives events and transfers into pb format
 type Consumer interface {
+	// Listen receives events transfered into pb
 	Listen() <-chan *notificationpb.Event
+	// Close closes listen channel
+	Close()
 }
 
 type consumer struct {
@@ -23,7 +28,8 @@ type consumer struct {
 	logger logger.Logger
 }
 
-func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
+// NewConsumer creates new instance of event consumer
+func NewConsumer(ctx context.Context, logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 	var c consumer
 
 	// setting logger
@@ -49,10 +55,15 @@ func NewConsumer(logger logger.Logger, ch *amqp.Channel) (Consumer, error) {
 		false, false, false,
 		false, nil,
 	)
+	if err != nil {
+		return nil, err
+	}
 	c.msgs = eventsMsgs
 
 	// start messages receiving
 	c.events = make(chan *notificationpb.Event)
+
+	// consumer receives msgs until ctx done
 	go c.receive()
 
 	c.logger.Info("event consumer was successfully created")
@@ -80,5 +91,10 @@ func (c *consumer) receive() {
 		msg.Ack(false)
 		c.events <- &event
 	}
+}
+
+func (c *consumer) Close() {
+	// close events channel
+	close(c.events)
 	c.logger.Info("receiving messages stopped")
 }
