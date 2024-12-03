@@ -28,13 +28,17 @@ type app struct {
 	logger logger.Logger
 }
 
+// AppOptions is struct for building app arguments
 type AppOptions struct {
-	Bot               bot.Bot
+	Bot bot.Bot
+
 	UserClient        user.Client
 	ParcelsUserClient pu.Client
-	Broker            rabbitmq.Broker
+
+	Broker rabbitmq.Broker
 }
 
+// New creates new instance of app
 func New(logger logger.Logger, opts AppOptions) App {
 	var a app
 
@@ -75,7 +79,7 @@ func (a *app) Run(ctx context.Context) error {
 			cancel()
 		}
 	}()
-	a.logger.Info("app is running")
+	a.logger.Info("app running...")
 
 	// wait until signal will come or context will end
 	select {
@@ -85,10 +89,10 @@ func (a *app) Run(ctx context.Context) error {
 		a.logger.Info("context canceled")
 	}
 
-	a.logger.Info("stopping all service")
-	// context cancel => bot stopping
+	a.logger.Info("stopping all services")
+	// stop services
 	cancel()
-	// wait until bot will be stopped
+	// wait until services will be stopped
 	wg.Wait()
 
 	// stop clients
@@ -96,6 +100,6 @@ func (a *app) Run(ctx context.Context) error {
 		a.logger.Warn(err)
 	}
 
-	a.logger.Info("service was gracefully shutdowned)")
+	a.logger.Info("app was gracefully shutdowned :)")
 	return nil
 }

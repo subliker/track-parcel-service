@@ -4,6 +4,10 @@ version: '3'
 
 tasks:
   run:
-    - go run ./cmd/pm/main.go
-  run-migrate:
-    - go run ./cmd/pm/main.go -migrate
+    desc: Run service
+    cmds:
+      - go run ./cmd/pm/main.go
+  set-example:
+    desc: Set example configuration
+    cmds:
+      - cp -f configs/config.example.toml configs/config.toml

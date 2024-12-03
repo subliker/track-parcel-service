@@ -20,17 +20,18 @@ func init() {
 	viper.SetEnvPrefix("NOT")
 
 	// env and default binding
+	viper.SetDefault("rabbitmq.host", "localhost")
 	viper.BindEnv("rabbitmq.user")
 	viper.BindEnv("rabbitmq.password")
-	viper.SetDefault("rabbitmq.host", "localhost")
 
 	viper.SetDefault("db.host", "localhost")
 	viper.SetDefault("db.port", 5433)
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
-	viper.BindEnv("db.name")
+	viper.BindEnv("db.db")
 }
 
+// Get returns parsed service config.
 func Get() Config {
 	logger := zap.NewLogger().WithFields("layer", "config")
 

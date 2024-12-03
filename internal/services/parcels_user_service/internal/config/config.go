@@ -1,23 +1,17 @@
 package config
 
 import (
-	"time"
-
 	"github.com/spf13/viper"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_user_service/internal/server/grpc"
 )
 
 type (
 	Config struct {
-		GRPC GRPCConfig `mapstructure:"grpc"`
-		DB   pg.Config  `mapstructure:"db"`
-	}
-
-	GRPCConfig struct {
-		Port    int           `mapstructure:"port"`
-		Timeout time.Duration `mapstructure:"timeout"`
+		GRPC grpc.Config `validate:"required" mapstructure:"grpc"`
+		DB   pg.Config   `validate:"required" mapstructure:"db"`
 	}
 )
 
@@ -26,7 +20,6 @@ func init() {
 
 	// env and default binding
 	viper.SetDefault("grpc.port", 50051)
-	viper.SetDefault("grpc.timeout", time.Second)
 
 	viper.SetDefault("db.host", "localhost")
 	viper.SetDefault("db.port", 3306)

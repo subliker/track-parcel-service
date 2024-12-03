@@ -2,17 +2,61 @@
 
 version: '3'
 
+dotenv: ['.env']
+
+vars:
+  USERS_CONN: "host=$USERS_POSTGRES_HOST port=$USERS_POSTGRES_PORT user=$USERS_POSTGRES_USER password=$USERS_POSTGRES_PASSWORD dbname=$USERS_POSTGRES_DB sslmode=disable"
+  PARCELS_CONN: "host=$PARCELS_POSTGRES_HOST port=$PARCELS_POSTGRES_PORT user=$PARCELS_POSTGRES_USER password=$PARCELS_POSTGRES_PASSWORD dbname=$PARCELS_POSTGRES_DB sslmode=disable"
+
 tasks:
   install-i18n:
     - go install github.com/MrNemo64/go-n-i18n/cmd/i18n@latest
+
+  # goose migrations
+  install-goose:
+    - go install github.com/pressly/goose/v3/cmd/goose@latest
+  # user migrations 
+  migrate-user-up:
+    - goose -dir migrations/user postgres "{{.USERS_CONN}}" up
+  migrate-user-down:
+    - goose -dir migrations/user postgres "{{.USERS_CONN}}" down
+  migrate-test-user-up:
+    - goose -dir migrations/user/test postgres "{{.USERS_CONN}}" up
+  migrate-test-user-down:
+    - goose -dir migrations/user/test postgres "{{.USERS_CONN}}" down
+  # parcel migrations
+  migrate-parcel-up:
+    - goose -dir migrations/parcel postgres "{{.PARCELS_CONN}}" up
+  migrate-parcel-down:
+    - goose -dir migrations/parcel postgres "{{.PARCELS_CONN}}" down
+  migrate-test-parcel-up:
+    - goose -dir migrations/parcel/test postgres "{{.PARCELS_CONN}}" up
+  migrate-test-parcel-down:
+    - goose -dir migrations/parcel/test postgres "{{.PARCELS_CONN}}" down
+  # all migrations
+  migrate-all-up:
+    - task: migrate-parcel-up
+    - task: migrate-user-up
+  migrate-test-all-up:
+    - task: migrate-test-user-up
+    - task: migrate-test-parcel-up
+  
+
   proto:
     cmds:
       - mkdir -p ./internal/pkg/gen
-      - |
+      - | 
         protoc -I ./internal/pkg/proto/ --go_out=./internal/pkg/ --go-grpc_out=./internal/pkg/ \
         --go_opt=module=github.com/subliker/track-parcel-service/internal/pkg --go-grpc_opt=module=github.com/subliker/track-parcel-service/internal/pkg \
         ./internal/pkg/proto/parcel/parcel.proto \
         ./internal/pkg/proto/account/* \
         ./internal/pkg/proto/pm/pm.proto \
         ./internal/pkg/proto/pu/pu.proto \
-        ./internal/pkg/proto/notification/notification.proto                        
+        ./internal/pkg/proto/notification/notification.proto
+
+  set-example:
+    desc: Set example configurations in all services
+    cmds:
+      - cp -f .example.env .env
+      - task --taskfile internal/services/notification_service/Taskfile.yml set-example           
+      - task --taskfile internal/services/parcels_manager_service/Taskfile.yml set-example

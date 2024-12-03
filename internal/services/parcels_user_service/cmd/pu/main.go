@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
@@ -31,5 +32,5 @@ func main() {
 	// creating new instance of app
 	a := app.New(cfg, logger, store, parcelServer)
 	// running app
-	a.Run()
+	a.Run(context.Background())
 }

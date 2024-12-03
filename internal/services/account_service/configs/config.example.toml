@@ -1,0 +1,9 @@
+[grpc]
+port=50051 # default
+
+[db]
+host="localhost" # default
+port=5432 # default
+user="subliker"
+password="qwe123123"
+db="postgres"

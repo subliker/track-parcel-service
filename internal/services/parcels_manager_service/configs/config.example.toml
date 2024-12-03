@@ -1,0 +1,20 @@
+[grpc]
+port=50051 # default
+
+[rest]
+port=8080 # default
+
+[db]
+host="localhost" # default
+port=5433 # default
+user="subliker"
+password="qwe123123"
+db="postgres"
+
+[rabbitmq]
+host="localhost" # default
+user="admin"
+password="password"
+
+[managerclient]
+target="localhost:50051" # default

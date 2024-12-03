@@ -9,7 +9,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// Producer publishes events for customers.
 type Producer interface {
+	// Publish publishes events
 	Publish(*notificationpb.Event) error
 }
 
@@ -20,6 +22,7 @@ type producer struct {
 	logger logger.Logger
 }
 
+// NewProducer creates new instance of event producer
 func NewProducer(logger logger.Logger, ch *amqp.Channel) (Producer, error) {
 	var p producer
 

@@ -9,4 +9,9 @@
 *.test
 
 *.toml
+!*.example.toml
+
+.env
+!.example.env
+
 *.log

@@ -5,18 +5,18 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: subliker
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: qwe123123
+      POSTGRES_USER: ${USERS_POSTGRES_USER}
+      POSTGRES_DB: ${USERS_POSTGRES_DB}
+      POSTGRES_PASSWORD: ${USERS_POSTGRES_PASSWORD}
   parcels:
     container_name: parcels
     image: postgres
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_USER: subliker
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: qwe123123
+      POSTGRES_USER: ${PARCELS_POSTGRES_USER}
+      POSTGRES_DB: ${PARCELS_POSTGRES_DB}
+      POSTGRES_PASSWORD: ${PARCELS_POSTGRES_PASSWORD}
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:management
@@ -24,8 +24,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 

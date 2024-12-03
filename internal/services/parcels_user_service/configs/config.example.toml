@@ -1,7 +1,5 @@
-[rabbitmq]
-host="localhost" # default
-user="admin"
-password="password"
+[grpc]
+port=50051 # default
 
 [db]
 host="localhost" # default
