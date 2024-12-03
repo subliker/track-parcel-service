@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
 	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/pupb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
@@ -30,12 +31,14 @@ func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*p
 	}
 
 	return &pb.GetParcelResponse{
-		ParcelName:           p.Name,
-		ParcelRecipient:      p.Recipient,
-		ParcelArrivalAddress: p.ArrivalAddress,
-		ParcelForecastDate:   timestamppb.New(p.ForecastDate),
-		ParcelDescription:    p.Description,
-		ParcelStatus:         pb.ParcelStatus(pb.ParcelStatus_value[string(p.Status)]),
-		UserSubscribed:       subscribed,
+		Parcel: &parcelpb.Parcel{
+			Name:           p.Name,
+			Recipient:      p.Recipient,
+			ArrivalAddress: p.ArrivalAddress,
+			ForecastDate:   timestamppb.New(p.ForecastDate),
+			Description:    p.Description,
+			Status:         parcelpb.Status(parcelpb.Status_value[string(p.Status)]),
+		},
+		UserSubscribed: subscribed,
 	}, nil
 }

@@ -2,23 +2,15 @@ package pg
 
 import (
 	"database/sql"
-	"flag"
 	"fmt"
 
 	_ "github.com/lib/pq"
-	"github.com/pressly/goose/v3"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg/manager"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg/user"
 )
-
-var migrateMode bool
-
-func init() {
-	flag.BoolVar(&migrateMode, "migrate", false, "set to use migrations")
-}
 
 type pgStore struct {
 	db      *sql.DB
@@ -45,14 +37,6 @@ func New(logger logger.Logger, cfg config.DBConfig) (store.Store, error) {
 	}
 
 	logger.Info("pgstore was connected")
-
-	// migrations
-	if migrateMode {
-		if err := goose.Up(db, "migrations"); err != nil {
-			logger.Fatalf("migrations error: %s", err)
-		}
-		logger.Info("migration was successful")
-	}
 
 	return &pgStore{
 		db:      db,

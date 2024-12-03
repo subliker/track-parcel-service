@@ -5,12 +5,14 @@ import (
 	"flag"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/app"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/broker/rabbitmq/event"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/server/grpc"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/server/rest/api"
 )
 
 func main() {
@@ -40,6 +42,18 @@ func main() {
 		logger.Fatalf("error event producer making: %s", err)
 	}
 
+	// app context
+	ctx := context.Background()
+
+	// creating new manager client
+	managerClient, err := manager.New(ctx, logger, cfg.ManagerClient)
+	if err != nil {
+		logger.Fatalf("error manager client creating: %s", err)
+	}
+
+	// creating new rest api server
+	apiServer := api.New(logger, cfg.REST, managerClient, store)
+
 	// creating new grpc server
 	parcelServer := grpc.NewServer(logger, store, eventProducer)
 
@@ -49,7 +63,8 @@ func main() {
 		Store:        store,
 		ParcelServer: parcelServer,
 		Broker:       broker,
+		APIServer:    apiServer,
 	})
 	// running app
-	a.Run(context.Background())
+	a.Run(ctx)
 }

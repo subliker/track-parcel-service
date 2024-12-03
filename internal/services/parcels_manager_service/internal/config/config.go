@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
+	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
@@ -13,10 +14,11 @@ import (
 
 type (
 	Config struct {
-		GRPC     GRPCConfig      `mapstructure:"grpc"`
-		REST     RESTConfig      `validate:"required" mapstructure:"rest"`
-		DB       pg.Config       `validate:"required" mapstructure:"db"`
-		RabbitMQ rabbitmq.Config `validate:"required" mapstructure:"rabbitmq"`
+		GRPC          GRPCConfig      `mapstructure:"grpc"`
+		REST          RESTConfig      `validate:"required" mapstructure:"rest"`
+		DB            pg.Config       `validate:"required" mapstructure:"db"`
+		RabbitMQ      rabbitmq.Config `validate:"required" mapstructure:"rabbitmq"`
+		ManagerClient manager.Config  `validate:"required" mapstructure:"managerclient"`
 	}
 
 	GRPCConfig struct {
@@ -55,6 +57,8 @@ func init() {
 	viper.SetDefault("rabbitmq.host", "localhost")
 
 	viper.SetDefault("rest.port", 8080)
+
+	viper.SetDefault("managerclient.target", "localhost:50051")
 }
 
 // Get returns parsed service config.

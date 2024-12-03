@@ -12,6 +12,7 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/config"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/server/rest/api"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
 	"google.golang.org/grpc"
 )
@@ -27,6 +28,8 @@ type app struct {
 	parcelServer *grpc.Server
 	grpcConfig   config.GRPCConfig
 
+	APIServer *api.Server
+
 	store parcel.ManagerStore
 
 	broker rabbitmq.Broker
@@ -39,6 +42,7 @@ type AppOptions struct {
 	Config       config.Config
 	Store        parcel.ManagerStore
 	ParcelServer *grpc.Server
+	APIServer    *api.Server
 	Broker       rabbitmq.Broker
 }
 
@@ -57,6 +61,9 @@ func New(logger logger.Logger, opts AppOptions) App {
 
 	// setting parcel server
 	a.parcelServer = opts.ParcelServer
+
+	// setting rest api service
+	a.APIServer = opts.APIServer
 
 	// setting broker
 	a.broker = opts.Broker
@@ -95,6 +102,22 @@ func (a *app) Run(ctx context.Context) error {
 			}
 		}
 	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		// starting api server
+		if err := a.APIServer.Run(); err != nil {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				errMsg := fmt.Errorf("running rest api server error: %s", err)
+				a.logger.Error(errMsg)
+				cancel()
+			}
+		}
+	}()
 	a.logger.Info("app running...")
 
 	// wait until signal will come or context will end
@@ -111,6 +134,10 @@ func (a *app) Run(ctx context.Context) error {
 	// closing net listener
 	if err := lis.Close(); err != nil {
 		a.logger.Warnf("net listener closing ended with error: %s", err)
+	}
+	// closing rest api server
+	if err := a.APIServer.Close(); err != nil {
+		a.logger.Warnf("rest api server closing ended with error: %s", err)
 	}
 	// wait until services will be stopped
 	wg.Wait()

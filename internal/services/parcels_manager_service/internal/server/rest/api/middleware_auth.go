@@ -7,6 +7,13 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/model"
+)
+
+type contextKey uint
+
+const (
+	contextKeyManagerTID contextKey = iota
 )
 
 func (s *Server) authApiTokenMiddleware() mux.MiddlewareFunc {
@@ -33,7 +40,7 @@ func (s *Server) authApiTokenMiddleware() mux.MiddlewareFunc {
 			}
 
 			// add authorized manager id in context
-			ctx := context.WithValue(r.Context(), "manager_telegram_id", res.ManagerTelegramId)
+			ctx := context.WithValue(r.Context(), contextKeyManagerTID, model.TelegramID(res.ManagerTelegramId))
 			h.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

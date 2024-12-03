@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
@@ -25,7 +26,7 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 	const errMsg = "add parcel error: %s"
 	return func(w http.ResponseWriter, r *http.Request) {
 		// getting managerTelegramID from middleware
-		tID, ok := r.Context().Value("manager_telegram_id").(model.TelegramID)
+		tID, ok := r.Context().Value(contextKeyManagerTID).(model.TelegramID)
 		if !ok {
 			logger.Errorf(errMsg, "middleware context value fail")
 			http.Error(w, "internal error", http.StatusInternalServerError)
@@ -75,36 +76,32 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 			ParcelTrackNumber: string(trackNumber),
 		}
 
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(res)
 	}
 }
 
 func (s *Server) handleDeleteParcel() http.HandlerFunc {
-	type Request struct {
-		ParcelTrackNumber string `json:"parcel_track_number"`
-	}
 	logger := s.logger.WithFields("handler", " delete parcel")
 	const errMsg = "delete parcel error: %s"
 	return func(w http.ResponseWriter, r *http.Request) {
 		// getting managerTelegramID from middleware
-		tID, ok := r.Context().Value("manager_telegram_id").(model.TelegramID)
+		tID, ok := r.Context().Value(contextKeyManagerTID).(model.TelegramID)
 		if !ok {
 			logger.Errorf(errMsg, "middleware context value fail")
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
 		}
 
-		var req Request
-
-		// parse json
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid request body", http.StatusBadRequest)
-			return
+		// getting track number
+		trackNumber, ok := mux.Vars(r)["track-number"]
+		if trackNumber == "" || !ok {
+			http.Error(w, "parcel track number is not set", http.StatusBadRequest)
 		}
 
 		// check access
-		ok, err := s.store.CheckAccess(model.TrackNumber(req.ParcelTrackNumber), tID)
+		ok, err := s.store.CheckAccess(model.TrackNumber(trackNumber), tID)
 		if err == parcel.ErrParcelNotFound {
 			http.Error(w, "parcel with this track number is not found", http.StatusNotFound)
 		}
@@ -119,7 +116,7 @@ func (s *Server) handleDeleteParcel() http.HandlerFunc {
 		}
 
 		// delete parcel
-		if err := s.store.Delete(model.TrackNumber(req.ParcelTrackNumber)); err != nil {
+		if err := s.store.Delete(model.TrackNumber(trackNumber)); err != nil {
 			logger.Errorf(errMsg, err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
@@ -130,9 +127,6 @@ func (s *Server) handleDeleteParcel() http.HandlerFunc {
 }
 
 func (s *Server) handleGetInfo() http.HandlerFunc {
-	type Request struct {
-		ParcelTrackNumber string `json:"parcel_track_number"`
-	}
 	type Response struct {
 		ParcelName           string `json:"parcel_name"`
 		ParcelRecipient      string `json:"parcel_recipient"`
@@ -141,27 +135,25 @@ func (s *Server) handleGetInfo() http.HandlerFunc {
 		ParcelDescription    string `json:"parcel_description"`
 		ParcelStatus         string `json:"parcel_status"`
 	}
-	logger := s.logger.WithFields("handler", " get info parcel")
+	logger := s.logger.WithFields("handler", "get info parcel")
 	const errMsg = "get info parcel error: %s"
 	return func(w http.ResponseWriter, r *http.Request) {
 		// getting managerTelegramID from middleware
-		tID, ok := r.Context().Value("manager_telegram_id").(model.TelegramID)
+		tID, ok := r.Context().Value(contextKeyManagerTID).(model.TelegramID)
 		if !ok {
 			logger.Errorf(errMsg, "middleware context value fail")
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
 		}
 
-		var req Request
-
-		// parse json
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid request body", http.StatusBadRequest)
-			return
+		// getting track number
+		trackNumber, ok := mux.Vars(r)["track-number"]
+		if trackNumber == "" || !ok {
+			http.Error(w, "parcel track number is not set", http.StatusBadRequest)
 		}
 
 		// check access
-		ok, err := s.store.CheckAccess(model.TrackNumber(req.ParcelTrackNumber), tID)
+		ok, err := s.store.CheckAccess(model.TrackNumber(trackNumber), tID)
 		if err == parcel.ErrParcelNotFound {
 			http.Error(w, "parcel with this track number is not found", http.StatusNotFound)
 		}
@@ -176,7 +168,7 @@ func (s *Server) handleGetInfo() http.HandlerFunc {
 		}
 
 		// get parcel info
-		p, err := s.store.GetInfo(model.TrackNumber(req.ParcelTrackNumber))
+		p, err := s.store.GetInfo(model.TrackNumber(trackNumber))
 		if err != nil {
 			logger.Errorf(errMsg, err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
@@ -193,6 +185,7 @@ func (s *Server) handleGetInfo() http.HandlerFunc {
 			ParcelStatus:         string(p.Status),
 		}
 
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(res)
 	}

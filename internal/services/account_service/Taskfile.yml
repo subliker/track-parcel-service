@@ -5,5 +5,7 @@ version: '3'
 tasks:
   run:
     - go run ./cmd/acnt/main.go
-  run-migrate:
-    - go run ./cmd/acnt/main.go -migrate
+  migrate:
+    desc: Run migrations. Args:-down down all migration -test migrate test data -clear-test delete test data
+    cmds:
+      - go run ./cmd/migrate/migrate.go {{.CLI_ARGS}}

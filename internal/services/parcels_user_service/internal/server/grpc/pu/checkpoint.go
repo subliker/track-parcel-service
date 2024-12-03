@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/pupb"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/pupb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 	"google.golang.org/grpc/codes"
@@ -12,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRequest) (*pb.GetCheckpointsResponse, error) {
+func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pupb.GetCheckpointsRequest) (*pupb.GetCheckpointsResponse, error) {
 	logger := s.logger.WithFields("handler", "get checkpoints")
 	const errMsg = "error get checkpoints for parcel(%s): %s"
 
@@ -37,17 +38,17 @@ func (s *ServerApi) GetCheckpoints(ctx context.Context, req *pb.GetCheckpointsRe
 	}
 
 	// transfer to proto checkpoints
-	protoCps := make([]*pb.Checkpoint, len(cps))
+	protoCps := make([]*parcelpb.Checkpoint, len(cps))
 	for i := range protoCps {
 		cp := cps[i]
-		protoCps[i] = &pb.Checkpoint{
+		protoCps[i] = &parcelpb.Checkpoint{
 			Time:        timestamppb.New(cp.Time),
 			Place:       cp.Place,
 			Description: cp.Description,
 		}
 	}
 
-	return &pb.GetCheckpointsResponse{
+	return &pupb.GetCheckpointsResponse{
 		Checkpoints: protoCps,
 	}, nil
 }
