@@ -6,7 +6,6 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg/manager"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg/user"
@@ -18,11 +17,11 @@ type pgStore struct {
 	manager store.ManagerRepository
 }
 
-func New(logger logger.Logger, cfg config.DBConfig) (store.Store, error) {
+func New(logger logger.Logger, cfg Config) (store.Store, error) {
 	logger = logger.WithFields("layer", "pgstore")
 
 	// pgs connection string
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName)
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DB)
 
 	// opening sql connection
 	db, err := sql.Open("postgres", dsn)

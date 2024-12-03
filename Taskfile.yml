@@ -59,4 +59,4 @@ tasks:
     cmds:
       - cp -f .example.env .env
       - task --taskfile internal/services/notification_service/Taskfile.yml set-example           
-      - task --taskfile internal/services/parcels_manager_service/Taskfile.yml set-example           
+      - task --taskfile internal/services/parcels_manager_service/Taskfile.yml set-example

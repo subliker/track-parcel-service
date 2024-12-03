@@ -4,8 +4,10 @@ version: '3'
 
 tasks:
   run:
-    - go run ./cmd/acnt/main.go
-  migrate:
-    desc: Run migrations. Args:-down down all migration -test migrate test data -clear-test delete test data
+    desc: Run service
     cmds:
-      - go run ./cmd/migrate/migrate.go {{.CLI_ARGS}}
+      - go run ./cmd/pm/main.go
+  set-example:
+    desc: Set example configuration
+    cmds:
+      - cp -f configs/config.example.toml configs/config.toml        

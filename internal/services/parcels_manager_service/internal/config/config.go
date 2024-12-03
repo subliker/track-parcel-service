@@ -1,8 +1,6 @@
 package config
 
 import (
-	"time"
-
 	"github.com/spf13/viper"
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
@@ -10,32 +8,17 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
 	"github.com/subliker/track-parcel-service/internal/pkg/validation"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/server/grpc"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/server/rest/api"
 )
 
 type (
 	Config struct {
-		GRPC          GRPCConfig      `mapstructure:"grpc"`
-		REST          RESTConfig      `validate:"required" mapstructure:"rest"`
+		GRPC          grpc.Config     `validate:"required" mapstructure:"grpc"`
+		REST          api.Config      `validate:"required" mapstructure:"rest"`
 		DB            pg.Config       `validate:"required" mapstructure:"db"`
 		RabbitMQ      rabbitmq.Config `validate:"required" mapstructure:"rabbitmq"`
 		ManagerClient manager.Config  `validate:"required" mapstructure:"managerclient"`
-	}
-
-	GRPCConfig struct {
-		Port    int           `mapstructure:"port"`
-		Timeout time.Duration `mapstructure:"timeout"`
-	}
-
-	RESTConfig struct {
-		Port int `validate:"required" mapstructure:"port"`
-	}
-
-	DBConfig struct {
-		Host     string `mapstructure:"host"`
-		Port     int    `mapstructure:"port"`
-		User     string `mapstructure:"user"`
-		Password string `mapstructure:"password"`
-		DBName   string `mapstructure:"dbname"`
 	}
 )
 
@@ -44,7 +27,8 @@ func init() {
 
 	// env and default binding
 	viper.SetDefault("grpc.port", 50051)
-	viper.SetDefault("grpc.timeout", time.Second)
+
+	viper.SetDefault("rest.port", 8080)
 
 	viper.SetDefault("db.host", "localhost")
 	viper.SetDefault("db.port", 5433)
@@ -52,11 +36,9 @@ func init() {
 	viper.BindEnv("db.password")
 	viper.BindEnv("db.db")
 
+	viper.SetDefault("rabbitmq.host", "localhost")
 	viper.BindEnv("rabbitmq.user")
 	viper.BindEnv("rabbitmq.password")
-	viper.SetDefault("rabbitmq.host", "localhost")
-
-	viper.SetDefault("rest.port", 8080)
 
 	viper.SetDefault("managerclient.target", "localhost:50051")
 }

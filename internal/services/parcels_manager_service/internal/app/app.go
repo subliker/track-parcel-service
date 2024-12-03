@@ -26,9 +26,9 @@ type App interface {
 
 type app struct {
 	parcelServer *grpc.Server
-	grpcConfig   config.GRPCConfig
+	grpcAddress  string
 
-	APIServer *api.Server
+	apiServer *api.Server
 
 	store parcel.ManagerStore
 
@@ -50,8 +50,8 @@ type AppOptions struct {
 func New(logger logger.Logger, opts AppOptions) App {
 	var a app
 
-	// setting config
-	a.grpcConfig = opts.Config.GRPC
+	// setting grpc address
+	a.grpcAddress = fmt.Sprintf(":%d", opts.Config.GRPC.Port)
 
 	// setting logger
 	a.logger = logger.WithFields("layer", "app")
@@ -63,7 +63,7 @@ func New(logger logger.Logger, opts AppOptions) App {
 	a.parcelServer = opts.ParcelServer
 
 	// setting rest api service
-	a.APIServer = opts.APIServer
+	a.apiServer = opts.APIServer
 
 	// setting broker
 	a.broker = opts.Broker
@@ -79,7 +79,7 @@ func (a *app) Run(ctx context.Context) error {
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	// creating new new listener
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", a.grpcConfig.Port))
+	lis, err := net.Listen("tcp", a.grpcAddress)
 	if err != nil {
 		a.logger.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func (a *app) Run(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		// starting serving server
-		a.logger.Infof("starting grpc server at port %d...", a.grpcConfig.Port)
+		a.logger.Infof("starting grpc server at port %d...", a.grpcAddress)
 		if err := a.parcelServer.Serve(lis); err != nil {
 			select {
 			case <-ctx.Done():
@@ -107,7 +107,7 @@ func (a *app) Run(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		// starting api server
-		if err := a.APIServer.Run(); err != nil {
+		if err := a.apiServer.Run(); err != nil {
 			select {
 			case <-ctx.Done():
 				return
@@ -136,7 +136,7 @@ func (a *app) Run(ctx context.Context) error {
 		a.logger.Warnf("net listener closing ended with error: %s", err)
 	}
 	// closing rest api server
-	if err := a.APIServer.Close(); err != nil {
+	if err := a.apiServer.Close(); err != nil {
 		a.logger.Warnf("rest api server closing ended with error: %s", err)
 	}
 	// wait until services will be stopped

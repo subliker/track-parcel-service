@@ -7,11 +7,7 @@ tasks:
     desc: Run service
     cmds:
       - go run ./cmd/pm/main.go
-  run-migrate:
-    desc: Run service with database migrations
-    cmds:
-      - go run ./cmd/pm/main.go -migrate
   set-example:
     desc: Set example configuration
     cmds:
-      - cp -f configs/config.example.toml configs/config.toml        
+      - cp -f configs/config.example.toml configs/config.toml

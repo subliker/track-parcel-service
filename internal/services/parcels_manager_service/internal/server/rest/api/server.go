@@ -7,7 +7,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/config"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
 )
 
@@ -23,7 +22,7 @@ type Server struct {
 }
 
 // New creates new instance of rest api server
-func New(logger logger.Logger, cfg config.RESTConfig, managerClient manager.Client, store parcel.ManagerStore) *Server {
+func New(logger logger.Logger, cfg Config, managerClient manager.Client, store parcel.ManagerStore) *Server {
 	s := Server{
 		server: &http.Server{
 			Addr: fmt.Sprintf("localhost:%d", cfg.Port),
