@@ -10,8 +10,8 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
-func (s *Server) handleAddParcel() http.HandlerFunc {
-	type Request struct {
+type (
+	AddParcelRequest struct {
 		ParcelName           string `json:"parcel_name"`
 		ParcelRecipient      string `json:"parcel_recipient"`
 		ParcelArrivalAddress string `json:"parcel_arrival_address"`
@@ -19,9 +19,22 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 		ParcelDescription    string `json:"parcel_description"`
 		ParcelStatus         string `json:"parcel_status"`
 	}
-	type Response struct {
+	AddParcelResponse struct {
 		ParcelTrackNumber string `json:"parcel_track_number"`
 	}
+)
+
+// @Summary		Add Parcel
+// @Description	Add Parcel adds new manager's parcel and returns unique parcel track number.
+// @Tags			Parcels
+// @Accept			json
+// @Produce		json
+// @Param			request	body		AddParcelRequest	true	"New Parcel data"
+// @Success		201		{object}	AddParcelResponse	"Parcel was added"
+// @Failure		400		{object}	string
+// @Failure		500		{object}	string
+// @Router			/parcels [post]
+func (s *Server) handleAddParcel() http.HandlerFunc {
 	logger := s.logger.WithFields("handler", "add parcel")
 	const errMsg = "add parcel error: %s"
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +46,7 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 			return
 		}
 
-		var req Request
+		var req AddParcelRequest
 
 		// parse json
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -72,7 +85,7 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 		}
 
 		// send response
-		res := Response{
+		res := AddParcelResponse{
 			ParcelTrackNumber: string(trackNumber),
 		}
 
@@ -82,6 +95,16 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 	}
 }
 
+// @Summary		Delete Parcel
+// @Description	Delete manager's Parcel with checkpoints.
+// @Tags			Parcels
+// @Accept			json
+// @Produce		json
+// @Param			track-number	path	string	true	"Parcel's track number"
+// @Success		204				"Parcel was deleted"
+// @Failure		400				{object}	string
+// @Failure		500				{object}	string
+// @Router			/parcels/{track-number} [delete]
 func (s *Server) handleDeleteParcel() http.HandlerFunc {
 	logger := s.logger.WithFields("handler", " delete parcel")
 	const errMsg = "delete parcel error: %s"
@@ -126,15 +149,27 @@ func (s *Server) handleDeleteParcel() http.HandlerFunc {
 	}
 }
 
+type GetInfoResponse struct {
+	ParcelName           string `json:"parcel_name"`
+	ParcelRecipient      string `json:"parcel_recipient"`
+	ParcelArrivalAddress string `json:"parcel_arrival_address"`
+	ParcelForecatDate    string `json:"parcel_forecast_date"`
+	ParcelDescription    string `json:"parcel_description"`
+	ParcelStatus         string `json:"parcel_status"`
+}
+
+// @Summary		Get Parcel
+// @Description	Get Parcel returns parcels info by track number.
+// @Tags			Parcels
+// @Accept			json
+// @Produce		json
+// @Param			track-number	path		string	true	"Parcel's track number"
+// @Success		200				{object}	GetInfoResponse
+// @Failure		400				{object}	string
+// @Failure		403				{object}	string
+// @Failure		500				{object}	string	"internal error"
+// @Router			/parcels/{track-number} [get]
 func (s *Server) handleGetInfo() http.HandlerFunc {
-	type Response struct {
-		ParcelName           string `json:"parcel_name"`
-		ParcelRecipient      string `json:"parcel_recipient"`
-		ParcelArrivalAddress string `json:"parcel_arrival_address"`
-		ParcelForecatDate    string `json:"parcel_forecast_date"`
-		ParcelDescription    string `json:"parcel_description"`
-		ParcelStatus         string `json:"parcel_status"`
-	}
 	logger := s.logger.WithFields("handler", "get info parcel")
 	const errMsg = "get info parcel error: %s"
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -176,7 +211,7 @@ func (s *Server) handleGetInfo() http.HandlerFunc {
 		}
 
 		// send response
-		res := Response{
+		res := GetInfoResponse{
 			ParcelName:           p.Name,
 			ParcelRecipient:      p.Recipient,
 			ParcelArrivalAddress: p.ArrivalAddress,
@@ -186,7 +221,7 @@ func (s *Server) handleGetInfo() http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(res)
 	}
 }

@@ -11,3 +11,7 @@ tasks:
     desc: Set example configuration
     cmds:
       - cp -f configs/config.example.toml configs/config.toml
+
+  swaggo-init:
+    cmds:
+      - swag init -g ./internal/server/rest/api/server.go
