@@ -10,4 +10,8 @@ tasks:
   set-example:
     desc: Set example configuration
     cmds:
-      - cp -f configs/config.example.toml configs/config.toml
+      - cmd: xcopy configs\config.example.toml configs\config.toml /Y
+        platforms: [windows]
+      - cmd: cp -f configs/config.example.toml configs/config.toml
+  gen-i18n:
+    - go generate ./internal/lang/lang.go

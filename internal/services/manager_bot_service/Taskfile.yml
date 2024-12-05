@@ -4,6 +4,14 @@ version: '3'
 
 tasks:
   run:
-    - go run ./cmd/mbot/main.go
+    desc: Run service
+    cmds:
+      - go run ./cmd/mbot/main.go
+  set-example:
+    desc: Set example configuration
+    cmds:
+      - cmd: xcopy configs\config.example.toml configs\config.toml /Y
+        platforms: [windows]
+      - cmd: cp -f configs/config.example.toml configs/config.toml
   gen-i18n:
     - go generate ./internal/lang/lang.go

@@ -6,7 +6,7 @@ tasks:
   run:
     desc: Run service
     cmds:
-      - go run ./cmd/pm/main.go
+      - go run ./cmd/acnt/main.go
   set-example:
     desc: Set example configuration
     cmds:
