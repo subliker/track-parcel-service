@@ -8,20 +8,25 @@ import (
 	tele "gopkg.in/telebot.v4"
 )
 
-var dontSpecifyKeyboard *tele.ReplyMarkup
-var btnDontSpecify tele.Btn
+var btnNotSpecify tele.Btn
 
+func (b *bot) notSpecifyKeyboard(data string) *tele.ReplyMarkup {
+	k := b.client.NewMarkup()
+	btn := btnNotSpecify
+	btn.Data = data
+	k.Inline(k.Row(btn))
+	return k
+}
 func (b *bot) handleOnText() tele.HandlerFunc {
-	dontSpecifyKeyboard = b.client.NewMarkup()
-
-	btnDontSpecify = dontSpecifyKeyboard.Data(b.bundle.Common().Markup().BtnDontSpecify(), "dont-specify")
-
-	dontSpecifyKeyboard.Inline(dontSpecifyKeyboard.Row(btnDontSpecify))
+	btnNotSpecify = (&tele.ReplyMarkup{}).Data(b.bundle.Common().Markup().BtnDontSpecify(), "not-specify", "0")
 	return func(ctx tele.Context) error {
 		// set handler name
 		ctx.Set("handler", "on text")
 
 		tID := model.TelegramID(ctx.Sender().ID)
+
+		// get not specify
+		notSpecifyField, _ := ctx.Get("not-specify-field").(uint)
 
 		// getting state
 		ss, err := b.sessionStore.Get(tID)
@@ -30,36 +35,12 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 			return fmt.Errorf("getting session error: %s", err)
 		}
 		switch st := ss.State().(type) {
-		case state.MakeParcel:
-			if err := b.fillParcel(ctx, &st); err != nil {
-				return err
-			}
-			if st.Ended() {
-				if err := b.sendParcel(ctx, st.Parcel); err != nil {
-					return err
-				}
-				ss.ClearState()
-				b.handleMenu()(ctx)
-				break
-			} else {
-				ss.SetState(st)
-			}
+		case state.AddParcel:
+			return b.onAddParcelState(ctx, ss, st)
 		case state.Register:
-			if err := b.fillRegister(ctx, &st); err != nil {
-				return err
-			}
-			if st.Ended() {
-				if err := b.sendRegister(ctx, st.Manager); err != nil {
-					return err
-				}
-				ss.ClearState()
-				b.handleMenu()(ctx)
-				break
-			} else {
-				ss.SetState(st)
-			}
+			return b.onRegisterState(ctx, ss, st, notSpecifyField)
 		default:
-			ctx.Send("Некорректный ввод")
+			ctx.Send(b.bundle.Common().Errors().IncorrectInput())
 		}
 
 		return nil

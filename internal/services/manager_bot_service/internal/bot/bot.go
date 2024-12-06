@@ -107,7 +107,7 @@ func (b *bot) initHandlers() {
 	b.client.Handle("/register", registerHandler)
 	b.client.Handle(&startBtnRegister, registerHandler)
 	// don't specify data handler
-	b.client.Handle(&btnDontSpecify, b.handleDontSpecify())
+	b.client.Handle(&btnNotSpecify, b.handleDontSpecify())
 
 	// groups
 	// group for authorized managers middleware
@@ -119,6 +119,10 @@ func (b *bot) initHandlers() {
 	addParcelHandler := b.handleAddParcel()
 	authGroup.Handle("/add-parcel", addParcelHandler)
 	authGroup.Handle(&menuBtnAddParcel, addParcelHandler)
+	// handle my api
+	myApiHandler := b.handleMyApi()
+	authGroup.Handle("/my-api", myApiHandler)
+	authGroup.Handle(&menuBtnMyApi, myApiHandler)
 
 	b.logger.Info("handlers were initialized")
 }

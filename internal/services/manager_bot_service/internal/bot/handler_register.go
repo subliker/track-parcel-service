@@ -1,13 +1,12 @@
 package bot
 
 import (
-	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
-	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
 )
@@ -43,76 +42,50 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 
 		// set register state
 		state.SetRegister(session, tID)
-		ctx.Send(b.bundle.Register().Points().FullName())
 
+		ctx.Send(b.bundle.Register().Points().FullName())
 		return nil
 	}
 }
 
-func (b *bot) fillRegister(ctx tele.Context, st *state.Register) error {
-	// set state handler
-	ctx.Set("state_handler", "fill register")
-
-	// check on don't specify button pressed
-	notSpecify, _ := ctx.Get("dont-specify").(bool)
-
-	st.FillStep++
-
-	fillBundle := b.bundle.Register().Points()
-	switch st.FillStep {
-	case state.RegisterFillStepFullName:
-		st.Manager.FullName = ctx.Text()
-		ctx.Send(fillBundle.Email())
-	case state.RegisterFillStepEmail:
-		st.Manager.Email = ctx.Text()
-		ctx.Send(fillBundle.PhoneNumber(), dontSpecifyKeyboard)
-	case state.RegisterFillStepPhoneNumber:
-		if notSpecify {
-			st.Manager.PhoneNumber = nil
-		} else {
-			t := ctx.Text()
-			st.Manager.PhoneNumber = &t
-		}
-		ctx.Send(fillBundle.Company(), dontSpecifyKeyboard)
-	case state.RegisterFillStepCompany:
-		if notSpecify {
-			st.Manager.Company = nil
-		} else {
-			t := ctx.Text()
-			st.Manager.Company = &t
-		}
-		st.FillStep++
-	}
-
-	return nil
-}
-
-func (b *bot) sendRegister(ctx tele.Context, m model.Manager) error {
-	err := b.managerClient.Register(context.Background(), &managerpb.RegisterRequest{
-		ManagerTelegramId:  int64(m.TelegramID),
-		ManagerFullName:    m.FullName,
-		ManagerEmail:       m.Email,
-		ManagerPhoneNumber: m.PhoneNumber,
-		ManagerCompany:     m.Company,
-	})
-	if errors.Is(err, manager.ErrManagerIsAlreadyExist) {
-		ctx.Send("you have been already registered")
+func (b *bot) onRegisterState(
+	ctx tele.Context, ss session.Session,
+	st state.Register, notSpecifyField uint,
+) error {
+	// make fill iteration
+	ended, err := st.Next(
+		ctx.Text(),
+		func(text string, optionalField state.RegisterFillStep) {
+			if optionalField > 0 {
+				ctx.Send(text, b.notSpecifyKeyboard(strconv.Itoa(int(optionalField))))
+				return
+			}
+			ctx.Send(text)
+		},
+		b.bundle,
+		state.RegisterFillStep(notSpecifyField),
+	)
+	// ignore incorrect not specify
+	if err != nil && err != session.ErrIncorrectNotSpecify {
 		return err
 	}
-	if err != nil {
-		ctx.Send("register ended with internal error")
+	// send
+	if ended {
+		err := st.Ready(
+			b.managerClient,
+			func(text string) {
+				ctx.Send(text)
+			},
+			b.bundle,
+		)
+		if err != nil {
+			ctx.Send("internal error")
+		}
+		ss.ClearState()
+		b.handleMenu()(ctx)
 		return err
+	} else {
+		ss.SetState(st)
 	}
-
-	// optional
-	var phoneNumber, company string
-	if m.PhoneNumber != nil {
-		phoneNumber = *m.PhoneNumber
-	}
-	if m.Company != nil {
-		company = *m.Company
-	}
-
-	ctx.Send(b.bundle.Register().Points().Ready(m.FullName, m.Email, phoneNumber, company))
 	return nil
 }
