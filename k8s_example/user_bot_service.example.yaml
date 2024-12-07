@@ -16,7 +16,7 @@ metadata:
   name: user-bot-service-secret
 type: Opaque
 data:
-  password: <your telegram bot token>
+  token: <your telegram bot token>
 ---
 apiVersion: apps/v1
 kind: Deployment

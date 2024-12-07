@@ -12,8 +12,11 @@ COPY internal/pkg/ .
 
 WORKDIR /app/service/build
 
-COPY internal/services/account_service .
+COPY internal/services/account_service/go.mod .
+COPY internal/services/account_service/go.sum .
 RUN go mod download
+
+COPY internal/services/account_service .
 RUN go build -ldflags="-s -w" -o /app/account_service ./cmd/acnt
 
 

@@ -6,7 +6,7 @@ data:
   config.toml: |
     [db]
     db="postgres"
-    host="user-pgs"
+    host="users-pgs"
 ---
 apiVersion: v1
 kind: Secret

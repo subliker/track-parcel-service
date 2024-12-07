@@ -42,7 +42,7 @@ func (c *CheckParcel) Ready(
 ) error {
 	// check if state done
 	if !c.done() {
-		return ErrStateNotDone
+		return session.ErrStateNotDone
 	}
 
 	// request parcel
@@ -50,7 +50,7 @@ func (c *CheckParcel) Ready(
 		TrackNumber: string(c.TrackNum),
 	})
 	if errors.Is(err, pu.ErrParcelNotFound) {
-		return ErrResNotFound
+		return session.ErrResNotFound
 	}
 	if err != nil {
 		return err
