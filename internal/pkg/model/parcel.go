@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 )
 
 type TrackNumber string
@@ -29,6 +30,8 @@ func NewTrackNumber() TrackNumber {
 	return TrackNumber(randomString(letters, 2) + randomString(digits, 9))
 }
 
+const ForecastDateLayout = "02.01.2006 15:04"
+
 type Parcel struct {
 	Name string `validate:"required,min=3,max=100"`
 
@@ -43,7 +46,7 @@ type Parcel struct {
 }
 
 func (p *Parcel) Validate() error {
-	if err := validate.Struct(p); err != nil {
+	if err := validator.V.Struct(p); err != nil {
 		return err
 	}
 

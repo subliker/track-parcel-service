@@ -3,7 +3,6 @@ package state
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/userpb"
@@ -53,8 +52,7 @@ func (r *Register) Next(
 ) (bool, error) {
 	// check not specify
 	if notSpecify > RegisterFillStepEmpty && r.FillStep+1 != notSpecify {
-		fmt.Print(notSpecify)
-		return false, ErrIncorrectNotSpecify
+		return false, session.ErrIncorrectNotSpecify
 	}
 
 	// increment step
@@ -64,6 +62,7 @@ func (r *Register) Next(
 
 	// lang bundle
 	fillBundle := bundle.Register().Points()
+
 	switch r.FillStep {
 	case RegisterFillStepFullName:
 		r.User.FullName = text
@@ -84,19 +83,15 @@ func (r *Register) Next(
 	return r.done(), nil
 }
 
-var (
-	ErrUserIsAlreadyExist = errors.New("request error: user with this id is already exists")
-)
-
 // Ready completes all data and send request
 func (r *Register) Ready(
 	userClient user.Client,
-	sendRegister func(text string),
+	send func(text string),
 	bundle lang.Messages,
 ) error {
 	// check if state done
 	if !r.done() {
-		return ErrStateNotDone
+		return session.ErrStateNotDone
 	}
 
 	// request register user
@@ -108,18 +103,18 @@ func (r *Register) Ready(
 		UserPhoneNumber: u.PhoneNumber,
 	})
 	if errors.Is(err, user.ErrUserIsAlreadyExist) {
-		return ErrUserIsAlreadyExist
+		return errors.New("request error: user with this id is already exists")
 	}
 	if err != nil {
 		return err
 	}
 
 	// optional
-	var phoneNumber string
+	phoneNumber := ""
 	if u.PhoneNumber != nil {
 		phoneNumber = *u.PhoneNumber
 	}
 
-	sendRegister(bundle.Register().Points().Ready(u.FullName, u.Email, phoneNumber))
+	send(bundle.Register().Points().Ready(u.FullName, u.Email, phoneNumber))
 	return nil
 }

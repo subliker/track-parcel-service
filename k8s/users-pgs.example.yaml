@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: users-pgs-config
+data:
+  db: postgres
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: users-pgs-secret
+type: Opaque
+data:
+  user: c3VibGlrZXI= # subliker
+  password: cXdlMTIzMTIz # qwe123123
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: users-pgs-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data/postgres
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: users-pgs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi 
+  storageClassName: manual
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-pgs
+spec:
+  selector:
+    matchLabels:
+      app: users-pgs
+  template:
+    metadata:
+      labels:
+        app: users-pgs
+    spec:
+      containers:
+      - name: users-pgs
+        image: postgres
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+          - containerPort: 5432
+        volumeMounts:
+          - name: pgdata
+            mountPath: /var/lib/postgresql/data
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: users-pgs-config
+                key: db
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: users-pgs-secret
+                key: user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: users-pgs-secret
+                key: password
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: users-pgs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-pgs
+spec:
+  selector:
+    app: user-pgs
+  ports:
+  - port: 5432
+    targetPort: 5432
+

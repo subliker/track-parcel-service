@@ -89,3 +89,9 @@ tasks:
   # documentation
   install-swaggo:
     - go install github.com/swaggo/swag/cmd/swag@latest
+
+  # docker build
+  docker-build-account-service:
+    -  docker build . -f internal/services/account_service/Dockerfile {{.CLI_ARGS}}
+  docker-build-manager-bot-service:
+    -  docker build . -f internal/services/manager_bot_service/Dockerfile {{.CLI_ARGS}}

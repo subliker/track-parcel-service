@@ -66,7 +66,7 @@ func (b *bot) onRegisterState(
 		state.RegisterFillStep(notSpecifyField),
 	)
 	// ignore incorrect not specify
-	if err != nil && err != state.ErrIncorrectNotSpecify {
+	if err != nil && err != session.ErrIncorrectNotSpecify {
 		return err
 	}
 	// send

@@ -1,5 +1,7 @@
 package model
 
+import "github.com/subliker/track-parcel-service/internal/pkg/validator"
+
 type User struct {
 	TelegramID  TelegramID `validate:"required"`
 	FullName    string     `validate:"required,min=3,max=255"`
@@ -8,5 +10,5 @@ type User struct {
 }
 
 func (u *User) Validate() error {
-	return validate.Struct(u)
+	return validator.V.Struct(u)
 }

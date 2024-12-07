@@ -6,7 +6,7 @@ import (
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel/pg"
-	"github.com/subliker/track-parcel-service/internal/pkg/validation"
+	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 )
 
 type (
@@ -42,7 +42,7 @@ func Get() Config {
 	}
 
 	// config validation
-	err := validation.V.Struct(cfg)
+	err := validator.V.Struct(cfg)
 	if err != nil {
 		logger.Fatalf("config validation error: %s", err)
 	}
