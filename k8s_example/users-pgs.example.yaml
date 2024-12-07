@@ -96,3 +96,41 @@ spec:
   ports:
   - port: 5432
     targetPort: 5432
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: users-pgs-migration-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: users-pgs-migration-job
+          image: subliker/track-parcel-users-pgs-migrations
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+          - name: POSTGRES_HOST
+            value: users-pgs
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: users-pgs-config
+                key: db
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: users-pgs-secret
+                key: user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: users-pgs-secret
+                key: password
+      restartPolicy: Never
+  backoffLimit: 1

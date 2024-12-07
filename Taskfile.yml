@@ -97,3 +97,10 @@ tasks:
     -  docker build . -f internal/services/manager_bot_service/Dockerfile {{.CLI_ARGS}}
   docker-build-user-bot-service:
     -  docker build . -f internal/services/user_bot_service/Dockerfile {{.CLI_ARGS}}
+  
+  docker-build-parcels-pgs-migrations:
+    dir: ./migrations/parcel
+    cmd: docker build . -f ../Dockerfile {{.CLI_ARGS}}
+  docker-build-users-pgs-migrations:
+    dir: ./migrations/user
+    cmd: docker build . -f ../Dockerfile {{.CLI_ARGS}}
