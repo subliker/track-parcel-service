@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: users-pgs-config
+  name: parcels-pgs-config
 data:
   db: postgres
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: users-pgs-secret
+  name: parcels-pgs-secret
 type: Opaque
 data:
   user: c3VibGlrZXI= # subliker
@@ -17,7 +17,7 @@ data:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: users-pgs-pv
+  name: parcels-pgs-pv
 spec:
   capacity:
     storage: 100Mi
@@ -26,42 +26,42 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
-    path: /data/users
+    path: /data/parcels
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: users-pgs-pvc
+  name: parcels-pgs-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi 
+      storage: 100Mi
   storageClassName: manual
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: users-pgs
+  name: parcels-pgs
 spec:
   selector:
     matchLabels:
-      app: users-pgs
+      app: parcels-pgs
   template:
     metadata:
       labels:
-        app: users-pgs
+        app: parcels-pgs
     spec:
       containers:
-      - name: users-pgs
+      - name: parcels-pgs
         image: postgres
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
-          - containerPort: 5432
+        - containerPort: 5432
         volumeMounts:
           - name: pgdata
             mountPath: /var/lib/postgresql/data
@@ -69,31 +69,34 @@ spec:
           - name: POSTGRES_DB
             valueFrom:
               configMapKeyRef:
-                name: users-pgs-config
+                name: parcels-pgs-config
                 key: db
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: users-pgs-secret
+                name: parcels-pgs-secret
                 key: user
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: users-pgs-secret
+                name: parcels-pgs-secret
                 key: password
       volumes:
         - name: pgdata
           persistentVolumeClaim:
-            claimName: users-pgs-pvc
+            claimName: parcels-pgs-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-pgs
+  name: parcels-pgs
 spec:
   selector:
-    app: user-pgs
+    app: parcels-pgs
   ports:
   - port: 5432
     targetPort: 5432
+
+
+
 
