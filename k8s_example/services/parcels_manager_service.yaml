@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parcels-manager-service-config
+data:
+  config.toml: |
+    [grpc]
+    port=50051
+
+    [rest]
+    port=8080
+
+    [db]
+    db="postgres"
+    host="parcels-pgs"
+    port=5432
+
+    [rabbitmq]
+    host="broker-rabbitmq"
+
+    [managerclient]
+    target="account-service:50051"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parcels-manager-service
+spec:
+  selector:
+    matchLabels:
+      app: parcels-manager-service
+  template:
+    metadata:
+      labels:
+        app: parcels-manager-service
+    spec:
+      containers:
+      - name: parcels-manager-service
+        image: subliker/track-parcel-parcels-manager-service:0.1.1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        - containerPort: 50051
+        volumeMounts:
+          - name: config-volume
+            mountPath: /app/parcels_manager_service/configs
+            readOnly: true
+        env:
+          - name: PM_RABBITMQ_USER
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq-secret
+                key: user
+          - name: PM_RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq-secret
+                key: password
+          - name: PM_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: parcels-pgs-secret
+                key: user
+          - name: PM_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: parcels-pgs-secret
+                key: password
+      volumes:
+        - name: config-volume
+          configMap:
+            name: parcels-manager-service-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parcels-manager-service
+spec:
+  selector:
+    app: parcels-manager-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: manager-api
+  - port: 50051
+    targetPort: 50051
+    name: grpc-server
+
+

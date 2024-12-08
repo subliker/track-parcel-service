@@ -75,7 +75,8 @@ var StatusValue = map[string]Status{
 }
 
 type Checkpoint struct {
-	Time        time.Time
-	Place       string
-	Description string
+	Time         time.Time
+	Place        string
+	Description  string
+	ParcelStatus Status
 }

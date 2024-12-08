@@ -17,8 +17,8 @@ func (s *store) AddCheckpoint(tNum model.TrackNumber, cp model.Checkpoint) error
 
 	// build query
 	query, args, err := psql.Insert("checkpoints").
-		Columns("time", "place", "description", "parcel_track_number").
-		Values(&cp.Time, &cp.Place, &cp.Description, &tNum).
+		Columns("time", "place", "description", "parcel_track_number", "parcel_status").
+		Values(&cp.Time, &cp.Place, &cp.Description, &tNum, &cp.ParcelStatus).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of checkpoint inserting: %s", err)
@@ -49,7 +49,7 @@ func (s *store) GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 	// build query
-	query, args, err := psql.Select("time", "place", "description").
+	query, args, err := psql.Select("time", "place", "description", "parcel_status").
 		From("checkpoints").
 		Where(squirrel.Eq{"parcel_track_number": trackNum}).
 		Limit(pageSize).

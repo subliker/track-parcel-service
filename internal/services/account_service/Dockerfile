@@ -20,7 +20,7 @@ COPY internal/services/account_service .
 RUN go build -ldflags="-s -w" -o /app/account_service ./cmd/acnt
 
 
-FROM scratch
+FROM alpine
 
 WORKDIR /app/account_service
 

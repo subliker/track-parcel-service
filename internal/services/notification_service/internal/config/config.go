@@ -25,7 +25,7 @@ func init() {
 	viper.BindEnv("rabbitmq.password")
 
 	viper.SetDefault("db.host", "localhost")
-	viper.SetDefault("db.port", 5433)
+	viper.SetDefault("db.port", 5432)
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
 	viper.BindEnv("db.db")

@@ -93,6 +93,12 @@ tasks:
   # docker build
   docker-build-account-service:
     -  docker build . -f internal/services/account_service/Dockerfile {{.CLI_ARGS}}
+  docker-build-parcels-manager-service:
+    - docker build . -f internal/services/parcels_manager_service/Dockerfile {{.CLI_ARGS}}
+  docker-build-parcels-user-service:
+    - docker build . -f internal/services/parcels_user_service/Dockerfile {{.CLI_ARGS}}
+  docker-build-notification-service:
+    - docker build . -f internal/services/notification_service/Dockerfile {{.CLI_ARGS}}
   docker-build-manager-bot-service:
     -  docker build . -f internal/services/manager_bot_service/Dockerfile {{.CLI_ARGS}}
   docker-build-user-bot-service:

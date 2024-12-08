@@ -40,7 +40,7 @@ spec:
             cpu: "500m"
         volumeMounts:
           - name: config-volume
-            mountPath: /app/manager_bot_service/configs
+            mountPath: /app/user_bot_service/configs
             readOnly: true
         env:
           - name: UBOT_BOT_TOKEN

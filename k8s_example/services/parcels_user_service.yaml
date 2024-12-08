@@ -1,30 +1,36 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: account-service-config
+  name: parcels-user-service-config
 data:
   config.toml: |
+    [grpc]
+    port=50051
+
     [db]
-    host="users-pgs"
-    port=5432
     db="postgres"
+    host="parcels-pgs"
+    port=5432
+
+    [userclient]
+    target="account-service:50051"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: account-service
+  name: parcels-user-service
 spec:
   selector:
     matchLabels:
-      app: account-service
+      app: parcels-user-service
   template:
     metadata:
       labels:
-        app: account-service
+        app: parcels-user-service
     spec:
       containers:
-      - name: account-service
-        image: subliker/track-parcel-account-service:0.1.0
+      - name: parcels-user-service
+        image: subliker/track-parcel-parcels-user-service:0.1.0
         resources:
           limits:
             memory: "128Mi"
@@ -33,32 +39,33 @@ spec:
         - containerPort: 50051
         volumeMounts:
           - name: config-volume
-            mountPath: /app/account_service/configs
+            mountPath: /app/parcels_user_service/configs
             readOnly: true
         env:
-          - name: ACNT_DB_USER
+          - name: PU_DB_USER
             valueFrom:
               secretKeyRef:
-                name: users-pgs-secret
+                name: parcels-pgs-secret
                 key: user
-          - name: ACNT_DB_PASSWORD
+          - name: PU_DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: users-pgs-secret
+                name: parcels-pgs-secret
                 key: password
       volumes:
         - name: config-volume
           configMap:
-            name: account-service-config
-
+            name: parcels-user-service-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: account-service
+  name: parcels-user-service
 spec:
   selector:
-    app: account-service
+    app: parcels-user-service
   ports:
   - port: 50051
     targetPort: 50051
+
+

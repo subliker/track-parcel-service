@@ -20,7 +20,7 @@ COPY internal/services/user_bot_service .
 RUN go build -ldflags="-s -w" -o /app/user_bot_service ./cmd/ubot
 
 
-FROM scratch
+FROM alpine
 
 WORKDIR /app/user_bot_service
 

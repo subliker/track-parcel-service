@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: parcels-pgs-migration-job
-          image: subliker/track-parcel-parcels-pgs-migrations
+          image: subliker/track-parcel-parcels-pgs-migrations:0.1.1
           imagePullPolicy: Always
           resources:
             limits:
