@@ -11,8 +11,8 @@
 *.toml
 !*.example.toml
 
-k8s/*.yaml
-!k8s/*.example.yaml
+k8s/**/*.yaml
+!k8s/**/*.example.yaml
 
 .env
 !.example.env
