@@ -19,7 +19,7 @@ func (b *bot) handleAddParcel() tele.HandlerFunc {
 		// get session
 		session, err := b.sessionStore.Get(tID)
 		if err != nil {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
 			return fmt.Errorf("get session error: %s", err)
 		}
 

@@ -40,7 +40,6 @@ require (
 )
 
 require (
-	github.com/go-playground/validator v9.31.0+incompatible // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/spf13/viper v1.19.0
 	go.uber.org/multierr v1.11.0 // indirect

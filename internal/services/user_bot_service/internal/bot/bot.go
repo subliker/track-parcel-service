@@ -88,6 +88,10 @@ func (b *bot) Run(ctx context.Context) error {
 	}()
 	b.logger.Info("bot is running")
 
+	go func() {
+		b.receiveNotification()
+	}()
+
 	// wait until context will be canceled
 	<-ctx.Done()
 
@@ -101,8 +105,8 @@ func (b *bot) Run(ctx context.Context) error {
 func (b *bot) initHandlers() {
 	// global middlewares:
 	// ensure sessions
-	b.client.Use(middleware.Session(b.logger, b.sessionStore))
-	b.client.Use(middleware.Auth(b.logger, b.userClient))
+	b.client.Use(middleware.Session(b.logger, b.sessionStore, b.bundle))
+	b.client.Use(middleware.Auth(b.logger, b.userClient, b.bundle))
 
 	// global handlers
 	// handle text
@@ -119,13 +123,17 @@ func (b *bot) initHandlers() {
 	// groups
 	// group for authorized managers middleware
 	authGroup := b.client.Group()
-	authGroup.Use(middleware.Authorized(b.logger))
+	authGroup.Use(middleware.Authorized(b.logger, b.bundle))
 	// handle menu
 	authGroup.Handle("/menu", b.handleMenu())
 	// handle check parcel
 	authGroup.Handle(&menuBtnCheckParcel, b.handleCheckParcel())
 	// on refresh show parcel
 	// authGroup.Handle(&showParcelBtnRefresh)
+	// subscribe parcel
+	authGroup.Handle(&checkParcelBtnSubscribe, b.handleSubscribeParcel(true))
+	// describe parcel
+	authGroup.Handle(&checkParcelBtnDescribe, b.handleSubscribeParcel(false))
 
 	b.logger.Info("handlers were initialized")
 }

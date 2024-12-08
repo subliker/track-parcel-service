@@ -97,7 +97,8 @@ func (r *Register) Next(
 		// skip
 		if skip {
 			r.Manager.PhoneNumber = nil
-			r.FillStep++
+			// request next step
+			request(fillBundle.Company(), RegisterFillStepCompany)
 			break
 		}
 
@@ -117,6 +118,7 @@ func (r *Register) Next(
 		// skip
 		if skip {
 			r.Manager.Company = nil
+			// jump to ready
 			r.FillStep++
 			break
 		}

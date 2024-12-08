@@ -1,12 +1,12 @@
 [grpc]
-port=50051 # default
+port=50052 # default=50051
 
 [rest]
 port=8080 # default
 
 [db]
 host="localhost" # default
-port=5433 # default
+port=5433 # default=5432
 user="subliker"
 password="qwe123123"
 db="postgres"

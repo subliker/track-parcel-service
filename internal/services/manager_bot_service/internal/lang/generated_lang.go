@@ -55,6 +55,7 @@ type commonerrors interface{
     Email() string
     PhoneNumber() string
     AlreadyRegistered() string
+    NotAuthorized() string
 }
 type startMessage interface{
     Head(user_name string) string
@@ -133,6 +134,9 @@ func (ru_RU_commonerrors) PhoneNumber() string {
 }
 func (ru_RU_commonerrors) AlreadyRegistered() string {
     return "⚠️ Ошибка! Этот аккаунт уже зарегистрирован!"
+}
+func (ru_RU_commonerrors) NotAuthorized() string {
+    return "🚫 К сожалению, вы не авторизованы для доступа к этой функции. Пожалуйста, зарегистрируйтесь, чтобы продолжить. 🔑✨"
 }
 func (ru_RU_Messages) StartMessage() startMessage {
     return ru_RU_startMessage{}

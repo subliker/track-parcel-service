@@ -1,7 +1,9 @@
 package bot
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/session/state"
@@ -31,7 +33,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 		// getting state
 		ss, err := b.sessionStore.Get(tID)
 		if err != nil {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
 			return fmt.Errorf("getting session error: %s", err)
 		}
 		switch st := ss.State().(type) {
@@ -49,7 +51,13 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 
 func (b *bot) handleDontSpecify() tele.HandlerFunc {
 	return func(ctx tele.Context) error {
-		ctx.Set("dont-specify", true)
+		data := ctx.Callback().Data
+		field, err := strconv.Atoi(data)
+		if err != nil {
+			return errors.New("incorrect callback data")
+		}
+
+		ctx.Set("not-specify-field", uint(field))
 		ctx.Respond()
 		return b.handleOnText()(ctx)
 	}

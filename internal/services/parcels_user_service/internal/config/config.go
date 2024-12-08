@@ -22,7 +22,7 @@ func init() {
 	viper.SetDefault("grpc.port", 50051)
 
 	viper.SetDefault("db.host", "localhost")
-	viper.SetDefault("db.port", 3306)
+	viper.SetDefault("db.port", 5432)
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
 	viper.BindEnv("db.dbname")

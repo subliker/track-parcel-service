@@ -7,10 +7,11 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
+	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
 	tele "gopkg.in/telebot.v4"
 )
 
-func Auth(logger logger.Logger, managerClient manager.Client) tele.MiddlewareFunc {
+func Auth(logger logger.Logger, managerClient manager.Client, bundle lang.Messages) tele.MiddlewareFunc {
 	logger = logger.WithFields("middleware", "auth")
 	const errMsg = "manager auth error: %s"
 	return func(next tele.HandlerFunc) tele.HandlerFunc {
@@ -21,7 +22,7 @@ func Auth(logger logger.Logger, managerClient manager.Client) tele.MiddlewareFun
 			})
 			// if error exists and isn't ErrManagerNotFound throw error
 			if err != nil && err != manager.ErrManagerNotFound {
-				ctx.Send("internal error")
+				ctx.Send(bundle.Common().Errors().Internal())
 				err = fmt.Errorf(errMsg, err)
 				logger.Error(err)
 				return err
@@ -33,20 +34,20 @@ func Auth(logger logger.Logger, managerClient manager.Client) tele.MiddlewareFun
 	}
 }
 
-func Authorized(logger logger.Logger) tele.MiddlewareFunc {
+func Authorized(logger logger.Logger, bundle lang.Messages) tele.MiddlewareFunc {
 	logger = logger.WithFields("middleware", "authorized")
 	const errMsg = "manager authorized error: %s"
 	return func(next tele.HandlerFunc) tele.HandlerFunc {
 		return func(ctx tele.Context) error {
 			authorized, ok := ctx.Get("authorized").(bool)
 			if !ok {
-				ctx.Send("internal error")
+				ctx.Send(bundle.Common().Errors().Internal())
 				err := fmt.Errorf(errMsg, "auth middleware dropped")
 				logger.Error(err)
 				return err
 			}
 			if !authorized {
-				ctx.Send("you are not authorized")
+				ctx.Send(bundle.Common().Errors().NotAuthorized())
 				return nil
 			}
 			return next(ctx)

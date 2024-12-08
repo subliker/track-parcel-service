@@ -34,7 +34,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 		// getting state
 		ss, err := b.sessionStore.Get(tID)
 		if err != nil {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
 			return fmt.Errorf("getting session error: %s", err)
 		}
 		switch st := ss.State().(type) {
@@ -46,7 +46,7 @@ func (b *bot) handleOnText() tele.HandlerFunc {
 			}
 			return b.onCheckParcelState(ctx, ss, st)
 		default:
-			ctx.Send("Некорректный ввод")
+			ctx.Send(b.bundle.Common().Errors().IncorrectInput())
 		}
 
 		return nil

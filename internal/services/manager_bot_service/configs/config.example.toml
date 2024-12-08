@@ -1,0 +1,13 @@
+[bot]
+language="ru-RU" # default
+token="<your telegram id>"
+
+[session]
+count = 1024 # default
+ttl = 172_800_000_000_000#ns=48hours # default
+
+[userclient]
+target="localhost:50051" # default
+
+[pmclient]
+target="localhost:50052" # default=localhost:50051

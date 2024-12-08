@@ -19,11 +19,19 @@ func (s *ServerApi) GetParcel(ctx context.Context, req *pb.GetParcelRequest) (*p
 	const errMsg = "error get parcel(%s): %s"
 
 	// get parcel from store
-	p, subscribed, err := s.store.GetUserInfo(model.TrackNumber(req.TrackNumber), model.TelegramID(req.UserTelegramId))
+	p, err := s.store.GetInfo(model.TrackNumber(req.TrackNumber))
 	if errors.Is(err, parcel.ErrParcelNotFound) {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		return nil, status.Error(codes.NotFound, errMsg)
 	}
+	if err != nil {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
+	}
+
+	// getting subscribed
+	subscribed, err := s.store.GetSubscribed(model.TrackNumber(req.TrackNumber), model.TelegramID(req.UserTelegramId))
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)

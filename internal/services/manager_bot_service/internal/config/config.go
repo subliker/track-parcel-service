@@ -8,12 +8,13 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/session/lru"
 	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 )
 
 type Config struct {
 	Bot                  BotConfig      `validate:"required" mapstructure:"bot"`
-	Session              SessionConfig  `mapstructure:"session"`
+	Session              lru.Config     `mapstructure:"session"`
 	ManagerClient        manager.Config `validate:"required" mapstructure:"managerclient"`
 	ParcelsManagerClient pm.Config      `validate:"required" mapstructure:"pmclient"`
 }
@@ -21,11 +22,6 @@ type Config struct {
 type BotConfig struct {
 	Token    string `validate:"required" mapstructure:"token"`
 	Language string `validate:"required" mapstructure:"language"`
-}
-
-type SessionConfig struct {
-	Count int   `validate:"required" mapstructure:"count"`
-	TTL   int64 `validate:"required" mapstructure:"ttl"`
 }
 
 func init() {

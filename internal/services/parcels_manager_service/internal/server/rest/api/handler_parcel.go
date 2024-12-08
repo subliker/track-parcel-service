@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -17,7 +18,6 @@ type (
 		ParcelArrivalAddress string `json:"parcel_arrival_address"`
 		ParcelForecatDate    string `json:"parcel_forecast_date"`
 		ParcelDescription    string `json:"parcel_description"`
-		ParcelStatus         string `json:"parcel_status"`
 	}
 	AddParcelResponse struct {
 		ParcelTrackNumber string `json:"parcel_track_number"`
@@ -50,7 +50,7 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 
 		// parse json
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid request body", http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("invalid request body: %s", err), http.StatusBadRequest)
 			return
 		}
 
@@ -58,13 +58,6 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 		forecastDate, err := time.Parse(time.RFC3339, req.ParcelForecatDate)
 		if err != nil {
 			http.Error(w, "invalid time format", http.StatusBadRequest)
-			return
-		}
-
-		// parse status
-		parcelStatus, ok := model.StatusValue[req.ParcelStatus]
-		if !ok {
-			http.Error(w, "invalid parcel status enum", http.StatusBadRequest)
 			return
 		}
 
@@ -76,7 +69,6 @@ func (s *Server) handleAddParcel() http.HandlerFunc {
 			ArrivalAddress: req.ParcelArrivalAddress,
 			ForecastDate:   forecastDate,
 			Description:    req.ParcelDescription,
-			Status:         parcelStatus,
 		})
 		if err != nil {
 			logger.Errorf(errMsg, err)
@@ -134,7 +126,7 @@ func (s *Server) handleDeleteParcel() http.HandlerFunc {
 			return
 		}
 		if !ok {
-			http.Error(w, "you havn't access for this track number", http.StatusForbidden)
+			http.Error(w, "you haven't access for this track number", http.StatusForbidden)
 			return
 		}
 
@@ -198,7 +190,7 @@ func (s *Server) handleGetInfo() http.HandlerFunc {
 			return
 		}
 		if !ok {
-			http.Error(w, "you havn't access for this track number", http.StatusForbidden)
+			http.Error(w, "you haven't access for this track number", http.StatusForbidden)
 			return
 		}
 

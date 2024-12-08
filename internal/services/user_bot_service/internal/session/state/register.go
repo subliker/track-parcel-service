@@ -8,6 +8,7 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
+	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"
 )
 
@@ -62,21 +63,55 @@ func (r *Register) Next(
 
 	// lang bundle
 	fillBundle := bundle.Register().Points()
+	errBundle := bundle.Common().Errors()
 
 	switch r.FillStep {
 	case RegisterFillStepFullName:
+		// check length
+		if err := validator.V.Var(text, "min=3,max=255"); err != nil {
+			// send error
+			request(errBundle.Length(3, 255), RegisterFillStepEmpty)
+			// undo
+			r.FillStep--
+			break
+		}
+		// fill
 		r.User.FullName = text
-		request(fillBundle.Email(), 0)
+		// request next step
+		request(fillBundle.Email(), RegisterFillStepEmpty)
 	case RegisterFillStepEmail:
+		// check email
+		if err := validator.V.Var(text, "email"); err != nil {
+			// send error
+			request(errBundle.Email(), RegisterFillStepEmpty)
+			// undo
+			r.FillStep--
+			break
+		}
+		// fill
 		r.User.Email = text
+		// request next step
 		request(fillBundle.PhoneNumber(), RegisterFillStepPhoneNumber)
 	case RegisterFillStepPhoneNumber:
+		// skip
 		if skip {
 			r.User.PhoneNumber = nil
-		} else {
-			r.User.PhoneNumber = &text
+			// jump to ready
+			r.FillStep++
+			break
 		}
 
+		// check phone number
+		if err := validator.V.Var(text, "e164"); err != nil {
+			// send error
+			request(errBundle.PhoneNumber(), RegisterFillStepEmpty)
+			// undo
+			r.FillStep--
+			break
+		}
+		// fill
+		r.User.PhoneNumber = &text
+		// jump to ready
 		r.FillStep++
 	}
 

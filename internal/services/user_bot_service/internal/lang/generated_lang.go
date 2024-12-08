@@ -38,12 +38,24 @@ type Messages interface{
     Register() register
     CheckParcel() checkParcel
     Menu() menu
+    Notification() notification
 }
 type common interface{
     Markup() commonmarkup
+    Errors() commonerrors
 }
 type commonmarkup interface{
     BtnDontSpecify() string
+}
+type commonerrors interface{
+    Internal() string
+    IncorrectInput() string
+    Length(min int, max int) string
+    TimeFormat() string
+    Email() string
+    PhoneNumber() string
+    AlreadyRegistered() string
+    NotAuthorized() string
 }
 type startMessage interface{
     Head(user_name string) string
@@ -63,7 +75,28 @@ type registerpoints interface{
     Ready(name string, email string, phoneNumber string) string
 }
 type checkParcel interface{
+    Errors() checkParcelerrors
+    Points() checkParcelpoints
     Main(name string, recipient string, arrivalAddress string, forecastDate string, description string, status string) string
+    Subscription(subscribed bool) string
+    Markup() checkParcelmarkup
+    SubscribeEvent() checkParcelsubscribeEvent
+}
+type checkParcelerrors interface{
+    NotFound() string
+    AlreadyDescribed() string
+    AlreadySubscribed() string
+}
+type checkParcelpoints interface{
+    TrackNumber() string
+}
+type checkParcelmarkup interface{
+    Subscribe() string
+    Describe() string
+}
+type checkParcelsubscribeEvent interface{
+    Subscribed(trackNumber string) string
+    Described(trackNumber string) string
 }
 type menu interface{
     Main() string
@@ -71,6 +104,9 @@ type menu interface{
 }
 type menumarkup interface{
     CheckParcel() string
+}
+type notification interface{
+    Main(trackNumber string, time string, place string, description string, status string) string
 }
 
 type ru_RU_Messages struct{}
@@ -84,6 +120,34 @@ func (ru_RU_common) Markup() commonmarkup {
 type ru_RU_commonmarkup struct{}
 func (ru_RU_commonmarkup) BtnDontSpecify() string {
     return "Не указывать"
+}
+func (ru_RU_common) Errors() commonerrors {
+    return ru_RU_commonerrors{}
+}
+type ru_RU_commonerrors struct{}
+func (ru_RU_commonerrors) Internal() string {
+    return "🚨 Произошла внутренняя ошибка. Пожалуйста, попробуйте позже. Если проблема повторится, свяжитесь с поддержкой."
+}
+func (ru_RU_commonerrors) IncorrectInput() string {
+    return "❌ Неверный ввод!"
+}
+func (ru_RU_commonerrors) Length(min int, max int) string {
+    return fmt.Sprintf("🚫 Некорректная длина: должно быть от %d до %d символов. ✍️ Попробуйте снова!", min, max)
+}
+func (ru_RU_commonerrors) TimeFormat() string {
+    return "⏰ Некорректный формат времени! Пожалуйста, введите дату и время в формате: ДД.ММ.ГГГГ ЧЧ:ММ. Например: 24.12.2024 12:30. Попробуйте снова!"
+}
+func (ru_RU_commonerrors) Email() string {
+    return "❌ Неверный формат почты! Пожалуйста, введите корректный адрес электронной почты. Например: example@mail.com."
+}
+func (ru_RU_commonerrors) PhoneNumber() string {
+    return "❌ Неверный формат номера телефона! Пожалуйста, введите номер в правильном формате. Например: +7 123 456-78-90."
+}
+func (ru_RU_commonerrors) AlreadyRegistered() string {
+    return "⚠️ Ошибка! Этот аккаунт уже зарегистрирован!"
+}
+func (ru_RU_commonerrors) NotAuthorized() string {
+    return "🚫 К сожалению, вы не авторизованы для доступа к этой функции. Пожалуйста, зарегистрируйтесь, чтобы продолжить. 🔑✨"
 }
 func (ru_RU_Messages) StartMessage() startMessage {
     return ru_RU_startMessage{}
@@ -145,7 +209,7 @@ func (ru_RU_registerpoints) Ready(name string, email string, phoneNumber string)
         "Вот что теперь видят менеджеры:" + "\n" +
         fmt.Sprintf("*Имя:* %s", name) + "\n" +
         fmt.Sprintf("*Email:* %s", email) + "\n" +
-        fmt.Sprintf("*Телефон* %s", phoneNumber) + "\n" +
+        fmt.Sprintf("*Телефон:* %s", phoneNumber) + "\n" +
         "" + "\n" +
         "_Если нужно изменить какие-то данные, вы всегда можете это сделать в настройках профиля. 👇_"
 }
@@ -153,14 +217,67 @@ func (ru_RU_Messages) CheckParcel() checkParcel {
     return ru_RU_checkParcel{}
 }
 type ru_RU_checkParcel struct{}
+func (ru_RU_checkParcel) Errors() checkParcelerrors {
+    return ru_RU_checkParcelerrors{}
+}
+type ru_RU_checkParcelerrors struct{}
+func (ru_RU_checkParcelerrors) NotFound() string {
+    return "К сожалению, мы не можем найти посылку с указанным трек-номером. 📦❌"
+}
+func (ru_RU_checkParcelerrors) AlreadyDescribed() string {
+    return "❌ Вы не можете отписаться, ведь не были подписаны на посылку"
+}
+func (ru_RU_checkParcelerrors) AlreadySubscribed() string {
+    return "❌ Вы уже подписаны на посылку"
+}
+func (ru_RU_checkParcel) Points() checkParcelpoints {
+    return ru_RU_checkParcelpoints{}
+}
+type ru_RU_checkParcelpoints struct{}
+func (ru_RU_checkParcelpoints) TrackNumber() string {
+    return "📨 Пожалуйста, введите номер вашей посылки для отслеживания. Например, VF834349180"
+}
 func (ru_RU_checkParcel) Main(name string, recipient string, arrivalAddress string, forecastDate string, description string, status string) string {
     return "Вот информация по вашей посылке:" + "\n" +
-        fmt.Sprintf("Наименование: %s", name) + "\n" +
-        fmt.Sprintf("Получатель: %s", recipient) + "\n" +
-        fmt.Sprintf("Адрес доставки: %s", arrivalAddress) + "\n" +
-        fmt.Sprintf("Ожидаемая дата доставки: %s", forecastDate) + "\n" +
-        fmt.Sprintf("Описание: %s", description) + "\n" +
-        fmt.Sprintf("Статус: %s", status)
+        fmt.Sprintf("📦 Наименование: %s", name) + "\n" +
+        fmt.Sprintf("👤 Получатель: %s", recipient) + "\n" +
+        fmt.Sprintf("📍 Адрес доставки: %s", arrivalAddress) + "\n" +
+        fmt.Sprintf("📅 Ожидаемая дата доставки: %s", forecastDate) + "\n" +
+        fmt.Sprintf("📋 Описание: %s", description) + "\n" +
+        fmt.Sprintf("⏳ Статус: %s", status) + "\n" +
+        ""
+}
+func (ru_RU_checkParcel) Subscription(subscribed bool) string {
+    if subscribed==true {
+        return "Вы *подписаны* на уведомления! 📦" + "\n" +
+            "Вы будете получать обновления при изменении ее статуса." + "\n" +
+            "Если вы хотите отписаться, просто нажмите кнопку ниже. 👇"
+    } else if subscribed==false {
+        return "Вы *не подписаны* на уведомления о вашей посылке. 📦" + "\n" +
+            "Если вы хотите получать обновления при изменении статуса, вы можете подписаться, нажав кнопку ниже. 👇"
+    } else {
+        return fmt.Sprintf("%t", subscribed)
+    }
+}
+func (ru_RU_checkParcel) Markup() checkParcelmarkup {
+    return ru_RU_checkParcelmarkup{}
+}
+type ru_RU_checkParcelmarkup struct{}
+func (ru_RU_checkParcelmarkup) Subscribe() string {
+    return "✅ Подписаться"
+}
+func (ru_RU_checkParcelmarkup) Describe() string {
+    return "❌ Отписаться"
+}
+func (ru_RU_checkParcel) SubscribeEvent() checkParcelsubscribeEvent {
+    return ru_RU_checkParcelsubscribeEvent{}
+}
+type ru_RU_checkParcelsubscribeEvent struct{}
+func (ru_RU_checkParcelsubscribeEvent) Subscribed(trackNumber string) string {
+    return fmt.Sprintf("Вы успешно подписались на посылку с трек-номером %s ✅", trackNumber)
+}
+func (ru_RU_checkParcelsubscribeEvent) Described(trackNumber string) string {
+    return fmt.Sprintf("Вы успешно отписались от посылки с трек-номером %s ❌", trackNumber)
 }
 func (ru_RU_Messages) Menu() menu {
     return ru_RU_menu{}
@@ -177,6 +294,18 @@ func (ru_RU_menu) Markup() menumarkup {
 type ru_RU_menumarkup struct{}
 func (ru_RU_menumarkup) CheckParcel() string {
     return "📦 Проверить посылку"
+}
+func (ru_RU_Messages) Notification() notification {
+    return ru_RU_notification{}
+}
+type ru_RU_notification struct{}
+func (ru_RU_notification) Main(trackNumber string, time string, place string, description string, status string) string {
+    return fmt.Sprintf("📦 Статус посылки %s обновлён!", trackNumber) + "\n" +
+        "" + "\n" +
+        fmt.Sprintf("🕒 *Время:* %s", time) + "\n" +
+        fmt.Sprintf("📍 *Место:* %s", place) + "\n" +
+        fmt.Sprintf("📝 *Описание:* %s", description) + "\n" +
+        fmt.Sprintf("📊 *Текущий статус:* %s", status)
 }
 
 

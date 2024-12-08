@@ -17,8 +17,19 @@ func (s *ServerApi) AddSubscription(ctx context.Context, req *pb.AddSubscription
 	logger := s.logger.WithFields("handler", "add subscription")
 	const errMsg = "error add subscription(%s): %s"
 
+	// check if subscribed
+	subscribed, err := s.store.GetSubscribed(model.TrackNumber(req.TrackNumber), model.TelegramID(req.UserTelegramId))
+	if err != nil {
+		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
+		logger.Error(errMsg)
+		return nil, status.Error(codes.Internal, errMsg)
+	}
+	if subscribed {
+		return nil, status.Error(codes.AlreadyExists, "")
+	}
+
 	// add subscription in store
-	err := s.store.AddSubscription(model.TrackNumber(req.TrackNumber), model.TelegramID(req.UserTelegramId))
+	err = s.store.AddSubscription(model.TrackNumber(req.TrackNumber), model.TelegramID(req.UserTelegramId))
 	if errors.Is(err, parcel.ErrIncorrectForeignTrackNumber) {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)
@@ -39,6 +50,9 @@ func (s *ServerApi) DeleteSubscription(ctx context.Context, req *pb.DeleteSubscr
 
 	// delete subscription from store
 	err := s.store.DeleteSubscription(model.TrackNumber(req.TrackNumber), model.TelegramID(req.UserTelegramId))
+	if errors.Is(err, parcel.ErrParcelNotFound) {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
 		logger.Error(errMsg)

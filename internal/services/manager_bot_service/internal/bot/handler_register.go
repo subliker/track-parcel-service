@@ -24,7 +24,7 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 		// check if authorized
 		authorized, ok := ctx.Get("authorized").(bool)
 		if !ok {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
 			return errors.New("auth error: authorized is nil")
 		}
 
@@ -36,7 +36,7 @@ func (b *bot) handleRegister() tele.HandlerFunc {
 		// get session
 		session, err := b.sessionStore.Get(tID)
 		if err != nil {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
 			return fmt.Errorf("get session error: %s", err)
 		}
 
@@ -79,7 +79,7 @@ func (b *bot) onRegisterState(
 			b.bundle,
 		)
 		if err != nil {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
 		}
 		ss.ClearState()
 		b.handleMenu()(ctx)

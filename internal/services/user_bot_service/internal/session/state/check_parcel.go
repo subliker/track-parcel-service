@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/pupb"
@@ -37,8 +36,9 @@ func (c *CheckParcel) Next(text string) (bool, error) {
 // Ready completes all data and send request
 func (c *CheckParcel) Ready(
 	parcelsUserClient pu.Client,
-	sendParcel func(text string),
+	sendParcel func(text string, subscribed bool),
 	bundle lang.Messages,
+	userTID model.TelegramID,
 ) error {
 	// check if state done
 	if !c.done() {
@@ -47,7 +47,8 @@ func (c *CheckParcel) Ready(
 
 	// request parcel
 	res, err := parcelsUserClient.GetParcel(context.Background(), &pupb.GetParcelRequest{
-		TrackNumber: string(c.TrackNum),
+		TrackNumber:    string(c.TrackNum),
+		UserTelegramId: int64(userTID),
 	})
 	if errors.Is(err, pu.ErrParcelNotFound) {
 		return session.ErrResNotFound
@@ -67,9 +68,10 @@ func (c *CheckParcel) Ready(
 		res.Parcel.Name,
 		res.Parcel.Recipient,
 		res.Parcel.ArrivalAddress,
-		res.Parcel.ForecastDate.AsTime().Format(time.RFC1123),
+		res.Parcel.ForecastDate.AsTime().Format(model.ForecastDateLayout),
 		res.Parcel.Description,
 		string(parcelStatus),
-	))
+	)+"\n"+
+		bundle.CheckParcel().Subscription(res.UserSubscribed), res.UserSubscribed)
 	return nil
 }
