@@ -18,3 +18,5 @@ k8s/**/*.yaml
 !.example.env
 
 *.log
+
+.vscode/
