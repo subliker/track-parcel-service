@@ -1,5 +1,0 @@
-{
-    "yaml.schemas": {
-        "kubernetes://schema/v1%40service": "file:///home/subliker/projects/track-parcel-service/k8s/manager_bot_service.example.yaml"
-    }
-}
