@@ -13,5 +13,6 @@ tasks:
       - cp -f configs/config.example.toml configs/config.toml
 
   swaggo-init:
+    desc: Init swaggo for rest api documentation
     cmds:
       - swag init -g ./internal/server/rest/api/server.go

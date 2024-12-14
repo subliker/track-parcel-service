@@ -6,8 +6,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/notificationpb"
+	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type (
@@ -29,7 +32,7 @@ type (
 // @Success 201 "checkpoint was added"
 // @Failure 400 {object} string
 // @Failure 500 {object} string
-// @Router /parcels/checkpoints [post]
+// @Router /checkpoints [post]
 func (s *Server) handleAddCheckpoint() http.HandlerFunc {
 	logger := s.logger.WithFields("handler", "add checkpoint")
 	const errMsg = "add checkpoint error: %s"
@@ -90,6 +93,27 @@ func (s *Server) handleAddCheckpoint() http.HandlerFunc {
 			logger.Errorf(errMsg, err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
+		}
+
+		// parse status for proto
+		pStatus, ok := parcelpb.Status_value[req.ParcelTrackNumber]
+		if !ok {
+			s.logger.Error("error parsing proto parcel status, enum does not match in proto and model")
+
+			w.WriteHeader(http.StatusCreated)
+		}
+
+		// publishing event
+		if err := s.eventProducer.Publish(&notificationpb.Event{
+			TrackNumber: req.ParcelTrackNumber,
+			Checkpoint: &parcelpb.Checkpoint{
+				Time:         timestamppb.New(cTime),
+				Place:        req.CheckpointPlace,
+				Description:  req.CheckpointDescription,
+				ParcelStatus: parcelpb.Status(pStatus),
+			},
+		}); err != nil {
+			logger.Errorf("error publishing checkpoint event: %s", err)
 		}
 
 		w.WriteHeader(http.StatusCreated)

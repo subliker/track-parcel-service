@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// creating new rest api server
-	apiServer := api.New(logger, cfg.REST, managerClient, store)
+	apiServer := api.New(logger, cfg.REST, managerClient, store, eventProducer)
 
 	// creating new grpc server
 	parcelServer := grpc.NewServer(logger, store, eventProducer)

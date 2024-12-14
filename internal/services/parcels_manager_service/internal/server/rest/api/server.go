@@ -8,6 +8,7 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
 	docs "github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/docs"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/broker/rabbitmq/event"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
 )
 
@@ -23,9 +24,9 @@ import (
 //	@BasePath	/api/v1
 //	@schemes	http
 
-//	@securityDefinitions.apikey	ManagerApiKey
-//	@in							header
-//	@name						Authorization
+// @securityDefinitions.apikey	ManagerApiKey
+// @in							header
+// @name						Authorization
 type Server struct {
 	server *http.Server
 	router *mux.Router
@@ -34,11 +35,13 @@ type Server struct {
 
 	store parcel.ManagerStore
 
+	eventProducer event.Producer
+
 	logger logger.Logger
 }
 
 // New creates new instance of rest api server
-func New(logger logger.Logger, cfg Config, managerClient manager.Client, store parcel.ManagerStore) *Server {
+func New(logger logger.Logger, cfg Config, managerClient manager.Client, store parcel.ManagerStore, eventProducer event.Producer) *Server {
 	addr := fmt.Sprintf("localhost:%d", cfg.Port)
 	s := Server{
 		server: &http.Server{
@@ -47,6 +50,7 @@ func New(logger logger.Logger, cfg Config, managerClient manager.Client, store p
 		router:        mux.NewRouter().PathPrefix("/api/v1").Subrouter(),
 		store:         store,
 		managerClient: managerClient,
+		eventProducer: eventProducer,
 		logger:        logger.WithFields("layer", "rest"),
 	}
 	s.server.Handler = s.router
