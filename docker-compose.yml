@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: ${USERS_POSTGRES_USER}
       POSTGRES_DB: ${USERS_POSTGRES_DB}
       POSTGRES_PASSWORD: ${USERS_POSTGRES_PASSWORD}
+    volumes:
+      - users_data:/var/lib/postgresql/data
   parcels:
     container_name: parcels
     image: postgres
@@ -17,6 +19,8 @@ services:
       POSTGRES_USER: ${PARCELS_POSTGRES_USER}
       POSTGRES_DB: ${PARCELS_POSTGRES_DB}
       POSTGRES_PASSWORD: ${PARCELS_POSTGRES_PASSWORD}
+    volumes:
+      - parcels_data:/var/lib/postgresql/data
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:management
@@ -31,3 +35,5 @@ services:
 
 volumes:
   rabbitmq_data:
+  parcels_data:
+  users_data:
