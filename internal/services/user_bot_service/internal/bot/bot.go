@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"strings"
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq/delivery"
@@ -46,7 +47,7 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 
 	// try to build bot client
 	client, err := tele.NewBot(tele.Settings{
-		Token:     opts.Cfg.Token,
+		Token:     strings.TrimSpace(opts.Cfg.Token),
 		Poller:    &tele.LongPoller{Timeout: time.Second * 10},
 		OnError:   b.OnError,
 		ParseMode: tele.ModeMarkdown,
