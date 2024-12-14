@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: parcels-user-service
-        image: subliker/track-parcel-parcels-user-service:0.1.0
+        image: subliker/track-parcel-parcels-user-service
         resources:
           limits:
             memory: "128Mi"

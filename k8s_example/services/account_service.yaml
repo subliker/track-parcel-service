@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: account-service
-        image: subliker/track-parcel-account-service:0.1.0
+        image: subliker/track-parcel-account-service
         resources:
           limits:
             memory: "128Mi"

@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
       - name: parcels-manager-service
-        image: subliker/track-parcel-parcels-manager-service:0.1.1
+        image: subliker/track-parcel-parcels-manager-service
         resources:
           limits:
             memory: "128Mi"
@@ -82,11 +82,21 @@ spec:
   selector:
     app: parcels-manager-service
   ports:
-  - port: 8080
-    targetPort: 8080
-    name: manager-api
   - port: 50051
     targetPort: 50051
     name: grpc-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parcels-manager-service-api
+spec:
+  type: LoadBalancer
+  selector:
+    app: parcels-manager-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: manager-api
 
 

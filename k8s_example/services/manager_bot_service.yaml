@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: manager-bot-service  
-        image: subliker/track-parcel-manager-bot-service:0.1.0
+        image: subliker/track-parcel-manager-bot-service
         resources:
           limits:
             memory: "128Mi"

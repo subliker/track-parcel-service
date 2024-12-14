@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: notification-service
-        image: subliker/track-parcel-notification-service:0.1.0
+        image: subliker/track-parcel-notification-service
         resources:
           limits:
             memory: "128Mi"

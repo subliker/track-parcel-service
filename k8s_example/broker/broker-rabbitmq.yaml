@@ -13,7 +13,7 @@ metadata:
   name: broker-rabbitmq-pv
 spec:
   capacity:
-    storage: 100Mi
+    storage: 500Mi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
@@ -30,7 +30,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 500Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -50,7 +50,7 @@ spec:
         image: rabbitmq
         resources:
           limits:
-            memory: "128Mi"
+            memory: "700Mi"
             cpu: "500m"
         ports:
           - containerPort: 5672

@@ -9,6 +9,9 @@ data:
 
     [puclient]
     target="parcels-user-service:50051"
+
+    [rabbitmq]
+    host="broker-rabbitmq"
 ---
 apiVersion: v1
 kind: Secret
@@ -33,7 +36,7 @@ spec:
     spec:
       containers:
       - name: user-bot-service
-        image: subliker/track-parcel-user-bot-service:0.1.0
+        image: subliker/track-parcel-user-bot-service
         resources:
           limits:
             memory: "128Mi"
@@ -48,6 +51,16 @@ spec:
               secretKeyRef:
                 name: user-bot-service-secret
                 key: token
+          - name: UBOT_RABBITMQ_USER
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq-secret
+                key: user
+          - name: UBOT_RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq-secret
+                key: password
       volumes:
         - name: config-volume
           configMap:
