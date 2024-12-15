@@ -12,9 +12,11 @@ import (
 func (b *bot) handleSubscribeParcel(subscribe bool) tele.HandlerFunc {
 	return func(ctx tele.Context) error {
 		defer ctx.Respond()
+		trackNum := ctx.Data()
+		// if subscribe action
 		if subscribe {
 			err := b.parcelsUserClient.AddSubscription(context.Background(), &pupb.AddSubscriptionRequest{
-				TrackNumber:    ctx.Data(),
+				TrackNumber:    trackNum,
 				UserTelegramId: ctx.Sender().ID,
 			})
 			if errors.Is(err, pu.ErrAlreadyExists) {
@@ -29,6 +31,15 @@ func (b *bot) handleSubscribeParcel(subscribe bool) tele.HandlerFunc {
 				ctx.Send(b.bundle.Common().Errors().Internal())
 				return err
 			}
+
+			// make describe btn in old message
+			mk := b.client.NewMarkup()
+			dBtn := checkParcelBtnDescribe
+			dBtn.Data = trackNum
+			mk.Inline(mk.Row(dBtn))
+			ctx.Edit(ctx.Text(), mk)
+
+			// send ready msg
 			ctx.Send(b.bundle.CheckParcel().SubscribeEvent().Subscribed(ctx.Callback().Data))
 		} else {
 			err := b.parcelsUserClient.DeleteSubscription(context.Background(), &pupb.DeleteSubscriptionRequest{
@@ -43,6 +54,15 @@ func (b *bot) handleSubscribeParcel(subscribe bool) tele.HandlerFunc {
 				ctx.Send(b.bundle.Common().Errors().Internal())
 				return err
 			}
+
+			// make describe btn in old message
+			mk := b.client.NewMarkup()
+			dBtn := checkParcelBtnSubscribe
+			dBtn.Data = trackNum
+			mk.Inline(mk.Row(dBtn))
+			ctx.Edit(ctx.Text(), mk)
+
+			// send ready msg
 			ctx.Send(b.bundle.CheckParcel().SubscribeEvent().Described(ctx.Callback().Data))
 		}
 		return nil

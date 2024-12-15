@@ -84,11 +84,14 @@ func (b *bot) onCheckParcelState(
 
 	// send
 	if ended {
+		// run state ready
 		err := st.Ready(
 			b.parcelsUserClient,
 			func(text string, subscribed bool) {
+				// new message markup
 				mk := b.client.NewMarkup()
 
+				// choose subscribe or describe btn
 				if subscribed {
 					dBtn := checkParcelBtnDescribe
 					dBtn.Data = string(st.TrackNum)

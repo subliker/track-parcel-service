@@ -84,14 +84,18 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 
 // Run runs bot after initialization
 func (b *bot) Run(ctx context.Context) error {
+	// run bot client
 	go func() {
 		b.client.Start()
 	}()
 	b.logger.Info("bot is running")
 
-	go func() {
-		b.receiveNotification()
-	}()
+	// start receiving messages from broker
+	if b.deliveryConsumer != nil {
+		go func() {
+			b.receiveNotification()
+		}()
+	}
 
 	// wait until context will be canceled
 	<-ctx.Done()

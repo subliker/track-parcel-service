@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq/delivery"
@@ -14,7 +15,13 @@ import (
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/config"
 )
 
+var ignoreBroker *bool
+
 func main() {
+	// flags
+	ignoreBroker = flag.Bool("ignore-broker", false, "ignore broker connection")
+	flag.Parse()
+
 	// creating logger
 	logger := zap.NewLogger()
 
@@ -36,16 +43,22 @@ func main() {
 	// creating lru session store
 	store := lru.New(logger)
 
-	// creating broker
-	broker, err := rabbitmq.New(logger, cfg.RabbitMQ)
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	// creating delivery consumer
-	deliveryConsumer, err := delivery.NewConsumer(logger, broker.Chan())
-	if err != nil {
-		logger.Fatal(err)
+	// creating broker and delivery consumer
+	var broker rabbitmq.Broker
+	var deliveryConsumer delivery.Consumer
+	if !*ignoreBroker {
+		// creating broker
+		broker, err := rabbitmq.New(logger, cfg.RabbitMQ)
+		if err != nil {
+			logger.Fatal(err)
+		}
+		// creating delivery consumer
+		deliveryConsumer, err = delivery.NewConsumer(logger, broker.Chan())
+		if err != nil {
+			logger.Fatal(err)
+		}
+	} else {
+		logger.Warn("using broker was ignored")
 	}
 
 	// creating new bot
