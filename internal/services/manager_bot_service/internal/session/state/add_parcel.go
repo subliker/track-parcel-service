@@ -34,8 +34,12 @@ const (
 )
 
 // SetAddParcel sets empty add parcel state in user session
-func SetAddParcel(ss session.Session) {
-	ss.SetState(AddParcel{})
+func SetAddParcel(ss session.Session, tID model.TelegramID) {
+	ss.SetState(AddParcel{
+		Parcel: model.Parcel{
+			ManagerID: tID,
+		},
+	})
 }
 
 // done returns true if all state data is filled up
@@ -145,6 +149,7 @@ func (ap *AddParcel) Ready(
 			ManagerTelegramId: int64(p.ManagerID),
 			Recipient:         p.Recipient,
 			ArrivalAddress:    p.ArrivalAddress,
+			Description:       p.Description,
 			ForecastDate:      timestamppb.New(p.ForecastDate),
 		},
 	})

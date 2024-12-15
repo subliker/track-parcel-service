@@ -24,7 +24,7 @@ func (b *bot) handleAddParcel() tele.HandlerFunc {
 		}
 
 		// set add parcel state
-		state.SetAddParcel(session)
+		state.SetAddParcel(session, tID)
 
 		ctx.Send(b.bundle.AddParcel().Points().Name())
 		return nil
@@ -59,7 +59,6 @@ func (b *bot) onAddParcelState(
 			return err
 		}
 		ss.ClearState()
-		b.handleMenu()(ctx)
 		return err
 	} else {
 		ss.SetState(st)

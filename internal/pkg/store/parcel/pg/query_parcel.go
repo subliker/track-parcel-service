@@ -39,14 +39,13 @@ func (s *store) Add(p model.Parcel) (model.TrackNumber, error) {
 	}
 
 	// executing query
-	res, err := s.db.Exec(query, args...)
+	_, err = s.db.Exec(query, args...)
 	if err != nil {
 		errMsg := fmt.Errorf("error executing of parcel inserting: %s", err)
 		logger.Error(errMsg)
 		return "", errMsg
 	}
 
-	logger.Info(res)
 	return trackNum, nil
 }
 

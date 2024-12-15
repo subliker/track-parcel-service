@@ -23,7 +23,6 @@ func (b *bot) handleMyApi() tele.HandlerFunc {
 		}
 
 		ctx.Send(b.bundle.MyApi().Main(string(apiToken)))
-		b.handleMenu()(ctx)
 		return nil
 	}
 }
