@@ -40,7 +40,7 @@ func New(logger logger.Logger, cfg Config) (parcel.Store, error) {
 	}, nil
 }
 
-func (s *store) Close() {
-	s.db.Close()
-	s.logger.Info("store stopped")
+func (s *store) Close() error {
+	defer s.logger.Info("store stopped")
+	return s.db.Close()
 }

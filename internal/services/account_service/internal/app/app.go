@@ -38,6 +38,9 @@ func New(cfg config.Config,
 	accountServer *grpc.Server) App {
 	var a app
 
+	// setting logger
+	a.logger = logger.WithFields("layer", "app")
+
 	// setting grpc address
 	a.grpcAddress = fmt.Sprintf(":%d", cfg.GRPC.Port)
 
@@ -47,8 +50,7 @@ func New(cfg config.Config,
 	// setting account server
 	a.accountServer = accountServer
 
-	// setting logger
-	a.logger = logger.WithFields("layer", "app")
+	a.logger.Info("app was built")
 	return &a
 }
 
@@ -106,8 +108,10 @@ func (a *app) Run(ctx context.Context) error {
 	wg.Wait()
 
 	// close store
-	a.store.Close()
+	if err := a.store.Close(); err != nil {
+		a.logger.Warnf("store closing ended with error: %s", err)
+	}
 
-	a.logger.Info("app was gracefully shutdowned :)")
+	a.logger.Info("app was gracefully shutdowned 👌")
 	return nil
 }

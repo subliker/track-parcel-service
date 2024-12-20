@@ -53,6 +53,7 @@ func init() {
 func Get() Config {
 	logger := zap.Logger.WithFields("layer", "config")
 
+	// viper config unmarshaling
 	cfg := Config{}
 	if err := viper.Unmarshal(&cfg); err != nil {
 		logger.Fatalf("error unmarshal config: %s", err)

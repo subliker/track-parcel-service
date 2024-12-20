@@ -3,6 +3,7 @@ module github.com/subliker/track-parcel-service/internal/pkg
 go 1.22.9
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/spf13/viper v1.19.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.68.0
