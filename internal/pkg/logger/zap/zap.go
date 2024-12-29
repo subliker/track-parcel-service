@@ -2,6 +2,7 @@ package zap
 
 import (
 	"log"
+	"net"
 	"os"
 	"path/filepath"
 
@@ -13,7 +14,7 @@ import (
 var Logger logger.Logger
 
 func init() {
-	Logger = NewLogger()
+	Logger = NewLogger("")
 }
 
 type zapLogger struct {
@@ -22,9 +23,9 @@ type zapLogger struct {
 
 const logDir = "./logs"
 
-// New creates sugared zap logger with common config.
+// NewLogger creates sugared zap logger with common config.
 // It logs into writer from params.
-func NewLogger() logger.Logger {
+func NewLogger(tcpTarget string) logger.Logger {
 	// making log file
 	os.MkdirAll(logDir, os.ModePerm)
 
@@ -50,12 +51,26 @@ func NewLogger() logger.Logger {
 
 	consoleEncoder := zapcore.NewConsoleEncoder(cfg)
 
-	// TODO add kibana, logstash
-
-	core := zapcore.NewTee(
-		zapcore.NewCore(fileEncoder, zapcore.AddSync(logFile), zapcore.DebugLevel),
-		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
-	)
+	var conn net.Conn
+	if tcpTarget != "" {
+		conn, err = net.Dial("tcp", tcpTarget)
+		if err != nil {
+			log.Fatalf("error connecting to target(%s): %s", tcpTarget, err)
+		}
+	}
+	var core zapcore.Core
+	if tcpTarget != "" {
+		core = zapcore.NewTee(
+			zapcore.NewCore(fileEncoder, zapcore.AddSync(logFile), zapcore.DebugLevel),
+			zapcore.NewCore(fileEncoder, zapcore.AddSync(conn), zapcore.DebugLevel),
+			zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
+		)
+	} else {
+		core = zapcore.NewTee(
+			zapcore.NewCore(fileEncoder, zapcore.AddSync(logFile), zapcore.DebugLevel),
+			zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
+		)
+	}
 
 	return &zapLogger{
 		logger: zap.New(core).Sugar(),

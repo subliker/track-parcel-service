@@ -30,7 +30,7 @@ func init() {
 }
 
 func Get() Config {
-	logger := zap.NewLogger().WithFields("layer", "config")
+	logger := zap.Logger.WithFields("layer", "config")
 
 	// viper config unmarshaling
 	cfg := Config{}

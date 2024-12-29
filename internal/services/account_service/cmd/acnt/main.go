@@ -14,11 +14,11 @@ import (
 func main() {
 	flag.Parse()
 
-	// creating logger
-	logger := zap.NewLogger()
-
 	// reading config
 	cfg := config.Get()
+
+	// creating logger
+	logger := zap.NewLogger("localhost:5000")
 
 	// creating parcel store
 	store, err := pg.New(logger, cfg.DB)
