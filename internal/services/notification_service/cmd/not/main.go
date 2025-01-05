@@ -14,11 +14,11 @@ import (
 )
 
 func main() {
-	// creating logger
-	logger := zap.NewLogger()
-
 	// reading config
 	cfg := config.Get()
+
+	// creating logger
+	logger := zap.NewLogger(cfg.Logger).WithFields("service", "notification_service")
 
 	// creating parcel store
 	store, err := pg.New(logger, cfg.DB)

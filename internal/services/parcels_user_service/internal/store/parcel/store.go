@@ -9,5 +9,5 @@ type UserStore interface {
 	AddSubscription(model.TrackNumber, model.TelegramID) error
 	DeleteSubscription(model.TrackNumber, model.TelegramID) error
 	Exists(model.TrackNumber) (bool, error)
-	Close()
+	Close() error
 }

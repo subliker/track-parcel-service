@@ -1,3 +1,6 @@
+[logger]
+targets=["localhost:5000"] # default=[]
+
 [bot]
 language="ru-RU" # default
 token="<your telegram id>"

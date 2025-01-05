@@ -74,7 +74,7 @@ func (a *app) Run(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		// starting serving server
-		a.logger.Infof("starting grpc server at port %d...", a.grpcAddress)
+		a.logger.Infof("starting grpc server at address %s...", a.grpcAddress)
 		if err := a.accountServer.Serve(lis); err != nil {
 			select {
 			case <-ctx.Done():

@@ -1,3 +1,6 @@
+[logger]
+targets=["localhost:5000"] # default=[]
+
 [bot]
 language="ru-RU" # default
 token="<your telegram id>"
@@ -11,3 +14,8 @@ target="localhost:50051" # default
 
 [puclient]
 target="localhost:50053" # default=localhost:50051
+
+[rabbitmq]
+host="localhost" # default
+user="admin"
+password="password"

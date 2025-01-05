@@ -1,3 +1,6 @@
+[logger]
+targets=["localhost:5000"] # default=[]
+
 [grpc]
 port=50052 # default=50051
 

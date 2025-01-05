@@ -11,8 +11,9 @@ import (
 
 type (
 	Config struct {
-		GRPC grpc.Config `validate:"required" mapstructure:"grpc"`
-		DB   pg.Config   `validate:"required" mapstructure:"db"`
+		Logger zap.Config  `mapstructure:"logger"`
+		GRPC   grpc.Config `validate:"required" mapstructure:"grpc"`
+		DB     pg.Config   `validate:"required" mapstructure:"db"`
 	}
 )
 
@@ -20,6 +21,8 @@ func init() {
 	viper.SetEnvPrefix("ACNT")
 
 	// env and default binding
+	viper.SetDefault("logger.targets", []string{})
+
 	viper.SetDefault("grpc.port", 50051)
 
 	viper.SetDefault("db.host", "localhost")

@@ -13,6 +13,7 @@ import (
 )
 
 type Config struct {
+	Logger               zap.Config     `mapstructure:"logger"`
 	Bot                  BotConfig      `validate:"required" mapstructure:"bot"`
 	Session              lru.Config     `mapstructure:"session"`
 	ManagerClient        manager.Config `validate:"required" mapstructure:"managerclient"`
@@ -28,6 +29,8 @@ func init() {
 	viper.SetEnvPrefix("MBOT")
 
 	// env and default binding
+	viper.SetDefault("logger.targets", []string{})
+
 	viper.BindEnv("bot.token")
 	viper.SetDefault("bot.language", "ru-RU")
 

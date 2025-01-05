@@ -18,7 +18,7 @@ func main() {
 	cfg := config.Get()
 
 	// creating logger
-	logger := zap.NewLogger("localhost:5000")
+	logger := zap.NewLogger(cfg.Logger).WithFields("service", "account_service")
 
 	// creating parcel store
 	store, err := pg.New(logger, cfg.DB)

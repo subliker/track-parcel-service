@@ -11,6 +11,7 @@ import (
 
 type (
 	Config struct {
+		Logger   zap.Config      `mapstructure:"logger"`
 		RabbitMQ rabbitmq.Config `validate:"required" mapstructure:"rabbitmq"`
 		DB       pg.Config       `validate:"required" mapstructure:"db"`
 	}
@@ -20,6 +21,8 @@ func init() {
 	viper.SetEnvPrefix("NOT")
 
 	// env and default binding
+	viper.SetDefault("logger.targets", []string{})
+
 	viper.SetDefault("rabbitmq.host", "localhost")
 	viper.BindEnv("rabbitmq.user")
 	viper.BindEnv("rabbitmq.password")
@@ -33,7 +36,7 @@ func init() {
 
 // Get returns parsed service config.
 func Get() Config {
-	logger := zap.NewLogger().WithFields("layer", "config")
+	logger := zap.Logger.WithFields("layer", "config")
 
 	// viper config unmarshaling
 	cfg := Config{}

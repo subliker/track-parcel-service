@@ -9,5 +9,5 @@ type NotificationStore interface {
 	// ParcelSubscribers returns array of user telegram id subscribers
 	ParcelSubscribers(model.TrackNumber) ([]model.TelegramID, error)
 	// Close closes store
-	Close()
+	Close() error
 }

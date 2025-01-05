@@ -22,11 +22,11 @@ func main() {
 	ignoreBroker = flag.Bool("ignore-broker", false, "ignore broker connection")
 	flag.Parse()
 
-	// creating logger
-	logger := zap.NewLogger()
-
 	// reading config
 	cfg := config.Get()
+
+	// creating logger
+	logger := zap.NewLogger(cfg.Logger).WithFields("service", "user_bot_service")
 
 	// creating new user service client
 	userClient, err := user.New(context.Background(), logger, cfg.UserClient)

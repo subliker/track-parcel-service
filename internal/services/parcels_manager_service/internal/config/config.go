@@ -14,6 +14,7 @@ import (
 
 type (
 	Config struct {
+		Logger        zap.Config      `mapstructure:"logger"`
 		GRPC          grpc.Config     `validate:"required" mapstructure:"grpc"`
 		REST          api.Config      `validate:"required" mapstructure:"rest"`
 		DB            pg.Config       `validate:"required" mapstructure:"db"`
@@ -26,6 +27,8 @@ func init() {
 	viper.SetEnvPrefix("PM")
 
 	// env and default binding
+	viper.SetDefault("logger.targets", []string{})
+
 	viper.SetDefault("grpc.port", 50051)
 
 	viper.SetDefault("rest.port", 8080)
@@ -45,7 +48,7 @@ func init() {
 
 // Get returns parsed service config.
 func Get() Config {
-	logger := zap.NewLogger().WithFields("layer", "config")
+	logger := zap.Logger.WithFields("layer", "config")
 
 	// viper config unmarshaling
 	cfg := Config{}

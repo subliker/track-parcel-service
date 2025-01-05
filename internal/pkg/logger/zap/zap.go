@@ -14,7 +14,7 @@ import (
 var Logger logger.Logger
 
 func init() {
-	Logger = NewLogger()
+	Logger = NewLogger(Config{})
 }
 
 type zapLogger struct {
@@ -23,9 +23,14 @@ type zapLogger struct {
 
 const logDir = "./logs"
 
+// Config is struct to configure logger
+type Config struct {
+	Targets []string `mapstructure:"targets"`
+}
+
 // NewLogger creates sugared zap logger with common config.
 // It logs into writer from params.
-func NewLogger(tcpTargets ...string) logger.Logger {
+func NewLogger(cfg Config) logger.Logger {
 	// making log file
 	os.MkdirAll(logDir, os.ModePerm)
 
@@ -35,21 +40,21 @@ func NewLogger(tcpTargets ...string) logger.Logger {
 	}
 
 	// making encoder config
-	var cfg zapcore.EncoderConfig
+	var zcfg zapcore.EncoderConfig
 	if os.Getenv("APP_ENV") == "development" {
-		cfg = zap.NewDevelopmentEncoderConfig()
+		zcfg = zap.NewDevelopmentEncoderConfig()
 	} else {
-		cfg = zap.NewProductionEncoderConfig()
+		zcfg = zap.NewProductionEncoderConfig()
 	}
 	// time layout 2006-01-02T15:04:05.000Z0700
-	cfg.EncodeTime = zapcore.ISO8601TimeEncoder
+	zcfg.EncodeTime = zapcore.ISO8601TimeEncoder
 
-	fileEncoder := zapcore.NewJSONEncoder(cfg)
+	fileEncoder := zapcore.NewJSONEncoder(zcfg)
 
 	// colorized output
-	cfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	zcfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
-	consoleEncoder := zapcore.NewConsoleEncoder(cfg)
+	consoleEncoder := zapcore.NewConsoleEncoder(zcfg)
 
 	// cores array
 	cores := []zapcore.Core{
@@ -58,12 +63,13 @@ func NewLogger(tcpTargets ...string) logger.Logger {
 	}
 
 	// walk for tcp targets
-	for _, target := range tcpTargets {
+	for _, target := range cfg.Targets {
 		conn, err := net.Dial("tcp", target)
 		if err != nil {
 			log.Fatalf("error connecting to target(%s): %s", target, err)
 		}
 		cores = append(cores, zapcore.NewCore(fileEncoder, zapcore.AddSync(conn), zapcore.DebugLevel))
+		log.Printf("connected to logs target(%s)", target)
 	}
 
 	core := zapcore.NewTee(cores...)
