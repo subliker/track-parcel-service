@@ -2,6 +2,12 @@
 
 This documentation is also available in Russian [there](./README_RU.md).
 
+# Table of Contents
+
+1. [Project Idea](#project-idea)
+2. [Project Setup](#project-setup)
+3. [Selected Tools](#selected-tools)
+
 <img src="./assets/track-parcel-service.svg">
 
 ## Project Idea
@@ -106,7 +112,7 @@ For working with data storage, we use stores and repositories. This approach als
 
 SQL queries are generated using [Masterminds/squirrel](https://github.com/Masterminds/squirrel), which simplifies and types query creation.
 
-### Instruction Overview
+#### Instruction Overview
 For quick and easy interaction with services, we use the [Taskfile](https://taskfile.dev/) (an alternative to Makefile). It is used in the project to define build commands, apply standard configurations, run services, generate code, and more.
 
 ### Test Environment
