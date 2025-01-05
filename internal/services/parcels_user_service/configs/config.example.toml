@@ -1,5 +1,8 @@
+[logger]
+targets=["localhost:5000"] # default=[]
+
 [grpc]
-port=50051 # default
+port=50053 # default
 
 [db]
 host="localhost" # default

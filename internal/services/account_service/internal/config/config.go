@@ -4,15 +4,16 @@ import (
 	"github.com/spf13/viper"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
-	"github.com/subliker/track-parcel-service/internal/pkg/validation"
+	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/server/grpc"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store/pg"
 )
 
 type (
 	Config struct {
-		GRPC grpc.Config `validate:"required" mapstructure:"grpc"`
-		DB   pg.Config   `validate:"required" mapstructure:"db"`
+		Logger zap.Config  `mapstructure:"logger"`
+		GRPC   grpc.Config `validate:"required" mapstructure:"grpc"`
+		DB     pg.Config   `validate:"required" mapstructure:"db"`
 	}
 )
 
@@ -20,6 +21,8 @@ func init() {
 	viper.SetEnvPrefix("ACNT")
 
 	// env and default binding
+	viper.SetDefault("logger.targets", []string{})
+
 	viper.SetDefault("grpc.port", 50051)
 
 	viper.SetDefault("db.host", "localhost")
@@ -30,7 +33,7 @@ func init() {
 }
 
 func Get() Config {
-	logger := zap.NewLogger().WithFields("layer", "config")
+	logger := zap.Logger.WithFields("layer", "config")
 
 	// viper config unmarshaling
 	cfg := Config{}
@@ -39,7 +42,7 @@ func Get() Config {
 	}
 
 	// config validation
-	err := validation.V.Struct(cfg)
+	err := validator.V.Struct(cfg)
 	if err != nil {
 		logger.Fatalf("config validation error: %s", err)
 	}

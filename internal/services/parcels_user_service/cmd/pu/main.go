@@ -14,11 +14,11 @@ import (
 func main() {
 	flag.Parse()
 
-	// creating logger
-	logger := zap.NewLogger()
-
 	// reading config
 	cfg := config.Get()
+
+	// creating logger
+	logger := zap.NewLogger(cfg.Logger).WithFields("service", "parcels_user_service")
 
 	// creating store
 	store, err := pg.New(logger, cfg.DB)

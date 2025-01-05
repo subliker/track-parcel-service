@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"strings"
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq/delivery"
@@ -46,7 +47,7 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 
 	// try to build bot client
 	client, err := tele.NewBot(tele.Settings{
-		Token:     opts.Cfg.Token,
+		Token:     strings.TrimSpace(opts.Cfg.Token),
 		Poller:    &tele.LongPoller{Timeout: time.Second * 10},
 		OnError:   b.OnError,
 		ParseMode: tele.ModeMarkdown,
@@ -83,10 +84,18 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 
 // Run runs bot after initialization
 func (b *bot) Run(ctx context.Context) error {
+	// run bot client
 	go func() {
 		b.client.Start()
 	}()
 	b.logger.Info("bot is running")
+
+	// start receiving messages from broker
+	if b.deliveryConsumer != nil {
+		go func() {
+			b.receiveNotification()
+		}()
+	}
 
 	// wait until context will be canceled
 	<-ctx.Done()
@@ -101,8 +110,8 @@ func (b *bot) Run(ctx context.Context) error {
 func (b *bot) initHandlers() {
 	// global middlewares:
 	// ensure sessions
-	b.client.Use(middleware.Session(b.logger, b.sessionStore))
-	b.client.Use(middleware.Auth(b.logger, b.userClient))
+	b.client.Use(middleware.Session(b.logger, b.sessionStore, b.bundle))
+	b.client.Use(middleware.Auth(b.logger, b.userClient, b.bundle))
 
 	// global handlers
 	// handle text
@@ -119,13 +128,17 @@ func (b *bot) initHandlers() {
 	// groups
 	// group for authorized managers middleware
 	authGroup := b.client.Group()
-	authGroup.Use(middleware.Authorized(b.logger))
+	authGroup.Use(middleware.Authorized(b.logger, b.bundle))
 	// handle menu
 	authGroup.Handle("/menu", b.handleMenu())
 	// handle check parcel
 	authGroup.Handle(&menuBtnCheckParcel, b.handleCheckParcel())
 	// on refresh show parcel
 	// authGroup.Handle(&showParcelBtnRefresh)
+	// subscribe parcel
+	authGroup.Handle(&checkParcelBtnSubscribe, b.handleSubscribeParcel(true))
+	// describe parcel
+	authGroup.Handle(&checkParcelBtnDescribe, b.handleSubscribeParcel(false))
 
 	b.logger.Info("handlers were initialized")
 }

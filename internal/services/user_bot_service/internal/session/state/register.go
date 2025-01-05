@@ -3,12 +3,12 @@ package state
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/userpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
+	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"
 )
 
@@ -53,8 +53,7 @@ func (r *Register) Next(
 ) (bool, error) {
 	// check not specify
 	if notSpecify > RegisterFillStepEmpty && r.FillStep+1 != notSpecify {
-		fmt.Print(notSpecify)
-		return false, ErrIncorrectNotSpecify
+		return false, session.ErrIncorrectNotSpecify
 	}
 
 	// increment step
@@ -64,39 +63,70 @@ func (r *Register) Next(
 
 	// lang bundle
 	fillBundle := bundle.Register().Points()
+	errBundle := bundle.Common().Errors()
+
 	switch r.FillStep {
 	case RegisterFillStepFullName:
+		// check length
+		if err := validator.V.Var(text, "min=3,max=255"); err != nil {
+			// send error
+			request(errBundle.Length(3, 255), RegisterFillStepEmpty)
+			// undo
+			r.FillStep--
+			break
+		}
+		// fill
 		r.User.FullName = text
-		request(fillBundle.Email(), 0)
+		// request next step
+		request(fillBundle.Email(), RegisterFillStepEmpty)
 	case RegisterFillStepEmail:
+		// check email
+		if err := validator.V.Var(text, "email"); err != nil {
+			// send error
+			request(errBundle.Email(), RegisterFillStepEmpty)
+			// undo
+			r.FillStep--
+			break
+		}
+		// fill
 		r.User.Email = text
+		// request next step
 		request(fillBundle.PhoneNumber(), RegisterFillStepPhoneNumber)
 	case RegisterFillStepPhoneNumber:
+		// skip
 		if skip {
 			r.User.PhoneNumber = nil
-		} else {
-			r.User.PhoneNumber = &text
+			// jump to ready
+			r.FillStep++
+			break
 		}
 
+		// check phone number
+		if err := validator.V.Var(text, "e164"); err != nil {
+			// send error
+			request(errBundle.PhoneNumber(), RegisterFillStepEmpty)
+			// undo
+			r.FillStep--
+			break
+		}
+		// fill
+		r.User.PhoneNumber = &text
+		// jump to ready
 		r.FillStep++
 	}
 
 	return r.done(), nil
 }
 
-var (
-	ErrUserIsAlreadyExist = errors.New("request error: user with this id is already exists")
-)
-
 // Ready completes all data and send request
 func (r *Register) Ready(
 	userClient user.Client,
-	sendRegister func(text string),
+	send func(text string),
 	bundle lang.Messages,
 ) error {
 	// check if state done
 	if !r.done() {
-		return ErrStateNotDone
+		return session.ErrStateNotDone
 	}
 
 	// request register user
@@ -108,18 +138,18 @@ func (r *Register) Ready(
 		UserPhoneNumber: u.PhoneNumber,
 	})
 	if errors.Is(err, user.ErrUserIsAlreadyExist) {
-		return ErrUserIsAlreadyExist
+		return errors.New("request error: user with this id is already exists")
 	}
 	if err != nil {
 		return err
 	}
 
 	// optional
-	var phoneNumber string
+	phoneNumber := ""
 	if u.PhoneNumber != nil {
 		phoneNumber = *u.PhoneNumber
 	}
 
-	sendRegister(bundle.Register().Points().Ready(u.FullName, u.Email, phoneNumber))
+	send(bundle.Register().Points().Ready(u.FullName, u.Email, phoneNumber))
 	return nil
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-
 	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
@@ -18,11 +17,11 @@ import (
 func main() {
 	flag.Parse()
 
-	// creating logger
-	logger := zap.NewLogger()
-
 	// reading cfg
 	cfg := config.Get()
+
+	// creating logger
+	logger := zap.NewLogger(cfg.Logger).WithFields("service", "parcels_manager_service")
 
 	// creating store
 	store, err := pg.New(logger, cfg.DB)
@@ -52,7 +51,7 @@ func main() {
 	}
 
 	// creating new rest api server
-	apiServer := api.New(logger, cfg.REST, managerClient, store)
+	apiServer := api.New(logger, cfg.REST, managerClient, store, eventProducer)
 
 	// creating new grpc server
 	parcelServer := grpc.NewServer(logger, store, eventProducer)

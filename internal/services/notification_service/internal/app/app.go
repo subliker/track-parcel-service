@@ -99,7 +99,9 @@ func (a *app) Run(ctx context.Context) error {
 	}
 
 	// stop store
-	a.store.Close()
+	if err := a.store.Close(); err != nil {
+		a.logger.Warnf("store closing ended with error: %s", err)
+	}
 
 	a.logger.Info("app was gracefully shutdowned :)")
 	return nil

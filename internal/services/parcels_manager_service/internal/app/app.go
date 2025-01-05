@@ -90,7 +90,7 @@ func (a *app) Run(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		// starting serving server
-		a.logger.Infof("starting grpc server at port %d...", a.grpcAddress)
+		a.logger.Infof("starting grpc server at address %s...", a.grpcAddress)
 		if err := a.parcelServer.Serve(lis); err != nil {
 			select {
 			case <-ctx.Done():
@@ -148,7 +148,9 @@ func (a *app) Run(ctx context.Context) error {
 	}
 
 	// close store
-	a.store.Close()
+	if err := a.store.Close(); err != nil {
+		a.logger.Warnf("store closing ended with error: %s", err)
+	}
 
 	a.logger.Info("app was gracefully shutdowned :)")
 	return nil

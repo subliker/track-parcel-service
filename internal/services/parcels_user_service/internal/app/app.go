@@ -60,7 +60,7 @@ func (a *app) Run(ctx context.Context) error {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	// creating new new listener
+	// creating new listener
 	lis, err := net.Listen("tcp", a.grpcAddress)
 	if err != nil {
 		a.logger.Fatal(err)
@@ -72,7 +72,7 @@ func (a *app) Run(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		// starting serving server
-		a.logger.Infof("starting grpc server at port %d...", a.grpcAddress)
+		a.logger.Infof("starting grpc server at address %s...", a.grpcAddress)
 		if err := a.parcelServer.Serve(lis); err != nil {
 			select {
 			case <-ctx.Done():
@@ -105,7 +105,9 @@ func (a *app) Run(ctx context.Context) error {
 	wg.Wait()
 
 	// close store
-	a.store.Close()
+	if err := a.store.Close(); err != nil {
+		a.logger.Warnf("store closing ended with error: %s", err)
+	}
 
 	a.logger.Info("app was gracefully shutdowned :)")
 	return nil

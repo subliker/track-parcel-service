@@ -10,8 +10,9 @@ import (
 
 type (
 	Config struct {
-		GRPC grpc.Config `validate:"required" mapstructure:"grpc"`
-		DB   pg.Config   `validate:"required" mapstructure:"db"`
+		Logger zap.Config  `mapstructure:"logger"`
+		GRPC   grpc.Config `validate:"required" mapstructure:"grpc"`
+		DB     pg.Config   `validate:"required" mapstructure:"db"`
 	}
 )
 
@@ -19,17 +20,19 @@ func init() {
 	viper.SetEnvPrefix("PU")
 
 	// env and default binding
+	viper.SetDefault("logger.targets", []string{})
+
 	viper.SetDefault("grpc.port", 50051)
 
 	viper.SetDefault("db.host", "localhost")
-	viper.SetDefault("db.port", 3306)
+	viper.SetDefault("db.port", 5432)
 	viper.BindEnv("db.user")
 	viper.BindEnv("db.password")
 	viper.BindEnv("db.dbname")
 }
 
 func Get() Config {
-	logger := zap.NewLogger().WithFields("layer", "config")
+	logger := zap.Logger.WithFields("layer", "config")
 
 	cfg := Config{}
 	if err := viper.Unmarshal(&cfg); err != nil {

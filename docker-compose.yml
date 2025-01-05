@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: ${USERS_POSTGRES_USER}
       POSTGRES_DB: ${USERS_POSTGRES_DB}
       POSTGRES_PASSWORD: ${USERS_POSTGRES_PASSWORD}
+    volumes:
+      - users_data:/var/lib/postgresql/data
   parcels:
     container_name: parcels
     image: postgres
@@ -17,6 +19,8 @@ services:
       POSTGRES_USER: ${PARCELS_POSTGRES_USER}
       POSTGRES_DB: ${PARCELS_POSTGRES_DB}
       POSTGRES_PASSWORD: ${PARCELS_POSTGRES_PASSWORD}
+    volumes:
+      - parcels_data:/var/lib/postgresql/data
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:management
@@ -28,6 +32,54 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+  elasticsearch:
+    image: elasticsearch:7.16.1
+    volumes:
+      - ./configs/elasticsearch/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: "elastic"
+      ELASTIC_PASSWORD: "MyPw123"
+      discovery.type: single-node
+    networks:
+      - elk
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  logstash:
+    image: logstash:7.16.1
+    volumes:
+      - ./configs/logstash/config.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./configs/logstash/pipeline.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+    ports:
+      - "5044:5044"
+      - "5000:5000"
+      - "9600:9600"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:7.16.1
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./configs/kibana/config.yml:/usr/share/kibana/config/kibana.yml:ro
+    networks:
+      - elk
+    ports:
+      - "5601:5601"
 
 volumes:
   rabbitmq_data:
+  parcels_data:
+  users_data:
+  elasticsearch_data:
+
+networks:
+  elk:

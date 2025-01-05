@@ -1,13 +1,26 @@
 package api
 
-func (s *Server) initRoutes() {
-	// auth middleware
-	s.router.Use(s.authApiTokenMiddleware())
+import (
+	httpSwagger "github.com/swaggo/http-swagger"
+)
 
-	// add parcel handler
-	s.router.Handle("/parcels", s.handleAddParcel()).Methods("POST")
-	s.router.Handle("/parcels/{track-number}", s.handleGetInfo()).Methods("GET")
-	s.router.Handle("/parcels/{track-number}", s.handleDeleteParcel()).Methods("DELETE")
+func (s *Server) initRoutes() {
+	// Swagger UI
+	s.router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+
+	// parcel handlers
+	parcelRouter := s.router.PathPrefix("/parcels").Subrouter()
+	// auth middleware
+	parcelRouter.Use(s.authApiTokenMiddleware())
+	parcelRouter.Handle("/", s.handleAddParcel()).Methods("POST")
+	parcelRouter.Handle("/{track-number}", s.handleGetInfo()).Methods("GET")
+	parcelRouter.Handle("/{track-number}", s.handleDeleteParcel()).Methods("DELETE")
+
+	// checkpoint handlers
+	checkpointRouter := s.router.PathPrefix("/checkpoints").Subrouter()
+	// auth middleware
+	checkpointRouter.Use(s.authApiTokenMiddleware())
+	checkpointRouter.Handle("/", s.handleAddCheckpoint()).Methods("POST")
 
 	s.logger.Info("routes was initialized")
 }

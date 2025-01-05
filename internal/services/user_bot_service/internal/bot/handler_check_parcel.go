@@ -11,8 +11,12 @@ import (
 )
 
 var showParcelBtnRefresh tele.Btn
+var checkParcelBtnSubscribe tele.Btn
+var checkParcelBtnDescribe tele.Btn
 
 func (b *bot) handleCheckParcel() tele.HandlerFunc {
+	checkParcelBtnSubscribe = (&tele.ReplyMarkup{}).Data(b.bundle.CheckParcel().Markup().Subscribe(), "subscribe-parcel")
+	checkParcelBtnDescribe = (&tele.ReplyMarkup{}).Data(b.bundle.CheckParcel().Markup().Describe(), "describe-parcel")
 	return func(ctx tele.Context) error {
 		// set handler name
 		ctx.Set("handler", "check parcel")
@@ -22,13 +26,13 @@ func (b *bot) handleCheckParcel() tele.HandlerFunc {
 		// get session
 		session, err := b.sessionStore.Get(tID)
 		if err != nil {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
 			return fmt.Errorf("get session error: %s", err)
 		}
 
 		// set check parcel state
 		state.SetCheckParcel(session)
-		ctx.Send("enter track number")
+		ctx.Send(b.bundle.CheckParcel().Points().TrackNumber())
 
 		return nil
 	}
@@ -80,18 +84,37 @@ func (b *bot) onCheckParcelState(
 
 	// send
 	if ended {
+		// run state ready
 		err := st.Ready(
 			b.parcelsUserClient,
-			func(text string) {
-				ctx.Send(text)
+			func(text string, subscribed bool) {
+				// new message markup
+				mk := b.client.NewMarkup()
+
+				// choose subscribe or describe btn
+				if subscribed {
+					dBtn := checkParcelBtnDescribe
+					dBtn.Data = string(st.TrackNum)
+					mk.Inline(mk.Row(dBtn))
+				} else {
+					sBtn := checkParcelBtnSubscribe
+					sBtn.Data = string(st.TrackNum)
+					mk.Inline(mk.Row(sBtn))
+				}
+
+				ctx.Send(text, mk)
 			},
-			b.bundle,
+			b.bundle, model.TelegramID(ctx.Sender().ID),
 		)
+		if errors.Is(err, session.ErrResNotFound) {
+			ctx.Send(b.bundle.CheckParcel().Errors().NotFound())
+			return nil
+		}
 		if err != nil {
-			ctx.Send("internal error")
+			ctx.Send(b.bundle.Common().Errors().Internal())
+			return nil
 		}
 		ss.ClearState()
-		b.handleMenu()(ctx)
 		return err
 	} else {
 		ss.SetState(st)

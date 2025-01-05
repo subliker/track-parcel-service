@@ -1,0 +1,21 @@
+[logger]
+targets=["localhost:5000"] # default=[]
+
+[bot]
+language="ru-RU" # default
+token="<your telegram id>"
+
+[session]
+count = 1024 # default
+ttl = 172_800_000_000_000#ns=48hours # default
+
+[userclient]
+target="localhost:50051" # default
+
+[puclient]
+target="localhost:50053" # default=localhost:50051
+
+[rabbitmq]
+host="localhost" # default
+user="admin"
+password="password"

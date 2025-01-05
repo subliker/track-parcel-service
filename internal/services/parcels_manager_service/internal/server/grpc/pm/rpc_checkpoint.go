@@ -22,9 +22,10 @@ func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pmpb.AddCheckpointRe
 
 	// add checkpoint to store
 	err := s.store.AddCheckpoint(model.TrackNumber(req.TrackNumber), model.Checkpoint{
-		Time:        req.Checkpoint.Time.AsTime(),
-		Place:       req.Checkpoint.Place,
-		Description: req.Checkpoint.Description,
+		Time:         req.Checkpoint.Time.AsTime(),
+		Place:        req.Checkpoint.Place,
+		Description:  req.Checkpoint.Description,
+		ParcelStatus: model.Status(req.Checkpoint.ParcelStatus.String()),
 	})
 	if errors.Is(err, parcel.ErrIncorrectForeignTrackNumber) {
 		errMsg := fmt.Sprintf(errMsg, req.TrackNumber, err)
@@ -38,10 +39,12 @@ func (s *ServerApi) AddCheckpoint(ctx context.Context, req *pmpb.AddCheckpointRe
 	}
 
 	// publishing event
-	s.eventProducer.Publish(&notificationpb.Event{
+	if err := s.eventProducer.Publish(&notificationpb.Event{
 		TrackNumber: req.TrackNumber,
 		Checkpoint:  req.Checkpoint,
-	})
+	}); err != nil {
+		logger.Errorf("error publishing checkpoint event: %s", err)
+	}
 
 	return nil, nil
 }

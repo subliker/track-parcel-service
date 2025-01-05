@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: broker-rabbitmq-secret
+type: Opaque
+data:
+  user: c3VibGlrZXI= # subliker
+  password: cXdlMTIzMTIz # qwe123123
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: broker-rabbitmq-pv
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /data/rabbitmq
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: broker-rabbitmq-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broker-rabbitmq
+spec:
+  selector:
+    matchLabels:
+      app: broker-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: broker-rabbitmq
+    spec:
+      containers:
+      - name: broker-rabbitmq
+        image: rabbitmq
+        resources:
+          limits:
+            memory: "700Mi"
+            cpu: "500m"
+        ports:
+          - containerPort: 5672
+          - containerPort: 15672
+        volumeMounts:
+          - name: rabbitmq-data
+            mountPath: /var/lib/rabbitmq
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq-secret
+                key: user
+          - name: RABBITMQ_DEFAULT_PASS
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq-secret
+                key: password
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: broker-rabbitmq-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker-rabbitmq
+spec:
+  selector:
+    app: broker-rabbitmq
+  ports:
+  - port: 5672
+    targetPort: 5672
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker-rabbitmq-ui
+spec:
+  type: LoadBalancer
+  selector:
+    app: broker-rabbitmq
+  ports:
+  - port: 15672
+    targetPort: 15672

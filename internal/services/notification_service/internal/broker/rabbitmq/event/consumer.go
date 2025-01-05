@@ -78,7 +78,7 @@ func (c *consumer) receive() {
 	c.logger.Info("receiving messages running...")
 	for msg := range c.msgs {
 		event := notificationpb.Event{}
-
+		fmt.Print(msg)
 		// deserialization
 		err := proto.Unmarshal(msg.Body, &event)
 		if err != nil {

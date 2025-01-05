@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"strings"
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
@@ -42,7 +43,7 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 
 	// try to build bot client
 	client, err := tele.NewBot(tele.Settings{
-		Token:     opts.Cfg.Token,
+		Token:     strings.TrimSpace(opts.Cfg.Token),
 		Poller:    &tele.LongPoller{Timeout: time.Second * 10},
 		OnError:   b.OnError,
 		ParseMode: tele.ModeMarkdown,
@@ -94,8 +95,8 @@ func (b *bot) Run(ctx context.Context) error {
 func (b *bot) initHandlers() {
 	// global middlewares:
 	// ensure sessions
-	b.client.Use(middleware.Session(b.logger, b.sessionStore))
-	b.client.Use(middleware.Auth(b.logger, b.managerClient))
+	b.client.Use(middleware.Session(b.logger, b.sessionStore, b.bundle))
+	b.client.Use(middleware.Auth(b.logger, b.managerClient, b.bundle))
 
 	// global handlers
 	// handle text
@@ -107,18 +108,22 @@ func (b *bot) initHandlers() {
 	b.client.Handle("/register", registerHandler)
 	b.client.Handle(&startBtnRegister, registerHandler)
 	// don't specify data handler
-	b.client.Handle(&btnDontSpecify, b.handleDontSpecify())
+	b.client.Handle(&btnNotSpecify, b.handleDontSpecify())
 
 	// groups
 	// group for authorized managers middleware
 	authGroup := b.client.Group()
-	authGroup.Use(middleware.Authorized(b.logger))
+	authGroup.Use(middleware.Authorized(b.logger, b.bundle))
 	// handle menu
 	authGroup.Handle("/menu", b.handleMenu())
 	// handle add parcel
 	addParcelHandler := b.handleAddParcel()
 	authGroup.Handle("/add-parcel", addParcelHandler)
 	authGroup.Handle(&menuBtnAddParcel, addParcelHandler)
+	// handle my api
+	myApiHandler := b.handleMyApi()
+	authGroup.Handle("/my-api", myApiHandler)
+	authGroup.Handle(&menuBtnMyApi, myApiHandler)
 
 	b.logger.Info("handlers were initialized")
 }

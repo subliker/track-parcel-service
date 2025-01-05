@@ -13,6 +13,8 @@ import (
 type Client interface {
 	GetParcel(ctx context.Context, in *pb.GetParcelRequest) (*pb.GetParcelResponse, error)
 	GetCheckpoints(ctx context.Context, in *pb.GetCheckpointsRequest) (*pb.GetCheckpointsResponse, error)
+	AddSubscription(ctx context.Context, in *pb.AddSubscriptionRequest) error
+	DeleteSubscription(ctx context.Context, in *pb.DeleteSubscriptionRequest) error
 	Close() error
 }
 

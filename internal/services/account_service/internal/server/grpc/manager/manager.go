@@ -146,7 +146,7 @@ func (s *ServerApi) AuthApiToken(ctx context.Context, req *pb.AuthApiTokenReques
 	}
 
 	// get manager telegram id
-	tID, err := s.repo.GetTelegramId(model.ManagerApiToken(req.ManagerApiToken))
+	tID, err := s.repo.RetrieveManagerIdByApiKey(model.ManagerApiToken(req.ManagerApiToken))
 	if err == store.ErrManagerNotFound {
 		errMsg := fmt.Sprintf(errMsg, err)
 		return nil, status.Error(codes.NotFound, errMsg)

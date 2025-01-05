@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parcels-pgs-config
+data:
+  db: postgres
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: parcels-pgs-secret
+type: Opaque
+data:
+  user: c3VibGlrZXI= # subliker
+  password: cXdlMTIzMTIz # qwe123123
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: parcels-pgs-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /data/parcels
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: parcels-pgs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  storageClassName: manual
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parcels-pgs
+spec:
+  selector:
+    matchLabels:
+      app: parcels-pgs
+  template:
+    metadata:
+      labels:
+        app: parcels-pgs
+    spec:
+      containers:
+      - name: parcels-pgs
+        image: postgres
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+          - name: pgdata
+            mountPath: /var/lib/postgresql/data
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: parcels-pgs-config
+                key: db
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: parcels-pgs-secret
+                key: user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: parcels-pgs-secret
+                key: password
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: parcels-pgs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parcels-pgs
+spec:
+  selector:
+    app: parcels-pgs
+  ports:
+  - port: 5432
+    targetPort: 5432

@@ -111,7 +111,7 @@ func (r *Repository) GetApiToken(tID model.TelegramID) (model.ManagerApiToken, e
 	return apiToken, nil
 }
 
-func (r *Repository) GetTelegramId(apiToken model.ManagerApiToken) (model.TelegramID, error) {
+func (r *Repository) RetrieveManagerIdByApiKey(apiToken model.ManagerApiToken) (model.TelegramID, error) {
 	logger := r.logger.WithFields("command", "get telegram id")
 
 	// making telegram id

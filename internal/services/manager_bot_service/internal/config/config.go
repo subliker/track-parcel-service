@@ -8,12 +8,14 @@ import (
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
 	_ "github.com/subliker/track-parcel-service/internal/pkg/config"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
-	"github.com/subliker/track-parcel-service/internal/pkg/validation"
+	"github.com/subliker/track-parcel-service/internal/pkg/session/lru"
+	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 )
 
 type Config struct {
+	Logger               zap.Config     `mapstructure:"logger"`
 	Bot                  BotConfig      `validate:"required" mapstructure:"bot"`
-	Session              SessionConfig  `mapstructure:"session"`
+	Session              lru.Config     `mapstructure:"session"`
 	ManagerClient        manager.Config `validate:"required" mapstructure:"managerclient"`
 	ParcelsManagerClient pm.Config      `validate:"required" mapstructure:"pmclient"`
 }
@@ -23,15 +25,12 @@ type BotConfig struct {
 	Language string `validate:"required" mapstructure:"language"`
 }
 
-type SessionConfig struct {
-	Count int   `validate:"required" mapstructure:"count"`
-	TTL   int64 `validate:"required" mapstructure:"ttl"`
-}
-
 func init() {
 	viper.SetEnvPrefix("MBOT")
 
 	// env and default binding
+	viper.SetDefault("logger.targets", []string{})
+
 	viper.BindEnv("bot.token")
 	viper.SetDefault("bot.language", "ru-RU")
 
@@ -52,7 +51,7 @@ func Get() Config {
 	}
 
 	// config validation
-	err := validation.V.Struct(cfg)
+	err := validator.V.Struct(cfg)
 	if err != nil {
 		logger.Fatalf("config validation error: %s", err)
 	}

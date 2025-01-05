@@ -1,0 +1,146 @@
+basePath: /api/v1
+definitions:
+  api.AddParcelRequest:
+    properties:
+      parcel_arrival_address:
+        type: string
+      parcel_description:
+        type: string
+      parcel_forecast_date:
+        type: string
+      parcel_name:
+        type: string
+      parcel_recipient:
+        type: string
+      parcel_status:
+        type: string
+    type: object
+  api.AddParcelResponse:
+    properties:
+      parcel_track_number:
+        type: string
+    type: object
+  api.GetInfoResponse:
+    properties:
+      parcel_arrival_address:
+        type: string
+      parcel_description:
+        type: string
+      parcel_forecast_date:
+        type: string
+      parcel_name:
+        type: string
+      parcel_recipient:
+        type: string
+      parcel_status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: subliker0@gmail.com
+    name: Shcherbachev Andrew
+    url: http://t.me/subliker
+  description: This server is useful for automated delivery info collectors to update
+    parcel data in tracking system.
+  title: Parcels Manager API
+  version: "1.0"
+paths:
+  /parcels:
+    post:
+      consumes:
+      - application/json
+      description: Add Parcel adds new manager's parcel and returns unique parcel
+        track number.
+      parameters:
+      - description: New Parcel data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.AddParcelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Parcel was added
+          schema:
+            $ref: '#/definitions/api.AddParcelResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Add Parcel
+      tags:
+      - Parcels
+  /parcels/{track-number}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete manager's Parcel with checkpoints.
+      parameters:
+      - description: Parcel's track number
+        in: path
+        name: track-number
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Parcel was deleted
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete Parcel
+      tags:
+      - Parcels
+    get:
+      consumes:
+      - application/json
+      description: Get Parcel returns parcels info by track number.
+      parameters:
+      - description: Parcel's track number
+        in: path
+        name: track-number
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.GetInfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: internal error
+          schema:
+            type: string
+      summary: Get Parcel
+      tags:
+      - Parcels
+schemes:
+- http
+securityDefinitions:
+  ManagerApiKey:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
@@ -28,6 +29,19 @@ func (s *ServerApi) AddParcel(ctx context.Context, req *pmpb.AddParcelRequest) (
 		ForecastDate:   req.Parcel.ForecastDate.AsTime(),
 		Description:    req.Parcel.Description,
 		Status:         model.Status(req.Parcel.Status.String()),
+	})
+	if err != nil {
+		errMsg := fmt.Sprintf(errMsg, err)
+		logger.Error(errMsg)
+		return &pmpb.AddParcelResponse{}, status.Error(codes.Internal, errMsg)
+	}
+
+	// add empty status
+	err = s.store.AddCheckpoint(trackNum, model.Checkpoint{
+		Time:         time.Now(),
+		Place:        "",
+		Description:  "Parcel was created",
+		ParcelStatus: model.StatusPending,
 	})
 	if err != nil {
 		errMsg := fmt.Sprintf(errMsg, err)

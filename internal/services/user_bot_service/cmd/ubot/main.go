@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"flag"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq"
+	"github.com/subliker/track-parcel-service/internal/pkg/broker/rabbitmq/delivery"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pu"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
@@ -12,12 +15,18 @@ import (
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/config"
 )
 
+var ignoreBroker *bool
+
 func main() {
-	// creating logger
-	logger := zap.NewLogger()
+	// flags
+	ignoreBroker = flag.Bool("ignore-broker", false, "ignore broker connection")
+	flag.Parse()
 
 	// reading config
 	cfg := config.Get()
+
+	// creating logger
+	logger := zap.NewLogger(cfg.Logger).WithFields("service", "user_bot_service")
 
 	// creating new user service client
 	userClient, err := user.New(context.Background(), logger, cfg.UserClient)
@@ -34,12 +43,31 @@ func main() {
 	// creating lru session store
 	store := lru.New(logger)
 
+	// creating broker and delivery consumer
+	var broker rabbitmq.Broker
+	var deliveryConsumer delivery.Consumer
+	if !*ignoreBroker {
+		// creating broker
+		broker, err := rabbitmq.New(logger, cfg.RabbitMQ)
+		if err != nil {
+			logger.Fatal(err)
+		}
+		// creating delivery consumer
+		deliveryConsumer, err = delivery.NewConsumer(logger, broker.Chan())
+		if err != nil {
+			logger.Fatal(err)
+		}
+	} else {
+		logger.Warn("using broker was ignored")
+	}
+
 	// creating new bot
 	bot := bot.New(logger, bot.BotOptions{
 		Cfg:               cfg.Bot,
 		SessionStore:      store,
 		UserClient:        userClient,
 		ParcelsUserClient: parcelsUserClient,
+		DeliveryConsumer:  deliveryConsumer,
 	})
 
 	// creating new instance of app
@@ -47,6 +75,7 @@ func main() {
 		Bot:               bot,
 		UserClient:        userClient,
 		ParcelsUserClient: parcelsUserClient,
+		Broker:            broker,
 	})
 	// running app
 	a.Run(context.Background())

@@ -39,14 +39,13 @@ func (s *store) Add(p model.Parcel) (model.TrackNumber, error) {
 	}
 
 	// executing query
-	res, err := s.db.Exec(query, args...)
+	_, err = s.db.Exec(query, args...)
 	if err != nil {
 		errMsg := fmt.Errorf("error executing of parcel inserting: %s", err)
 		logger.Error(errMsg)
 		return "", errMsg
 	}
 
-	logger.Info(res)
 	return trackNum, nil
 }
 
@@ -131,54 +130,12 @@ func (s *store) GetInfo(trackNum model.TrackNumber) (model.Parcel, error) {
 		return p, parcel.ErrParcelNotFound
 	}
 	if err != nil {
-		return p, err
+		errMsg := fmt.Errorf("error executing of getting parcel: %s", err)
+		logger.Error(errMsg)
+		return p, errMsg
 	}
 
 	return p, nil
-}
-
-func (s *store) GetUserInfo(trackNum model.TrackNumber, userTID model.TelegramID) (model.Parcel, bool, error) {
-	logger := s.logger.WithFields("command", "get user info")
-
-	// making parcel struct
-	var p model.Parcel
-	subscriptionID := 0
-
-	// making query builder
-	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-
-	// build query
-	query, args, err := psql.
-		Select(
-			"parcels.name",
-			"parcels.recipient",
-			"parcels.arrival_address",
-			"parcels.forecast_date",
-			"parcels.description",
-			"parcels.status",
-			"subscriptions.id AS subscription_id",
-		).
-		From("parcels").
-		LeftJoin("subscriptions ON parcels.track_number = subscriptions.parcel_track_number AND subscriptions.user_id = ?", userTID).
-		Where(squirrel.Eq{"parcels.track_number": trackNum}).
-		ToSql()
-	if err != nil {
-		errMsg := fmt.Errorf("error making query of user parcel getting: %s", err)
-		logger.Error(errMsg)
-		return p, false, errMsg
-	}
-
-	// executing query
-	row := s.db.QueryRow(query, args...)
-	err = row.Scan(&p.Name, &p.Recipient, &p.ArrivalAddress, &p.ForecastDate, &p.Description, &p.Status, &subscriptionID)
-	if errors.Is(err, sql.ErrNoRows) {
-		return p, false, parcel.ErrParcelNotFound
-	}
-	if err != nil {
-		return p, false, err
-	}
-
-	return p, subscriptionID != 0, nil
 }
 
 func (s *store) Exists(trackNum model.TrackNumber) (bool, error) {

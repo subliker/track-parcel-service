@@ -2,10 +2,12 @@ package model
 
 import (
 	"crypto/rand"
+	"errors"
 	"math/big"
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/logger/zap"
+	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 )
 
 type TrackNumber string
@@ -28,17 +30,30 @@ func NewTrackNumber() TrackNumber {
 	return TrackNumber(randomString(letters, 2) + randomString(digits, 9))
 }
 
+const ForecastDateLayout = "02.01.2006 15:04"
+
 type Parcel struct {
-	Name string
+	Name string `validate:"required,min=3,max=100"`
 
-	ManagerID TelegramID
+	ManagerID TelegramID `validate:"required"`
 
-	Recipient      string
-	ArrivalAddress string
-	ForecastDate   time.Time
+	Recipient      string    `validate:"required,min=3,max=255"`
+	ArrivalAddress string    `validate:"required,min=3,max=255"`
+	ForecastDate   time.Time `validate:"required"`
 
-	Description string
-	Status      Status
+	Description string `validate:"required,max=255"`
+	Status      Status `validate:"required"`
+}
+
+func (p *Parcel) Validate() error {
+	if err := validator.V.Struct(p); err != nil {
+		return err
+	}
+
+	if _, ok := StatusValue[string(p.Status)]; !ok {
+		return errors.New("status enum value doesn't exist")
+	}
+	return nil
 }
 
 type Status string
@@ -60,7 +75,8 @@ var StatusValue = map[string]Status{
 }
 
 type Checkpoint struct {
-	Time        time.Time
-	Place       string
-	Description string
+	Time         time.Time
+	Place        string
+	Description  string
+	ParcelStatus Status
 }

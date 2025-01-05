@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: manager-bot-service-config
+data:
+  config.toml: |
+    [managerclient]
+    target="account-service:50051"
+
+    [pmclient]
+    target="parcels-manager-service:50051"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: manager-bot-service-secret
+type: Opaque
+data:
+  token: <your telegram bot token>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: manager-bot-service
+spec:
+  selector:
+    matchLabels:
+      app: manager-bot-service
+  template:
+    metadata:
+      labels:
+        app: manager-bot-service
+    spec:
+      containers:
+      - name: manager-bot-service  
+        image: subliker/track-parcel-manager-bot-service
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        volumeMounts:
+          - name: config-volume
+            mountPath: /app/manager_bot_service/configs
+            readOnly: true
+        env:
+          - name: MBOT_BOT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: manager-bot-service-secret
+                key: token
+      volumes:
+        - name: config-volume
+          configMap:
+            name: manager-bot-service-config

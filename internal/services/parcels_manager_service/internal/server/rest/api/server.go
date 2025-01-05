@@ -7,9 +7,26 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
+	docs "github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/docs"
+	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/broker/rabbitmq/event"
 	"github.com/subliker/track-parcel-service/internal/services/parcels_manager_service/internal/store/parcel"
 )
 
+//	@title			Parcels Manager API
+//	@version		1.0
+//	@description	This server is useful for automated delivery info collectors to update parcel data in tracking system.
+
+//	@contact.name	Shcherbachev Andrew
+//	@contact.url	http://t.me/subliker
+//	@contact.email	subliker0@gmail.com
+
+//	@host		localhost:8080
+//	@BasePath	/api/v1
+//	@schemes	http
+
+// @securityDefinitions.apikey	ManagerApiKey
+// @in							header
+// @name						Authorization
 type Server struct {
 	server *http.Server
 	router *mux.Router
@@ -18,23 +35,30 @@ type Server struct {
 
 	store parcel.ManagerStore
 
+	eventProducer event.Producer
+
 	logger logger.Logger
 }
 
 // New creates new instance of rest api server
-func New(logger logger.Logger, cfg Config, managerClient manager.Client, store parcel.ManagerStore) *Server {
+func New(logger logger.Logger, cfg Config, managerClient manager.Client, store parcel.ManagerStore, eventProducer event.Producer) *Server {
+	addr := fmt.Sprintf("localhost:%d", cfg.Port)
 	s := Server{
 		server: &http.Server{
-			Addr: fmt.Sprintf("localhost:%d", cfg.Port),
+			Addr: addr,
 		},
-		router:        mux.NewRouter(),
+		router:        mux.NewRouter().PathPrefix("/api/v1").Subrouter(),
 		store:         store,
 		managerClient: managerClient,
+		eventProducer: eventProducer,
 		logger:        logger.WithFields("layer", "rest"),
 	}
 	s.server.Handler = s.router
 
 	s.initRoutes()
+
+	// swagger options
+	docs.SwaggerInfo.Host = addr
 
 	s.logger.Info("rest api server instance created")
 	return &s

@@ -1,6 +1,8 @@
 package pg
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
@@ -50,7 +52,7 @@ func (s *store) DeleteSubscription(trackNum model.TrackNumber, userTID model.Tel
 
 	// build query
 	query, args, err := psql.Delete("subscriptions").
-		Where(squirrel.Eq{"track_number": trackNum, "user_id": userTID}).
+		Where(squirrel.Eq{"parcel_track_number": trackNum, "user_id": userTID}).
 		ToSql()
 	if err != nil {
 		errMsg := fmt.Errorf("error making query of subscription deleting: %s", err)
@@ -126,4 +128,36 @@ func (s *store) ParcelSubscribers(trackNum model.TrackNumber) ([]model.TelegramI
 		return nil, errMsg
 	}
 	return sbs, nil
+}
+
+func (s *store) GetSubscribed(trackNum model.TrackNumber, userTID model.TelegramID) (bool, error) {
+	logger := s.logger.WithFields("command", "get info for user")
+
+	// making query builder
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// build query
+	query, args, err := psql.Select("1").
+		From("subscriptions").
+		Where(squirrel.Eq{"parcel_track_number": trackNum, "user_id": userTID}).
+		ToSql()
+	if err != nil {
+		errMsg := fmt.Errorf("error making query of user parcel getting: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	// executing query
+	r := 0
+	err = s.db.QueryRow(query, args...).Scan(&r)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil
+	}
+	if err != nil {
+		errMsg := fmt.Errorf("error executing of getting subscribed: %s", err)
+		logger.Error(errMsg)
+		return false, errMsg
+	}
+
+	return true, nil
 }
