@@ -14,7 +14,7 @@ import (
 var Logger logger.Logger
 
 func init() {
-	Logger = NewLogger("")
+	Logger = NewLogger()
 }
 
 type zapLogger struct {
@@ -25,7 +25,7 @@ const logDir = "./logs"
 
 // NewLogger creates sugared zap logger with common config.
 // It logs into writer from params.
-func NewLogger(tcpTarget string) logger.Logger {
+func NewLogger(tcpTargets ...string) logger.Logger {
 	// making log file
 	os.MkdirAll(logDir, os.ModePerm)
 
@@ -51,26 +51,22 @@ func NewLogger(tcpTarget string) logger.Logger {
 
 	consoleEncoder := zapcore.NewConsoleEncoder(cfg)
 
-	var conn net.Conn
-	if tcpTarget != "" {
-		conn, err = net.Dial("tcp", tcpTarget)
+	// cores array
+	cores := []zapcore.Core{
+		zapcore.NewCore(fileEncoder, zapcore.AddSync(logFile), zapcore.DebugLevel),
+		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
+	}
+
+	// walk for tcp targets
+	for _, target := range tcpTargets {
+		conn, err := net.Dial("tcp", target)
 		if err != nil {
-			log.Fatalf("error connecting to target(%s): %s", tcpTarget, err)
+			log.Fatalf("error connecting to target(%s): %s", target, err)
 		}
+		cores = append(cores, zapcore.NewCore(fileEncoder, zapcore.AddSync(conn), zapcore.DebugLevel))
 	}
-	var core zapcore.Core
-	if tcpTarget != "" {
-		core = zapcore.NewTee(
-			zapcore.NewCore(fileEncoder, zapcore.AddSync(logFile), zapcore.DebugLevel),
-			zapcore.NewCore(fileEncoder, zapcore.AddSync(conn), zapcore.DebugLevel),
-			zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
-		)
-	} else {
-		core = zapcore.NewTee(
-			zapcore.NewCore(fileEncoder, zapcore.AddSync(logFile), zapcore.DebugLevel),
-			zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
-		)
-	}
+
+	core := zapcore.NewTee(cores...)
 
 	return &zapLogger{
 		logger: zap.New(core).Sugar(),
