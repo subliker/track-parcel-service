@@ -35,6 +35,10 @@ Service configs are located in `configs/config.toml`. Configuration of databases
 
 To make the client-bots work, it is **important** to specify tokens in the configuration of the `internal/services/manager_bot_service` and `internal/services/user_bot_service` services.
 
+For the initial setup, run the migrations using: `task migrate-all-up`. For testing purposes, you can migrate test data using: `task migrate-test-all-up`.
+
+Now, you can start all services with `docker compose up -d` in the project root directory and `task run` in each service directory.
+
 ### Cluster Environment
 You should already have `kubectl` configured for this project.
 
