@@ -126,8 +126,7 @@ func (l *zapLogger) Fatalf(template string, args ...interface{}) {
 }
 
 func (l *zapLogger) WithFields(args ...interface{}) logger.Logger {
-	zl := zapLogger{
+	return &zapLogger{
 		logger: l.logger.With(args...),
 	}
-	return &zl
 }
