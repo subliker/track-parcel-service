@@ -17,7 +17,7 @@ func main() {
 	cfg := config.Get()
 
 	// creating logger
-	logger := zap.NewLogger(cfg.Logger).WithFields("service", "manager_bot_service")
+	logger := zap.NewLogger(cfg.Logger, "manager-bot-service")
 
 	// creating new manager service client
 	managerClient, err := manager.New(context.Background(), logger, cfg.ManagerClient)

@@ -21,7 +21,7 @@ func main() {
 	cfg := config.Get()
 
 	// creating logger
-	logger := zap.NewLogger(cfg.Logger).WithFields("service", "parcels_manager_service")
+	logger := zap.NewLogger(cfg.Logger, "parcels-manager-service")
 
 	// creating store
 	store, err := pg.New(logger, cfg.DB)

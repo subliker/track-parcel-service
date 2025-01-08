@@ -14,7 +14,7 @@ import (
 var Logger logger.Logger
 
 func init() {
-	Logger = NewLogger(Config{})
+	Logger = NewLogger(Config{}, "global")
 }
 
 type zapLogger struct {
@@ -30,7 +30,7 @@ type Config struct {
 
 // NewLogger creates sugared zap logger with common config.
 // It logs into writer from params.
-func NewLogger(cfg Config) logger.Logger {
+func NewLogger(cfg Config, serviceName string) logger.Logger {
 	// making log file
 	os.MkdirAll(logDir, os.ModePerm)
 
@@ -69,13 +69,19 @@ func NewLogger(cfg Config) logger.Logger {
 			log.Fatalf("error connecting to target(%s): %s", target, err)
 		}
 		cores = append(cores, zapcore.NewCore(fileEncoder, zapcore.AddSync(conn), zapcore.DebugLevel))
-		log.Printf("connected to logs target(%s)", target)
 	}
 
 	core := zapcore.NewTee(cores...)
 
+	// make new sugared logger
+	sugaredLogger := zap.New(core).Sugar()
+	sugaredLogger = sugaredLogger.Named(serviceName)
+	if Logger != nil {
+		sugaredLogger.Infof("logger initialized with targets: %s", cfg.Targets)
+	}
+
 	return &zapLogger{
-		logger: zap.New(core).Sugar(),
+		logger: sugaredLogger,
 	}
 }
 

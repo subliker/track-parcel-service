@@ -26,18 +26,18 @@ func main() {
 	cfg := config.Get()
 
 	// creating logger
-	logger := zap.NewLogger(cfg.Logger).WithFields("service", "user_bot_service")
+	logger := zap.NewLogger(cfg.Logger, "user-bot-service")
 
 	// creating new user service client
 	userClient, err := user.New(context.Background(), logger, cfg.UserClient)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatalf("error creating new user service client: %s", err)
 	}
 
 	// creating new parcels user service client
 	parcelsUserClient, err := pu.New(context.Background(), logger, cfg.ParcelsUserClient)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatalf("error creating new parcels user service client: %s", err)
 	}
 
 	// creating lru session store
@@ -50,12 +50,12 @@ func main() {
 		// creating broker
 		broker, err := rabbitmq.New(logger, cfg.RabbitMQ)
 		if err != nil {
-			logger.Fatal(err)
+			logger.Fatalf("error creating broker: %s", err)
 		}
 		// creating delivery consumer
 		deliveryConsumer, err = delivery.NewConsumer(logger, broker.Chan())
 		if err != nil {
-			logger.Fatal(err)
+			logger.Fatalf("error creating delivery consumer: %s", err)
 		}
 	} else {
 		logger.Warn("using broker was ignored")
