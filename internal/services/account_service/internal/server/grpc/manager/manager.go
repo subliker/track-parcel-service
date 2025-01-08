@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	pb "github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

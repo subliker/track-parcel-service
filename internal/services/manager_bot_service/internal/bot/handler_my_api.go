@@ -3,9 +3,8 @@ package bot
 import (
 	"context"
 	"fmt"
-
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	tele "gopkg.in/telebot.v4"
 )
 
@@ -22,8 +21,9 @@ func (b *bot) handleMyApi() tele.HandlerFunc {
 			return fmt.Errorf("api token request ended with: %s", err)
 		}
 
-		ctx.Send(b.bundle.MyApi().Main(string(apiToken)))
-		return nil
+		mk := b.client.NewMarkup()
+		mk.Inline(mk.Row(mk.URL(b.bundle.MyApi().Btns().Docs(), b.apiTarget+"/swagger")))
+		return ctx.Send(b.bundle.MyApi().Main(string(apiToken), b.apiTarget), mk)
 	}
 }
 

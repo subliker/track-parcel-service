@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/notificationpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -28,7 +28,7 @@ type (
 // @Tags Parcels Checkpoints
 // @Accept json
 // @Produce json
-// @Param track-number path string true
+// @Param track-number path string true "Parcel's track number"
 // @Success 201 "checkpoint was added"
 // @Failure 400 {object} string
 // @Failure 500 {object} string

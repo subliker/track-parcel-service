@@ -12,8 +12,6 @@ definitions:
         type: string
       parcel_recipient:
         type: string
-      parcel_status:
-        type: string
     type: object
   api.AddParcelResponse:
     properties:
@@ -46,6 +44,34 @@ info:
   title: Parcels Manager API
   version: "1.0"
 paths:
+  /checkpoints:
+    post:
+      consumes:
+      - application/json
+      description: Add Checkpoint adds new parcel's and send event for notification
+        system
+      parameters:
+      - description: Parcel's track number
+        in: path
+        name: track-number
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: checkpoint was added
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Add Checkpoint
+      tags:
+      - Parcels Checkpoints
   /parcels:
     post:
       consumes:

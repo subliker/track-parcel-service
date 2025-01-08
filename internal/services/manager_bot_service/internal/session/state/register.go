@@ -3,10 +3,9 @@ package state
 import (
 	"context"
 	"errors"
-
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
@@ -76,6 +75,16 @@ func (r *Register) Next(
 			r.FillStep--
 			break
 		}
+
+		// check format
+		if err := validator.V.Var(text, "fullName"); err != nil {
+			// send error
+			request(errBundle.FullName(), RegisterFillStepEmpty)
+			// undo
+			r.FillStep--
+			break
+		}
+
 		// fill
 		r.Manager.FullName = text
 		// request next step
@@ -101,6 +110,9 @@ func (r *Register) Next(
 			request(fillBundle.Company(), RegisterFillStepCompany)
 			break
 		}
+
+		// delete extra symbols
+		text = model.FormatToE164(text)
 
 		// check phone number
 		if err := validator.V.Var(text, "e164"); err != nil {

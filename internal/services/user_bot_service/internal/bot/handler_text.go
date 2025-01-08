@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/session/state"
 	tele "gopkg.in/telebot.v4"
 )

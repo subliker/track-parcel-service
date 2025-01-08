@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	model "github.com/subliker/track-parcel-service/internal/pkg/model"
+	model "github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 )
 
 // MockUserRepository is a mock of UserRepository interface.

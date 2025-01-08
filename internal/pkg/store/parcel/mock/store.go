@@ -5,10 +5,10 @@
 package mock
 
 import (
+	model2 "github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	model "github.com/subliker/track-parcel-service/internal/pkg/model"
 )
 
 // MockStore is a mock of Store interface.
@@ -35,10 +35,10 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 }
 
 // Add mocks base method.
-func (m *MockStore) Add(arg0 model.Parcel) (model.TrackNumber, error) {
+func (m *MockStore) Add(arg0 model2.Parcel) (model2.TrackNumber, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", arg0)
-	ret0, _ := ret[0].(model.TrackNumber)
+	ret0, _ := ret[0].(model2.TrackNumber)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,7 +50,7 @@ func (mr *MockStoreMockRecorder) Add(arg0 interface{}) *gomock.Call {
 }
 
 // AddCheckpoint mocks base method.
-func (m *MockStore) AddCheckpoint(arg0 model.TrackNumber, arg1 model.Checkpoint) error {
+func (m *MockStore) AddCheckpoint(arg0 model2.TrackNumber, arg1 model2.Checkpoint) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddCheckpoint", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -64,7 +64,7 @@ func (mr *MockStoreMockRecorder) AddCheckpoint(arg0, arg1 interface{}) *gomock.C
 }
 
 // AddSubscription mocks base method.
-func (m *MockStore) AddSubscription(arg0 model.TrackNumber, arg1 model.TelegramID) error {
+func (m *MockStore) AddSubscription(arg0 model2.TrackNumber, arg1 model2.TelegramID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddSubscription", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -78,7 +78,7 @@ func (mr *MockStoreMockRecorder) AddSubscription(arg0, arg1 interface{}) *gomock
 }
 
 // CheckAccess mocks base method.
-func (m *MockStore) CheckAccess(arg0 model.TrackNumber, arg1 model.TelegramID) (bool, error) {
+func (m *MockStore) CheckAccess(arg0 model2.TrackNumber, arg1 model2.TelegramID) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckAccess", arg0, arg1)
 	ret0, _ := ret[0].(bool)
@@ -105,7 +105,7 @@ func (mr *MockStoreMockRecorder) Close() *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockStore) Delete(arg0 model.TrackNumber) error {
+func (m *MockStore) Delete(arg0 model2.TrackNumber) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0)
 	ret0, _ := ret[0].(error)
@@ -119,7 +119,7 @@ func (mr *MockStoreMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 }
 
 // DeleteSubscription mocks base method.
-func (m *MockStore) DeleteSubscription(arg0 model.TrackNumber, arg1 model.TelegramID) error {
+func (m *MockStore) DeleteSubscription(arg0 model2.TrackNumber, arg1 model2.TelegramID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteSubscription", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -133,7 +133,7 @@ func (mr *MockStoreMockRecorder) DeleteSubscription(arg0, arg1 interface{}) *gom
 }
 
 // Exists mocks base method.
-func (m *MockStore) Exists(arg0 model.TrackNumber) (bool, error) {
+func (m *MockStore) Exists(arg0 model2.TrackNumber) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Exists", arg0)
 	ret0, _ := ret[0].(bool)
@@ -148,10 +148,10 @@ func (mr *MockStoreMockRecorder) Exists(arg0 interface{}) *gomock.Call {
 }
 
 // GetCheckpoints mocks base method.
-func (m *MockStore) GetCheckpoints(trackNum model.TrackNumber, page, pageSize uint64) ([]*model.Checkpoint, error) {
+func (m *MockStore) GetCheckpoints(trackNum model2.TrackNumber, page, pageSize uint64) ([]*model2.Checkpoint, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCheckpoints", trackNum, page, pageSize)
-	ret0, _ := ret[0].([]*model.Checkpoint)
+	ret0, _ := ret[0].([]*model2.Checkpoint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -163,10 +163,10 @@ func (mr *MockStoreMockRecorder) GetCheckpoints(trackNum, page, pageSize interfa
 }
 
 // GetInfo mocks base method.
-func (m *MockStore) GetInfo(arg0 model.TrackNumber) (model.Parcel, error) {
+func (m *MockStore) GetInfo(arg0 model2.TrackNumber) (model2.Parcel, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetInfo", arg0)
-	ret0, _ := ret[0].(model.Parcel)
+	ret0, _ := ret[0].(model2.Parcel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -178,7 +178,7 @@ func (mr *MockStoreMockRecorder) GetInfo(arg0 interface{}) *gomock.Call {
 }
 
 // GetSubscribed mocks base method.
-func (m *MockStore) GetSubscribed(arg0 model.TrackNumber, arg1 model.TelegramID) (bool, error) {
+func (m *MockStore) GetSubscribed(arg0 model2.TrackNumber, arg1 model2.TelegramID) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSubscribed", arg0, arg1)
 	ret0, _ := ret[0].(bool)
@@ -193,10 +193,10 @@ func (mr *MockStoreMockRecorder) GetSubscribed(arg0, arg1 interface{}) *gomock.C
 }
 
 // ParcelSubscribers mocks base method.
-func (m *MockStore) ParcelSubscribers(arg0 model.TrackNumber) ([]model.TelegramID, error) {
+func (m *MockStore) ParcelSubscribers(arg0 model2.TrackNumber) ([]model2.TelegramID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ParcelSubscribers", arg0)
-	ret0, _ := ret[0].([]model.TelegramID)
+	ret0, _ := ret[0].([]model2.TelegramID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/user"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/userpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"

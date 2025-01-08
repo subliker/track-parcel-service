@@ -22,6 +22,7 @@ type Bot interface {
 type bot struct {
 	client       *tele.Bot
 	bundle       lang.Messages
+	apiTarget    string
 	sessionStore session.Store
 
 	managerClient        manager.Client
@@ -52,6 +53,9 @@ func New(logger logger.Logger, opts BotOptions) Bot {
 		logger.Fatalf("error building bot: %s", err)
 	}
 	b.client = client
+
+	// set api address
+	b.apiTarget = opts.Cfg.APITarget
 
 	// set manager client
 	b.managerClient = opts.ManagerClient

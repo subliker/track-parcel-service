@@ -2,12 +2,12 @@ package lru
 
 import (
 	"errors"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"sync"
 	"time"
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 )
 

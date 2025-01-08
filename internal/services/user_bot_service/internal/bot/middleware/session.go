@@ -3,8 +3,8 @@ package middleware
 import (
 	"fmt"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/logger"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/services/user_bot_service/internal/lang"
 	tele "gopkg.in/telebot.v4"

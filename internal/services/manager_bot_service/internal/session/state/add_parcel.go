@@ -5,16 +5,16 @@ import (
 	"time"
 
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/pm"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/session"
 	"github.com/subliker/track-parcel-service/internal/pkg/validator"
 	"github.com/subliker/track-parcel-service/internal/services/manager_bot_service/internal/lang"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// MakeParcel is state to request parcel data to create one
+// AddParcel is state to request parcel data to create one
 type AddParcel struct {
 	Parcel   model.Parcel
 	FillStep AddParcelFillStep

@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	model2 "github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
-func (s *store) CheckAccess(trackNum model.TrackNumber, tID model.TelegramID) (bool, error) {
+func (s *store) CheckAccess(trackNum model2.TrackNumber, tID model2.TelegramID) (bool, error) {
 	p, err := s.GetInfo(trackNum)
 	if err != nil {
 		return false, err
@@ -18,14 +18,14 @@ func (s *store) CheckAccess(trackNum model.TrackNumber, tID model.TelegramID) (b
 	return p.ManagerID == tID, nil
 }
 
-func (s *store) Add(p model.Parcel) (model.TrackNumber, error) {
+func (s *store) Add(p model2.Parcel) (model2.TrackNumber, error) {
 	logger := s.logger.WithFields("command", "add")
 
 	// making query builder
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 	// generating track number
-	trackNum := model.NewTrackNumber()
+	trackNum := model2.NewTrackNumber()
 
 	// build query
 	query, args, err := psql.Insert("parcels").
@@ -49,7 +49,7 @@ func (s *store) Add(p model.Parcel) (model.TrackNumber, error) {
 	return trackNum, nil
 }
 
-func (s *store) Delete(trackNum model.TrackNumber) error {
+func (s *store) Delete(trackNum model2.TrackNumber) error {
 	logger := s.logger.WithFields("command", "delete")
 
 	// making query builder
@@ -87,11 +87,11 @@ func (s *store) Delete(trackNum model.TrackNumber) error {
 	return nil
 }
 
-func (s *store) GetInfo(trackNum model.TrackNumber) (model.Parcel, error) {
+func (s *store) GetInfo(trackNum model2.TrackNumber) (model2.Parcel, error) {
 	logger := s.logger.WithFields("command", "get info")
 
 	// making parcel struct
-	var p model.Parcel
+	var p model2.Parcel
 
 	// making query builder
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
@@ -138,7 +138,7 @@ func (s *store) GetInfo(trackNum model.TrackNumber) (model.Parcel, error) {
 	return p, nil
 }
 
-func (s *store) Exists(trackNum model.TrackNumber) (bool, error) {
+func (s *store) Exists(trackNum model2.TrackNumber) (bool, error) {
 	logger := s.logger.WithFields("command", "exists")
 
 	// making query builder

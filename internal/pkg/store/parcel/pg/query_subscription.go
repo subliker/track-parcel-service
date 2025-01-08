@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	model2 "github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
-func (s *store) AddSubscription(trackNum model.TrackNumber, userTID model.TelegramID) error {
+func (s *store) AddSubscription(trackNum model2.TrackNumber, userTID model2.TelegramID) error {
 	logger := s.logger.WithFields("command", "add subscription")
 
 	// making query builder
@@ -44,7 +44,7 @@ func (s *store) AddSubscription(trackNum model.TrackNumber, userTID model.Telegr
 	return nil
 }
 
-func (s *store) DeleteSubscription(trackNum model.TrackNumber, userTID model.TelegramID) error {
+func (s *store) DeleteSubscription(trackNum model2.TrackNumber, userTID model2.TelegramID) error {
 	logger := s.logger.WithFields("command", "delete subscription")
 
 	// making query builder
@@ -82,7 +82,7 @@ func (s *store) DeleteSubscription(trackNum model.TrackNumber, userTID model.Tel
 	return nil
 }
 
-func (s *store) ParcelSubscribers(trackNum model.TrackNumber) ([]model.TelegramID, error) {
+func (s *store) ParcelSubscribers(trackNum model2.TrackNumber) ([]model2.TelegramID, error) {
 	logger := s.logger.WithFields("command", "getting parcels subscribers")
 
 	// making query builder
@@ -108,11 +108,11 @@ func (s *store) ParcelSubscribers(trackNum model.TrackNumber) ([]model.TelegramI
 	}
 
 	// making subscribers array
-	sbs := make([]model.TelegramID, 0)
+	sbs := make([]model2.TelegramID, 0)
 
 	// rows appending
 	for rows.Next() {
-		var userTID model.TelegramID
+		var userTID model2.TelegramID
 		if err := rows.Scan(&userTID); err != nil {
 			errMsg := fmt.Errorf("failed to scan row: %s", err)
 			logger.Error(errMsg)
@@ -130,7 +130,7 @@ func (s *store) ParcelSubscribers(trackNum model.TrackNumber) ([]model.TelegramI
 	return sbs, nil
 }
 
-func (s *store) GetSubscribed(trackNum model.TrackNumber, userTID model.TelegramID) (bool, error) {
+func (s *store) GetSubscribed(trackNum model2.TrackNumber, userTID model2.TelegramID) (bool, error) {
 	logger := s.logger.WithFields("command", "get info for user")
 
 	// making query builder

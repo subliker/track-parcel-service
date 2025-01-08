@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 )
 
 //go:generate mockgen -source=repository.go -destination=mock/repository.go -package=mock

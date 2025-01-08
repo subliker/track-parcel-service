@@ -19,6 +19,47 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/checkpoints": {
+            "post": {
+                "description": "Add Checkpoint adds new parcel's and send event for notification system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Parcels Checkpoints"
+                ],
+                "summary": "Add Checkpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Parcel's track number",
+                        "name": "track-number",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "checkpoint was added"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/parcels": {
             "post": {
                 "description": "Add Parcel adds new manager's parcel and returns unique parcel track number.",
@@ -172,9 +213,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parcel_recipient": {
-                    "type": "string"
-                },
-                "parcel_status": {
                     "type": "string"
                 }
             }

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/parcelpb"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/pmpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

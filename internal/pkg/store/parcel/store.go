@@ -1,7 +1,7 @@
 package parcel
 
 import (
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	model2 "github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 )
 
 // Store is interface for accessing parcels store
@@ -9,29 +9,29 @@ import (
 //go:generate mockgen -source=store.go -destination=mock/store.go -package=mock
 type Store interface {
 	// CheckAccess checks whether the package belongs to the manager
-	CheckAccess(model.TrackNumber, model.TelegramID) (bool, error)
+	CheckAccess(model2.TrackNumber, model2.TelegramID) (bool, error)
 	// Add adds parcel in store
-	Add(model.Parcel) (model.TrackNumber, error)
+	Add(model2.Parcel) (model2.TrackNumber, error)
 	// Delete deletes parcel from store by track number
-	Delete(model.TrackNumber) error
+	Delete(model2.TrackNumber) error
 	// GetInfo returns parcel info from store by track number
-	GetInfo(model.TrackNumber) (model.Parcel, error)
+	GetInfo(model2.TrackNumber) (model2.Parcel, error)
 	// GetSubscribed returns true if user with telegram id if subscribed on parcel with track number
-	GetSubscribed(model.TrackNumber, model.TelegramID) (bool, error)
+	GetSubscribed(model2.TrackNumber, model2.TelegramID) (bool, error)
 	// Exists checks if parcel with track number exists in store
-	Exists(model.TrackNumber) (bool, error)
+	Exists(model2.TrackNumber) (bool, error)
 
 	// AddCheckpoint adds checkpoint in store for parcel with track number
-	AddCheckpoint(model.TrackNumber, model.Checkpoint) error
+	AddCheckpoint(model2.TrackNumber, model2.Checkpoint) error
 	// GetCheckpoints returns parcel's with track number checkpoints from store with pagination
-	GetCheckpoints(trackNum model.TrackNumber, page uint64, pageSize uint64) ([]*model.Checkpoint, error)
+	GetCheckpoints(trackNum model2.TrackNumber, page uint64, pageSize uint64) ([]*model2.Checkpoint, error)
 
 	// AddSubscription adds user's with telegram id subscription for parcel with track number in store
-	AddSubscription(model.TrackNumber, model.TelegramID) error
+	AddSubscription(model2.TrackNumber, model2.TelegramID) error
 	// DeleteSubscription removes user's with telegram id subscription for parcel with track number from store
-	DeleteSubscription(model.TrackNumber, model.TelegramID) error
+	DeleteSubscription(model2.TrackNumber, model2.TelegramID) error
 	// ParcelSubscribers returns array of user's telegram id subscribed for parcel with track number
-	ParcelSubscribers(model.TrackNumber) ([]model.TelegramID, error)
+	ParcelSubscribers(model2.TrackNumber) ([]model2.TelegramID, error)
 
 	// Close closes store
 	Close() error

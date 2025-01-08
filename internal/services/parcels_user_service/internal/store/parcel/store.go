@@ -1,6 +1,6 @@
 package parcel
 
-import "github.com/subliker/track-parcel-service/internal/pkg/model"
+import "github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 
 type UserStore interface {
 	GetInfo(model.TrackNumber) (model.Parcel, error)

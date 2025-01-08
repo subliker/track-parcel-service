@@ -21,8 +21,9 @@ type Config struct {
 }
 
 type BotConfig struct {
-	Token    string `validate:"required" mapstructure:"token"`
-	Language string `validate:"required" mapstructure:"language"`
+	Token     string `validate:"required" mapstructure:"token"`
+	APITarget string `validate:"required" mapstructure:"apitarget"`
+	Language  string `validate:"required" mapstructure:"language"`
 }
 
 func init() {
@@ -32,6 +33,7 @@ func init() {
 	viper.SetDefault("logger.targets", []string{})
 
 	viper.BindEnv("bot.token")
+	viper.SetDefault("bot.apitarget", "http://example.com:8080/api/v1")
 	viper.SetDefault("bot.language", "ru-RU")
 
 	viper.SetDefault("session.count", 1024)

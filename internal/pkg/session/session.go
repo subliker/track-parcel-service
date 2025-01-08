@@ -1,7 +1,7 @@
 package session
 
 import (
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 )
 
 type Store interface {

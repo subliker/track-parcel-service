@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/services/account_service/internal/store"
 )
 

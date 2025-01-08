@@ -3,8 +3,8 @@ package dispatcher
 import (
 	"context"
 
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/notificationpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 )
 
 // handleEvents catches event messages from event consumer and sends notifications to subscribers.

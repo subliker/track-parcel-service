@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	tele "gopkg.in/telebot.v4"
 )
 

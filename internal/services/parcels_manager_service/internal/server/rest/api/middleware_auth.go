@@ -6,8 +6,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/subliker/track-parcel-service/internal/pkg/client/grpc/account/manager"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/gen/account/managerpb"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 )
 
 type contextKey uint

@@ -2,10 +2,10 @@ package pg
 
 import (
 	"fmt"
+	"github.com/subliker/track-parcel-service/internal/pkg/domain/model"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
-	"github.com/subliker/track-parcel-service/internal/pkg/model"
 	"github.com/subliker/track-parcel-service/internal/pkg/store/parcel"
 )
 
